@@ -1,0 +1,135 @@
+"use client";
+
+import { useState, useRef, useEffect } from "react";
+import Link from "next/link";
+import { useAuth } from "../context/AuthContext";
+
+export default function Navbar({ onMenuClick }: { onMenuClick?: () => void }) {
+  const { user, loading, logout } = useAuth();
+  const [search, setSearch] = useState("");
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handle = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handle);
+    return () => document.removeEventListener("mousedown", handle);
+  }, []);
+
+  const initials = user?.name
+    ? user.name.trim().split(" ").map((w) => w[0]).join("").slice(0, 2).toUpperCase()
+    : "؟";
+  const isPro = user?.plan === "pro" || user?.plan === "enterprise" || user?.plan === "admin";
+
+  return (
+    <header
+      className="fixed top-0 right-0 lg:right-64 left-0 z-30 flex items-center gap-3 px-4 lg:px-6"
+      style={{
+        background: "rgba(137,87,246,0.07)",
+        backdropFilter: "blur(16px)",
+        WebkitBackdropFilter: "blur(16px)",
+        borderBottom: "1px solid rgba(137,87,246,0.15)",
+        height: "64px",
+      }}
+    >
+      {/* Mobile hamburger */}
+      <button onClick={onMenuClick}
+        className="lg:hidden p-2 rounded-lg transition-colors"
+        style={{ color: "#6b7280" }}>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+        </svg>
+      </button>
+
+      {/* Logo mobile */}
+      <Link href="/" className="lg:hidden flex items-center gap-2 shrink-0">
+        <div className="w-8 h-8 rounded-lg flex items-center justify-center text-xs font-black"
+          style={{ background: "#84cc18", color: "#fff" }}>AV</div>
+        <span className="font-black text-sm" style={{ color: "#1c1c1e" }}>AdVault</span>
+      </Link>
+
+      {/* Logo desktop */}
+      <Link href="/" className="hidden lg:flex items-center gap-3 shrink-0 min-w-0">
+        <div className="min-w-0">
+          <p className="font-black text-base leading-tight whitespace-nowrap" style={{ color: "#1c1c1e" }}>
+            AdVault <span style={{ color: "#84cc18" }}>MENA</span>
+          </p>
+          <p className="text-xs whitespace-nowrap" style={{ color: "#6b7280" }}>ذكاء إعلاني استراتيجي</p>
+        </div>
+      </Link>
+
+      {/* Search */}
+      <div className="flex-1 min-w-0 mx-2">
+        <div className="flex items-center gap-2 px-3 py-2 rounded-xl w-full"
+          style={{ background: "rgba(255,255,255,0.7)", border: "1px solid rgba(137,87,246,0.15)" }}>
+          <svg className="shrink-0" width="15" height="15" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" strokeWidth="2" style={{ color: "#9ca3af" }}>
+            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+          </svg>
+          <input type="text" value={search} onChange={(e) => setSearch(e.target.value)}
+            placeholder="ابحث عن استراتيجية أو قطاع أو براند..."
+            className="bg-transparent outline-none w-full min-w-0 text-sm placeholder:text-[#9ca3af]"
+            style={{ color: "#1c1c1e" }} dir="rtl" />
+        </div>
+      </div>
+
+      {/* Actions */}
+      <div className="flex items-center gap-2 shrink-0">
+        {/* Not logged in → show login button */}
+        {!loading && !user && (
+          <Link href="/login"
+            className="hidden sm:flex px-4 py-2 rounded-xl text-sm font-semibold border transition-all hover:border-[#84cc18]/40"
+            style={{ borderColor: "#e5e7eb", color: "#1c1c1e" }}>
+            دخول
+          </Link>
+        )}
+
+        {/* Free user → show upgrade button */}
+        {!loading && user && !isPro && (
+          <Link href="/pricing"
+            className="px-4 py-2 rounded-xl text-sm font-bold transition-all hover:opacity-90"
+            style={{ background: "#8957f6", color: "#fff", boxShadow: "0 2px 12px rgba(137,87,246,0.2)" }}>
+            ترقية Pro +
+          </Link>
+        )}
+
+        {/* Logged in → avatar + dropdown */}
+        {!loading && user && (
+          <div className="relative" ref={dropdownRef}>
+            <button
+              onClick={() => setDropdownOpen(!dropdownOpen)}
+              className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold text-white cursor-pointer shrink-0 hover:opacity-90 transition-all"
+              style={{ background: "#8957f6" }}>
+              {initials}
+            </button>
+            {dropdownOpen && (
+              <div className="absolute top-full mt-2 left-0 w-44 rounded-xl border shadow-lg overflow-hidden z-50"
+                style={{ background: "#ffffff", borderColor: "#e5e7eb" }}>
+                <Link href="/profile" onClick={() => setDropdownOpen(false)}
+                  className="flex items-center gap-2.5 px-4 py-3 text-sm hover:bg-gray-50 transition-colors"
+                  style={{ color: "#1c1c1e" }}>
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+                  </svg>
+                  حسابي
+                </Link>
+                <button onClick={() => { logout(); setDropdownOpen(false); }}
+                  className="w-full flex items-center gap-2.5 px-4 py-3 text-sm hover:bg-gray-50 transition-colors text-right"
+                  style={{ color: "#ef4444" }}>
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
+                  </svg>
+                  تسجيل الخروج
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </header>
+  );
+}
