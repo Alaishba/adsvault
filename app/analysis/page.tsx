@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 import AppLayout from "../components/AppLayout";
 import FilterBar from "../components/FilterBar";
 import { useAuth } from "../context/AuthContext";
 import { mockStrategies, type Strategy } from "../lib/mockData";
+import { fetchStrategies } from "../lib/db";
 
 const filterConfigs = [
   { key: "sector", label: "القطاع", options: ["مطاعم", "أزياء رياضية", "خدمات مالية", "تجارة إلكترونية", "اتصالات"] },
@@ -93,6 +94,9 @@ export default function AnalysisPage() {
   const isPro = user?.plan === "pro" || user?.plan === "enterprise" || user?.plan === "admin";
   const [selected, setSelected] = useState<Strategy | null>(null);
   const [activeFilters, setActiveFilters] = useState<Record<string, string>>({});
+  const [allStrategies, setAllStrategies] = useState<Strategy[]>(mockStrategies);
+
+  useEffect(() => { fetchStrategies().then(setAllStrategies); }, []);
 
   const handleFilterChange = (key: string, value: string | null) => {
     setActiveFilters((prev) => {
@@ -104,12 +108,12 @@ export default function AnalysisPage() {
   };
 
   const filtered = useMemo(() => {
-    return mockStrategies.filter((s) => {
+    return allStrategies.filter((s) => {
       if (activeFilters.sector && s.sector !== activeFilters.sector) return false;
       if (activeFilters.tag && !s.tags.includes(activeFilters.tag)) return false;
       return true;
     });
-  }, [activeFilters]);
+  }, [allStrategies, activeFilters]);
 
   return (
     <AppLayout>

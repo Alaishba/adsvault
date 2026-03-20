@@ -93,5 +93,22 @@ B2B AdTech platform for MENA region.
 ## Scripts
 - `npm run build` | `npm run dev` | `npm run dev:clean` | `npm test`
 
-## Mock data fallback
-All data fetches fall back to `app/lib/mockData.ts` when Supabase tables are empty or unconfigured.
+## Data Fetching
+- All public pages (/, /library, /analysis, /influencers) fetch from Supabase via `app/lib/db.ts`
+- Falls back to `app/lib/mockData.ts` when Supabase tables are empty or unconfigured
+- `isSupabaseConfigured()` guards all Supabase calls — returns false when env vars are missing/placeholder
+- Admin CRUD pages use local state + Supabase when configured
+
+## Auth Flow
+- Register: `supabase.auth.signUp()` + INSERT into public `users` table (plan: "free")
+- Login: `supabase.auth.signInWithPassword()` → redirect to /
+- Logout: `supabase.auth.signOut()` + clear state + redirect to /
+- Payment: mock flow → UPDATE `users.plan` in Supabase after success
+- Profile save: UPDATE `users.full_name` + `avatar_url` in Supabase
+
+## Last Audit (2026-03-21)
+29 bugs found and fixed:
+- 5 critical (register profile insert, payment plan update, profile save, logout redirect)
+- 6 high (stale dark mode classes, broken CSS vars)
+- 9 medium (forms not submitting to Supabase, avatar not persisting)
+- 9 lower (pages using only mock data — now all fetch from Supabase first)

@@ -6,7 +6,8 @@ import AppLayout from "./components/AppLayout";
 import AdCard from "./components/AdCard";
 import AdModal from "./components/AdModal";
 import PlatformBadge from "./components/PlatformBadge";
-import { mockAds, mockStrategies, type Ad } from "./lib/mockData";
+import { mockAds, mockStrategies, type Ad, type Strategy } from "./lib/mockData";
+import { fetchAds, fetchStrategies } from "./lib/db";
 
 /* ─── Animated counter hook ─── */
 function useCountUp(target: number, duration = 1500) {
@@ -98,6 +99,13 @@ function StatCard({ stat }: { stat: typeof statsData[0] }) {
 
 export default function HomePage() {
   const [selectedAd, setSelectedAd] = useState<Ad | null>(null);
+  const [ads, setAds] = useState<Ad[]>(mockAds);
+  const [strategies, setStrategies] = useState<Strategy[]>(mockStrategies);
+
+  useEffect(() => {
+    fetchAds().then(setAds);
+    fetchStrategies().then(setStrategies);
+  }, []);
 
   return (
     <AppLayout>
@@ -181,7 +189,7 @@ export default function HomePage() {
           </Link>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
-          {mockAds.map((ad) => <AdCard key={ad.id} ad={ad} onClick={setSelectedAd} />)}
+          {ads.map((ad) => <AdCard key={ad.id} ad={ad} onClick={setSelectedAd} />)}
         </div>
       </section>
 
@@ -197,7 +205,7 @@ export default function HomePage() {
           </Link>
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-          {mockStrategies.map((s) => (
+          {strategies.map((s) => (
             <Link key={s.id} href="/analysis"
               className="card-base card-hover overflow-hidden group p-0">
               <div className="w-full h-36 flex items-center justify-center" style={{ background: "#0f0f0f" }}>

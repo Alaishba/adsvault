@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import AppLayout from "../components/AppLayout";
 import PlatformBadge from "../components/PlatformBadge";
 import { mockInfluencers, type Influencer, type Platform } from "../lib/mockData";
+import { fetchInfluencers } from "../lib/db";
 
 function InfluencerModal({ inf, onClose }: { inf: Influencer; onClose: () => void }) {
   const [tab, setTab] = useState<"info" | "contact">("info");
@@ -37,14 +38,14 @@ function InfluencerModal({ inf, onClose }: { inf: Influencer; onClose: () => voi
               {inf.initial}
             </div>
             <div>
-              <h2 className="text-lg font-extrabold text-[--text]">{inf.name}</h2>
-              <p className="text-sm text-[--text-muted]">{inf.category} · {inf.country}</p>
+              <h2 className="text-lg font-extrabold text-[#1c1c1e]">{inf.name}</h2>
+              <p className="text-sm text-[#6b7280]">{inf.category} · {inf.country}</p>
               <div className="flex gap-1 mt-1">
                 {inf.platforms.map((p) => <PlatformBadge key={p} platform={p as Platform} />)}
               </div>
             </div>
           </div>
-          <button onClick={onClose} className="w-8 h-8 rounded-full flex items-center justify-center text-[--text-muted] hover:bg-[--surface2] transition-colors">
+          <button onClick={onClose} className="w-8 h-8 rounded-full flex items-center justify-center text-[#6b7280] hover:bg-[--surface2] transition-colors">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M18 6 6 18M6 6l12 12"/></svg>
           </button>
         </div>
@@ -69,31 +70,31 @@ function InfluencerModal({ inf, onClose }: { inf: Influencer; onClose: () => voi
             <div className="grid grid-cols-2 gap-3">
               <div className="p-3 rounded-xl bg-[--surface2] text-center">
                 <p className="text-xl font-extrabold" style={{ color: "#84cc18" }}>{inf.followers}</p>
-                <p className="text-xs text-[--text-muted]">متابع</p>
+                <p className="text-xs text-[#6b7280]">متابع</p>
               </div>
               <div className="p-3 rounded-xl bg-[--surface2] text-center">
                 <p className="text-xl font-extrabold" style={{ color: "#84cc18" }}>{inf.engagement}</p>
-                <p className="text-xs text-[--text-muted]">معدل التفاعل</p>
+                <p className="text-xs text-[#6b7280]">معدل التفاعل</p>
               </div>
             </div>
 
             {/* Bio */}
             <div>
-              <p className="text-xs font-bold text-[--text] mb-1">نبذة</p>
-              <p className="text-sm text-[--text-muted] leading-relaxed">{inf.bio}</p>
+              <p className="text-xs font-bold text-[#1c1c1e] mb-1">نبذة</p>
+              <p className="text-sm text-[#6b7280] leading-relaxed">{inf.bio}</p>
             </div>
 
             {/* Audience age */}
             <div>
-              <p className="text-xs font-bold text-[--text] mb-2">توزيع الجمهور حسب العمر</p>
+              <p className="text-xs font-bold text-[#1c1c1e] mb-2">توزيع الجمهور حسب العمر</p>
               <div className="space-y-2">
                 {inf.audienceAge.map((a) => (
                   <div key={a.label} className="flex items-center gap-3">
-                    <span className="text-xs text-[--text-muted] w-12 text-left">{a.label}</span>
+                    <span className="text-xs text-[#6b7280] w-12 text-left">{a.label}</span>
                     <div className="flex-1 h-2 rounded-full bg-[--surface2] overflow-hidden">
                       <div className="h-full rounded-full transition-all" style={{ width: `${a.pct}%`, background: "#84cc18" }} />
                     </div>
-                    <span className="text-xs text-[--text-muted] w-8">{a.pct}%</span>
+                    <span className="text-xs text-[#6b7280] w-8">{a.pct}%</span>
                   </div>
                 ))}
               </div>
@@ -102,15 +103,15 @@ function InfluencerModal({ inf, onClose }: { inf: Influencer; onClose: () => voi
             {/* Audience country */}
             {inf.audienceCountry && inf.audienceCountry.length > 0 && (
               <div>
-                <p className="text-xs font-bold text-[--text] mb-2">توزيع الجمهور حسب البلد</p>
+                <p className="text-xs font-bold text-[#1c1c1e] mb-2">توزيع الجمهور حسب البلد</p>
                 <div className="space-y-2">
                   {inf.audienceCountry.map((a) => (
                     <div key={a.label} className="flex items-center gap-3">
-                      <span className="text-xs text-[--text-muted] w-16">{a.label}</span>
+                      <span className="text-xs text-[#6b7280] w-16">{a.label}</span>
                       <div className="flex-1 h-2 rounded-full bg-[--surface2] overflow-hidden">
                         <div className="h-full rounded-full transition-all" style={{ width: `${a.pct}%`, background: "#3b82f6" }} />
                       </div>
-                      <span className="text-xs text-[--text-muted] w-8">{a.pct}%</span>
+                      <span className="text-xs text-[#6b7280] w-8">{a.pct}%</span>
                     </div>
                   ))}
                 </div>
@@ -120,7 +121,7 @@ function InfluencerModal({ inf, onClose }: { inf: Influencer; onClose: () => voi
             {/* Strengths/Weaknesses */}
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <p className="text-xs font-bold text-[--text] mb-2">نقاط قوة</p>
+                <p className="text-xs font-bold text-[#1c1c1e] mb-2">نقاط قوة</p>
                 <div className="flex flex-wrap gap-1">
                   {inf.strengths.map((s) => (
                     <span key={s} className="px-2 py-0.5 text-xs rounded-full font-medium" style={{ background: "#f0faf0", color: "#15803d" }}>{s}</span>
@@ -128,7 +129,7 @@ function InfluencerModal({ inf, onClose }: { inf: Influencer; onClose: () => voi
                 </div>
               </div>
               <div>
-                <p className="text-xs font-bold text-[--text] mb-2">نقاط ضعف</p>
+                <p className="text-xs font-bold text-[#1c1c1e] mb-2">نقاط ضعف</p>
                 <div className="flex flex-wrap gap-1">
                   {inf.weaknesses.map((w) => (
                     <span key={w} className="px-2 py-0.5 text-xs rounded-full font-medium" style={{ background: "#fef2f2", color: "#b91c1c" }}>{w}</span>
@@ -214,17 +215,20 @@ function InfluencerModal({ inf, onClose }: { inf: Influencer; onClose: () => voi
 
 export default function InfluencersPage() {
   const [selected, setSelected] = useState<Influencer | null>(null);
+  const [influencers, setInfluencers] = useState<Influencer[]>(mockInfluencers);
+
+  useEffect(() => { fetchInfluencers().then(setInfluencers); }, []);
 
   return (
     <AppLayout>
       <div className="px-6 lg:px-10 py-8">
         <div className="mb-7">
-          <h1 className="text-2xl font-extrabold text-[--text]">المؤثرون</h1>
-          <p className="text-sm text-[--text-muted] mt-1">اكتشف أبرز المؤثرين في المنطقة العربية وحلّل أداءهم</p>
+          <h1 className="text-2xl font-extrabold text-[#1c1c1e]">المؤثرون</h1>
+          <p className="text-sm text-[#6b7280] mt-1">اكتشف أبرز المؤثرين في المنطقة العربية وحلّل أداءهم</p>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
-          {mockInfluencers.map((inf) => (
+          {influencers.map((inf) => (
             <div
               key={inf.id}
               onClick={() => setSelected(inf)}
@@ -241,7 +245,7 @@ export default function InfluencersPage() {
                 </div>
                 <div>
                   <p className="font-bold text-sm transition-colors group-hover:text-[#84cc18]" style={{ color: "#1c1c1e" }}>{inf.name}</p>
-                  <p className="text-xs text-[--text-muted]">{inf.category} · {inf.country}</p>
+                  <p className="text-xs text-[#6b7280]">{inf.category} · {inf.country}</p>
                 </div>
               </div>
 
@@ -254,12 +258,12 @@ export default function InfluencersPage() {
               <div className="flex gap-3 mb-4 pb-4 border-b border-[--border]">
                 <div>
                   <p className="text-base font-extrabold" style={{ color: "#84cc18" }}>{inf.followers}</p>
-                  <p className="text-xs text-[--text-muted]">متابع</p>
+                  <p className="text-xs text-[#6b7280]">متابع</p>
                 </div>
                 <div className="w-px bg-[--border]" />
                 <div>
                   <p className="text-base font-extrabold" style={{ color: "#84cc18" }}>{inf.engagement}</p>
-                  <p className="text-xs text-[--text-muted]">تفاعل</p>
+                  <p className="text-xs text-[#6b7280]">تفاعل</p>
                 </div>
               </div>
 

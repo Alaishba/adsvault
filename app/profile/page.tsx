@@ -7,6 +7,7 @@ import AdCard from "../components/AdCard";
 import AdModal from "../components/AdModal";
 import { useAuth } from "../context/AuthContext";
 import { uploadFile } from "../lib/storage";
+import { supabase, isSupabaseConfigured } from "../lib/supabase";
 import { mockAds, mockStrategies, type Ad } from "../lib/mockData";
 
 const tabs = [
@@ -48,12 +49,38 @@ export default function ProfilePage() {
     const file = e.target.files?.[0];
     if (!file) return;
     setUploading(true);
-    const { url } = await uploadFile("user-avatars", file, `${user?.id ?? "anon"}-avatar`);
-    if (url) setAvatarUrl(url);
+    try {
+      const { url, error } = await uploadFile("user-avatars", file, `${user?.id ?? "anon"}-avatar`);
+      if (error) throw new Error(error);
+      if (url) {
+        setAvatarUrl(url);
+        // Persist avatar URL to Supabase
+        if (isSupabaseConfigured() && user?.id) {
+          await supabase.from("users").update({ avatar_url: url }).eq("id", user.id);
+        }
+      }
+    } catch { /* silent */ }
     setUploading(false);
   };
 
-  const handleSaveInfo = () => { setSaved(false); setTimeout(() => setSaved(true), 2000); };
+  const [saveError, setSaveError] = useState<string | null>(null);
+
+  const handleSaveInfo = async () => {
+    setSaved(false);
+    setSaveError(null);
+    try {
+      if (isSupabaseConfigured() && user?.id) {
+        const { error } = await supabase.from("users").update({
+          full_name: name,
+        }).eq("id", user.id);
+        if (error) throw error;
+      }
+      setTimeout(() => setSaved(true), 1500);
+    } catch (err: unknown) {
+      setSaveError(err instanceof Error ? err.message : "حدث خطأ في حفظ البيانات");
+      setSaved(true);
+    }
+  };
 
   const inputStyle = { background: "#ffffff", border: "1px solid #e5e7eb", color: "#1c1c1e" };
 
@@ -153,8 +180,8 @@ export default function ProfilePage() {
             </div>
             <button onClick={handleSaveInfo}
               className="mt-5 px-6 py-2.5 rounded-xl font-bold text-sm text-white hover:opacity-90 transition-all"
-              style={{ background: saved ? "#84cc18" : "#84cc18" }}>
-              {saved ? "حفظ التغييرات" : "✓ تم الحفظ"}
+              style={{ background: saved ? "#84cc18" : "#059669" }}>
+              {saved ? "حفظ التغييرات" : "✓ جارٍ الحفظ..."}
             </button>
           </div>
         )}

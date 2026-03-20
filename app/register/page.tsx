@@ -25,12 +25,22 @@ export default function RegisterPage() {
         window.location.href = "/";
         return;
       }
-      const { error } = await supabase.auth.signUp({
+      const { data: authData, error } = await supabase.auth.signUp({
         email,
         password,
         options: { data: { full_name: fullName } },
       });
       if (error) throw error;
+      // Insert profile into public users table
+      if (authData.user) {
+        await supabase.from("users").upsert({
+          id: authData.user.id,
+          email,
+          full_name: fullName,
+          plan: "free",
+          created_at: new Date().toISOString(),
+        });
+      }
       setSuccess(true);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "حدث خطأ، حاول مجدداً");
@@ -75,7 +85,7 @@ export default function RegisterPage() {
           </p>
         </div>
 
-        <div className="bg-white dark:bg-[#141414] rounded-2xl border border-[--border] p-6">
+        <div className="bg-white rounded-2xl border border-[--border] p-6">
           <form onSubmit={handleRegister} className="space-y-4">
             <div>
               <label className="block text-sm font-semibold mb-1.5" style={{ color: "var(--text-primary)" }}>

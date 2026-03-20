@@ -1,12 +1,13 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import AppLayout from "../components/AppLayout";
 import AdCard from "../components/AdCard";
 import AdModal from "../components/AdModal";
 import FilterBar from "../components/FilterBar";
 import { SkeletonList } from "../components/Skeleton";
 import { mockAds, type Ad } from "../lib/mockData";
+import { fetchAds } from "../lib/db";
 
 const filterConfigs = [
   { key: "sector", label: "القطاع", options: ["تجزئة", "اتصالات", "تجارة إلكترونية", "مواد استهلاكية"] },
@@ -22,10 +23,15 @@ const sortOptions = [
 ];
 
 export default function LibraryPage() {
+  const [ads, setAds] = useState<Ad[]>(mockAds);
   const [selectedAd, setSelectedAd] = useState<Ad | null>(null);
   const [activeFilters, setActiveFilters] = useState<Record<string, string>>({});
   const [sort, setSort] = useState("newest");
-  const [loading] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchAds().then((data) => { setAds(data); setLoading(false); });
+  }, []);
 
   const handleFilterChange = (key: string, value: string | null) => {
     setActiveFilters((prev) => {
@@ -37,18 +43,17 @@ export default function LibraryPage() {
   };
 
   const filtered = useMemo(() => {
-    return mockAds.filter((ad) => {
+    return ads.filter((ad) => {
       if (activeFilters.sector && ad.sector !== activeFilters.sector) return false;
       if (activeFilters.platform && ad.platform !== activeFilters.platform) return false;
       if (activeFilters.country && ad.country !== activeFilters.country) return false;
       if (activeFilters.funnel_stage && ad.funnel_stage !== activeFilters.funnel_stage) return false;
       return true;
     });
-  }, [activeFilters]);
+  }, [ads, activeFilters]);
 
   return (
     <AppLayout>
-      {/* FilterBar */}
       <FilterBar
         filters={filterConfigs}
         activeFilters={activeFilters}
@@ -61,14 +66,14 @@ export default function LibraryPage() {
 
       <div className="px-6 lg:px-10 py-6 min-w-0 overflow-hidden">
         <div className="mb-5">
-          <h1 className="text-xl font-extrabold text-[--text]">مكتبة الإعلانات</h1>
-          <p className="text-sm text-[--text-muted] mt-0.5">{filtered.length} إعلان</p>
+          <h1 className="text-xl font-extrabold" style={{ color: "var(--text-primary)" }}>مكتبة الإعلانات</h1>
+          <p className="text-sm mt-0.5" style={{ color: "var(--text-secondary)" }}>{filtered.length} إعلان</p>
         </div>
 
         {loading ? (
           <SkeletonList />
         ) : filtered.length === 0 ? (
-          <div className="text-center py-20 text-[--text-muted]">
+          <div className="text-center py-20" style={{ color: "var(--text-secondary)" }}>
             <p className="text-4xl mb-3">🔍</p>
             <p className="font-semibold">لا توجد نتائج مطابقة</p>
             <p className="text-sm mt-1">جرّب تعديل الفلاتر</p>

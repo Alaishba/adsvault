@@ -69,11 +69,33 @@ function PaymentModal({ onClose, planName }: { onClose: () => void; planName: st
   const [cvv, setCvv] = useState("");
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const handlePay = (e: React.FormEvent) => {
+  const handlePay = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setTimeout(() => { setLoading(false); setSuccess(true); }, 1500);
+    setError(null);
+    try {
+      // Mock payment delay
+      await new Promise((r) => setTimeout(r, 1500));
+      // Update user plan in Supabase
+      if (isSupabaseConfigured()) {
+        const { data: session } = await supabase.auth.getSession();
+        if (session.session?.user) {
+          const targetPlan = planName === "Pro" ? "pro" : planName === "Enterprise" ? "enterprise" : "pro";
+          const { error: updateErr } = await supabase
+            .from("users")
+            .update({ plan: targetPlan, subscription_start: new Date().toISOString() })
+            .eq("id", session.session.user.id);
+          if (updateErr) throw updateErr;
+        }
+      }
+      setSuccess(true);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "حدث خطأ في معالجة الدفع");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -133,6 +155,9 @@ function PaymentModal({ onClose, planName }: { onClose: () => void; planName: st
                   style={{ background: "#ffffff", color: "var(--text-primary)" }} dir="ltr" />
               </div>
             </div>
+            {error && (
+              <div className="px-3 py-2 rounded-lg text-xs" style={{ background: "#fef2f2", color: "#b91c1c" }}>{error}</div>
+            )}
             <button type="submit" disabled={loading}
               className="w-full py-3 rounded-xl font-bold text-sm text-white transition-all hover:opacity-90 disabled:opacity-60"
               style={{ background: "#84cc18" }}>

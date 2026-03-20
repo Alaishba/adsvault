@@ -93,10 +93,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (!isSupabaseConfigured()) {
       localStorage.removeItem("mockUser");
       setUser(null);
+      window.location.href = "/";
       return;
     }
     await supabase.auth.signOut();
     setUser(null);
+    window.location.href = "/";
   };
 
   return (

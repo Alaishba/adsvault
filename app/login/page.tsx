@@ -47,7 +47,7 @@ export default function LoginPage() {
           </p>
         </div>
 
-        <div className="bg-white dark:bg-[#141414] rounded-2xl border border-[--border] p-6">
+        <div className="bg-white rounded-2xl border border-[--border] p-6">
           <form onSubmit={handleLogin} className="space-y-4">
             <div>
               <label className="block text-sm font-semibold mb-1.5" style={{ color: "var(--text-primary)" }}>
