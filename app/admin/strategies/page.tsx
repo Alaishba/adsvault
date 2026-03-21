@@ -1,8 +1,10 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { mockStrategies, type Strategy } from "../../lib/mockData";
 import { uploadFile } from "../../lib/storage";
+import { supabase, isSupabaseConfigured } from "../../lib/supabase";
+import { fetchStrategies } from "../../lib/db";
 
 const emptyForm = {
   brand: "", brandInitial: "", brandColor: "#8957f6",
@@ -24,6 +26,9 @@ export default function AdminStrategiesPage() {
   const [thumbPreview, setThumbPreview] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => { fetchStrategies().then(setStrategies); }, []);
+  const reload = () => fetchStrategies().then(setStrategies);
 
   const filtered = strategies.filter(
     (s) => s.title.includes(search) || s.brand.includes(search) || s.sector.includes(search)
@@ -52,7 +57,10 @@ export default function AdminStrategiesPage() {
     setShowForm(true);
   };
 
-  const handleDelete = (id: string) => setStrategies((prev) => prev.filter((s) => s.id !== id));
+  const handleDelete = async (id: string) => {
+    if (isSupabaseConfigured()) { await supabase.from("strategies").delete().eq("id", id); }
+    setStrategies((prev) => prev.filter((s) => s.id !== id));
+  };
 
   const handleThumbnailChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -66,28 +74,29 @@ export default function AdminStrategiesPage() {
     setUploading(false);
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!form.title || !form.brand) return;
-    const newS = {
-      id: editId ?? Date.now().toString(),
-      brand: form.brand,
-      brandInitial: form.brandInitial || form.brand[0] || "?",
-      brandColor: form.brandColor,
-      title: form.title,
-      preview: form.preview,
-      insights: form.insights,
-      sector: form.sector,
-      tags: form.tags,
-      date: form.date,
-      thumbnail: form.thumbnail,
+    const stratData = {
+      title: form.title, brand: form.brand,
+      description: form.preview,
+      insights: form.insights, tags: form.tags,
+      thumbnail: form.thumbnail || null,
       is_pro_only: form.is_pro_only,
-    } as unknown as Strategy;
-
-    if (editId) {
-      setStrategies((prev) => prev.map((s) => (s.id === editId ? newS : s)));
-    } else {
-      setStrategies((prev) => [newS, ...prev]);
-    }
+    };
+    try {
+      if (isSupabaseConfigured()) {
+        if (editId) {
+          await supabase.from("strategies").update(stratData).eq("id", editId);
+        } else {
+          await supabase.from("strategies").insert(stratData);
+        }
+        await reload();
+      } else {
+        const newS = { id: editId ?? Date.now().toString(), brand: form.brand, brandInitial: form.brandInitial || form.brand[0] || "?", brandColor: form.brandColor, title: form.title, preview: form.preview, insights: form.insights, sector: form.sector, tags: form.tags, date: form.date, thumbnail: form.thumbnail, is_pro_only: form.is_pro_only } as unknown as Strategy;
+        if (editId) { setStrategies((prev) => prev.map((s) => (s.id === editId ? newS : s))); }
+        else { setStrategies((prev) => [newS, ...prev]); }
+      }
+    } catch (err) { console.error("Save error:", err); }
     setShowForm(false);
     setEditId(null);
   };

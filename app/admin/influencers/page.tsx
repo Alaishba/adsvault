@@ -1,8 +1,10 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { mockInfluencers, type Influencer, type Platform } from "../../lib/mockData";
 import { uploadFile } from "../../lib/storage";
+import { supabase, isSupabaseConfigured } from "../../lib/supabase";
+import { fetchInfluencers } from "../../lib/db";
 
 const emptyForm = {
   name: "", bio: "", category: "", country: "",
@@ -55,7 +57,14 @@ export default function AdminInfluencersPage() {
     setShowForm(true);
   };
 
-  const handleDelete = (id: string) => setInfluencers((prev) => prev.filter((i) => i.id !== id));
+  // Load from Supabase on mount
+  useEffect(() => { fetchInfluencers().then(setInfluencers); }, []);
+  const reload = () => fetchInfluencers().then(setInfluencers);
+
+  const handleDelete = async (id: string) => {
+    if (isSupabaseConfigured()) { await supabase.from("influencers").delete().eq("id", id); }
+    setInfluencers((prev) => prev.filter((i) => i.id !== id));
+  };
 
   const togglePlatform = (p: Platform) => {
     setForm((f) => ({
@@ -78,32 +87,40 @@ export default function AdminInfluencersPage() {
     setUploading(false);
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!form.name) return;
-    const newInf = {
-      id: editId ?? Date.now().toString(),
-      name: form.name,
-      initial: form.initial || form.name[0] || "?",
-      color: form.color,
-      bio: form.bio,
-      category: form.category,
-      country: form.country,
-      followers: form.followers,
-      engagement: form.engagement,
-      platforms: form.platforms,
+    const infData = {
+      name: form.name, bio: form.bio,
+      platform: form.platforms.join(","),
+      follower_count: form.followers,
+      engagement_rate: form.engagement,
       strengths: form.strengths,
       weaknesses: form.weaknesses,
-      audienceAge: [],
-      audienceCountry: [],
-      contactEmail: form.contactEmail,
-      profileImage: form.profileImage,
-    } as unknown as Influencer;
+      profile_image: form.profileImage || null,
+      contact_email: form.contactEmail || null,
+    };
 
-    if (editId) {
-      setInfluencers((prev) => prev.map((i) => (i.id === editId ? newInf : i)));
-    } else {
-      setInfluencers((prev) => [newInf, ...prev]);
-    }
+    try {
+      if (isSupabaseConfigured()) {
+        if (editId) {
+          await supabase.from("influencers").update(infData).eq("id", editId);
+        } else {
+          await supabase.from("influencers").insert(infData);
+        }
+        await reload();
+      } else {
+        const newInf = {
+          id: editId ?? Date.now().toString(), name: form.name,
+          initial: form.initial || form.name[0] || "?", color: form.color,
+          bio: form.bio, category: form.category, country: form.country,
+          followers: form.followers, engagement: form.engagement,
+          platforms: form.platforms, strengths: form.strengths, weaknesses: form.weaknesses,
+          audienceAge: [], audienceCountry: [],
+        } as unknown as Influencer;
+        if (editId) { setInfluencers((prev) => prev.map((i) => (i.id === editId ? newInf : i))); }
+        else { setInfluencers((prev) => [newInf, ...prev]); }
+      }
+    } catch (err) { console.error("Save error:", err); }
     setShowForm(false);
     setEditId(null);
   };

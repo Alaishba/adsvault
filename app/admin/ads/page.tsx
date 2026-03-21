@@ -1,8 +1,10 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { mockAds, type Ad } from "../../lib/mockData";
 import { uploadFile } from "../../lib/storage";
+import { supabase, isSupabaseConfigured } from "../../lib/supabase";
+import { fetchAds } from "../../lib/db";
 
 const platforms = ["Meta", "TikTok", "Snap", "YouTube", "Instagram"];
 const sectors = ["تجزئة", "اتصالات", "تجارة إلكترونية", "مواد استهلاكية", "خدمات مالية", "مطاعم", "عقارات", "تعليم"];
@@ -105,13 +107,23 @@ export default function AdminAdsPage() {
   const setPro = (update: Partial<ProAnalysis>) =>
     setForm((f) => ({ ...f, pro_analysis: { ...(f.pro_analysis ?? emptyProAnalysis), ...update } }));
 
+  // Load from Supabase on mount
+  useEffect(() => { fetchAds().then(setAds); }, []);
+
+  const reload = () => fetchAds().then(setAds);
+
   const filtered = ads.filter((a) =>
     a.title.includes(search) || a.brand.includes(search) || a.sector.includes(search)
   );
 
   const openAdd = () => { setForm(emptyForm); setEditId(null); setImageFiles([]); setImagePreviews([]); setShowForm(true); };
   const openEdit = (ad: Ad) => { setForm({ ...ad, is_pro_only: false, pro_analysis: { ...emptyProAnalysis } }); setEditId(ad.id); setImageFiles([]); setImagePreviews(ad.images ?? []); setShowForm(true); };
-  const handleDelete = (id: string) => setAds((prev) => prev.filter((a) => a.id !== id));
+  const handleDelete = async (id: string) => {
+    if (isSupabaseConfigured()) {
+      await supabase.from("ads").delete().eq("id", id);
+    }
+    setAds((prev) => prev.filter((a) => a.id !== id));
+  };
 
   const handleImages = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files ?? []).slice(0, 5);
@@ -139,20 +151,46 @@ export default function AdminAdsPage() {
   const handleSave = async () => {
     if (!form.title || !form.brand) return;
     setUploading(true);
-    let images = form.images ?? [];
-    if (imageFiles.length > 0) {
-      const uploads = await Promise.all(imageFiles.map((f) => uploadFile("ads-images", f)));
-      images = uploads.filter((u) => u.url).map((u) => u.url as string);
-    }
-    if (editId) {
-      setAds((prev) => prev.map((a) => (a.id === editId ? { ...a, ...form, images } as Ad : a)));
-    } else {
-      const newAd: Ad = {
-        ...emptyForm, ...form, images,
-        id: Date.now().toString(), views: "0", saved: 0,
-        tags: form.tags ?? [], basic_analysis: form.basic_analysis ?? [], apply_idea: form.apply_idea ?? [],
-      } as Ad;
-      setAds((prev) => [newAd, ...prev]);
+    try {
+      let images = form.images ?? [];
+      if (imageFiles.length > 0) {
+        const uploads = await Promise.all(imageFiles.map((f) => uploadFile("ads-images", f)));
+        images = uploads.filter((u) => u.url).map((u) => u.url as string);
+      }
+      const adData = {
+        title: form.title, brand: form.brand,
+        brand_initial: form.brandInitial || form.brand?.[0] || "?",
+        brand_color: form.brandColor || "#84cc18",
+        description: form.description || "", platform: form.platform || "Meta",
+        sector: form.sector || "", country: form.country || "",
+        season: form.season || "", ad_goal: form.ad_goal || "",
+        funnel_stage: form.funnel_stage || "awareness",
+        tags: form.tags ?? [], images,
+        source_url: form.source_url || "", video_url: (form as Record<string, unknown>).video_url as string || "",
+        basic_analysis: form.basic_analysis ?? [],
+        apply_idea: form.apply_idea ?? [],
+        recommended_action: form.recommended_action || "",
+        is_pro_only: form.is_pro_only ?? false,
+      };
+
+      if (isSupabaseConfigured()) {
+        if (editId) {
+          await supabase.from("ads").update(adData).eq("id", editId);
+        } else {
+          await supabase.from("ads").insert(adData);
+        }
+        await reload();
+      } else {
+        // Local fallback
+        if (editId) {
+          setAds((prev) => prev.map((a) => (a.id === editId ? { ...a, ...form, images } as Ad : a)));
+        } else {
+          const newAd = { ...emptyForm, ...form, images, id: Date.now().toString(), views: "0", saved: 0, tags: form.tags ?? [], basic_analysis: form.basic_analysis ?? [], apply_idea: form.apply_idea ?? [] } as Ad;
+          setAds((prev) => [newAd, ...prev]);
+        }
+      }
+    } catch (err) {
+      console.error("Save error:", err);
     }
     setUploading(false);
     setShowForm(false);
