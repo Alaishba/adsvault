@@ -1,6 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { supabase, isSupabaseConfigured } from "../../lib/supabase";
+import { fetchUsers } from "../../lib/db";
 
 type User = { id: string; email: string; full_name: string; plan: string; created_at: string; status: string };
 
@@ -26,12 +28,24 @@ export default function AdminUsersPage() {
   const [users, setUsers] = useState<User[]>(mockUsers);
   const [search, setSearch] = useState("");
 
+  useEffect(() => {
+    fetchUsers().then((data) => {
+      if (data.length) {
+        setUsers(data.map((u: any) => ({ ...u, status: u.status || "active" })));
+      }
+    });
+  }, []);
+
   const filtered = users.filter(
     (u) => u.full_name.includes(search) || u.email.includes(search)
   );
 
-  const changePlan = (id: string, plan: string) =>
+  const changePlan = async (id: string, plan: string) => {
+    if (isSupabaseConfigured()) {
+      await supabase.from("users").update({ plan }).eq("id", id);
+    }
     setUsers((prev) => prev.map((u) => (u.id === id ? { ...u, plan } : u)));
+  };
 
   const toggleStatus = (id: string) =>
     setUsers((prev) =>

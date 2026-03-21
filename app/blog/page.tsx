@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import AppLayout from "../components/AppLayout";
-import { blogArticles } from "../lib/blogData";
+import { blogArticles as defaultArticles, type BlogArticle } from "../lib/blogData";
+import { supabase, isSupabaseConfigured } from "../lib/supabase";
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const _blogDataBackup = [
@@ -99,6 +100,25 @@ function getInitials(title: string) {
 
 export default function BlogPage() {
   const [activeCategory, setActiveCategory] = useState("الكل");
+  const [blogArticles, setBlogArticles] = useState<BlogArticle[]>(defaultArticles);
+
+  useEffect(() => {
+    if (!isSupabaseConfigured()) return;
+    supabase.from("blog_posts").select("*").eq("status", "published").order("created_at", { ascending: false })
+      .then(({ data }) => {
+        if (data && data.length > 0) {
+          setBlogArticles(data.map((d: Record<string, unknown>) => ({
+            id: d.id as number, slug: (d.slug as string) ?? "",
+            title: (d.title as string) ?? "", excerpt: ((d.content as string) ?? "").slice(0, 120),
+            category: (d.category as string) ?? "تسويق",
+            coverImage: (d.banner_image as string) ?? "#8957f6",
+            author: (d.author as string) ?? "فريق AdVault",
+            date: ((d.created_at as string) ?? "").slice(0, 10),
+            readTime: "5 دقائق", tags: (d.tags as string[]) ?? [],
+          })));
+        }
+      });
+  }, []);
 
   const featured = blogArticles[0];
   const filtered =

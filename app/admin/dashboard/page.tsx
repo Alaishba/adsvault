@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { fetchUsers } from "../../lib/db";
+import { supabase, isSupabaseConfigured } from "../../lib/supabase";
 
 type User = { id: string; email: string; full_name: string; plan: string; created_at: string };
 
@@ -26,19 +27,22 @@ const planStyle: Record<string, { bg: string; color: string }> = {
   admin:      { bg: "#fef2f2", color: "#ef4444" },
 };
 
-const kpis = [
-  { label: "إجمالي المستخدمين", value: "1,247", change: "+12%", up: true,
-    icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#84cc18" strokeWidth="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> },
-  { label: "المشتركون Pro", value: "423", change: "+8%", up: true,
-    icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8957f6" strokeWidth="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> },
-  { label: "الإيراد الشهري (MRR)", value: "12,450 ر.س", change: "+8.3%", up: true,
-    icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#84cc18" strokeWidth="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> },
-  { label: "إعلانات مضافة", value: "38", change: "+5", up: true,
-    icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#84cc18" strokeWidth="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg> },
-  { label: "استراتيجيات", value: "24", change: "+3", up: true,
-    icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8957f6" strokeWidth="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg> },
-  { label: "مؤثرون", value: "156", change: "+12", up: true,
-    icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#84cc18" strokeWidth="2"><circle cx="12" cy="8" r="4"/><path d="M20 21a8 8 0 1 0-16 0"/></svg> },
+const kpiIcons = [
+  <svg key="0" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#84cc18" strokeWidth="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>,
+  <svg key="1" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8957f6" strokeWidth="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>,
+  <svg key="2" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#84cc18" strokeWidth="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>,
+  <svg key="3" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#84cc18" strokeWidth="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>,
+  <svg key="4" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8957f6" strokeWidth="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>,
+  <svg key="5" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#84cc18" strokeWidth="2"><circle cx="12" cy="8" r="4"/><path d="M20 21a8 8 0 1 0-16 0"/></svg>,
+];
+
+const defaultKpis = [
+  { label: "إجمالي المستخدمين", value: "1,247", change: "+12%", up: true },
+  { label: "المشتركون Pro", value: "423", change: "+8%", up: true },
+  { label: "الإيراد الشهري (MRR)", value: "12,450 ر.س", change: "+8.3%", up: true },
+  { label: "إعلانات مضافة", value: "38", change: "+5", up: true },
+  { label: "استراتيجيات", value: "24", change: "+3", up: true },
+  { label: "مؤثرون", value: "156", change: "+12", up: true },
 ];
 
 /* Simple bar chart */
@@ -86,8 +90,37 @@ const mockContactRequests = [
 
 export default function AdminDashboardPage() {
   const [users, setUsers] = useState<User[]>(mockUsers);
+  const [kpis, setKpis] = useState(defaultKpis);
+
   useEffect(() => {
     fetchUsers().then((u) => { if (u.length) setUsers(u); });
+  }, []);
+
+  useEffect(() => {
+    if (!isSupabaseConfigured()) return;
+    async function loadCounts() {
+      const [adsRes, strategiesRes, influencersRes, usersRes, proRes] = await Promise.all([
+        supabase.from("ads").select("id", { count: "exact", head: true }),
+        supabase.from("strategies").select("id", { count: "exact", head: true }),
+        supabase.from("influencers").select("id", { count: "exact", head: true }),
+        supabase.from("users").select("id", { count: "exact", head: true }),
+        supabase.from("users").select("id", { count: "exact", head: true }).eq("plan", "pro"),
+      ]);
+      const totalUsers = usersRes.count ?? 0;
+      const proUsers = proRes.count ?? 0;
+      const adsCount = adsRes.count ?? 0;
+      const strategiesCount = strategiesRes.count ?? 0;
+      const influencersCount = influencersRes.count ?? 0;
+      setKpis((prev) => prev.map((k, i) => {
+        if (i === 0) return { ...k, value: totalUsers.toLocaleString() };
+        if (i === 1) return { ...k, value: proUsers.toLocaleString() };
+        if (i === 3) return { ...k, value: adsCount.toLocaleString() };
+        if (i === 4) return { ...k, value: strategiesCount.toLocaleString() };
+        if (i === 5) return { ...k, value: influencersCount.toLocaleString() };
+        return k;
+      }));
+    }
+    loadCounts();
   }, []);
 
   return (
@@ -104,7 +137,7 @@ export default function AdminDashboardPage() {
         {kpis.map((k, i) => (
           <div key={i} className="rounded-2xl border p-4" style={{ background: "#ffffff", borderColor: "#e5e7eb" }}>
             <div className="flex items-center justify-between mb-2">
-              <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: "#f7fee7" }}>{k.icon}</div>
+              <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: "#f7fee7" }}>{kpiIcons[i]}</div>
               <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full"
                 style={{ background: k.up ? "#f7fee7" : "#fef2f2", color: k.up ? "#84cc18" : "#ef4444" }}>{k.change}</span>
             </div>

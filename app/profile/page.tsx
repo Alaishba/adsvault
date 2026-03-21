@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import AppLayout from "../components/AppLayout";
 import AdCard from "../components/AdCard";
@@ -8,7 +8,8 @@ import AdModal from "../components/AdModal";
 import { useAuth } from "../context/AuthContext";
 import { uploadFile } from "../lib/storage";
 import { supabase, isSupabaseConfigured } from "../lib/supabase";
-import { mockAds, mockStrategies, type Ad } from "../lib/mockData";
+import { mockAds, mockStrategies, type Ad, type Strategy } from "../lib/mockData";
+import { fetchAds, fetchStrategies } from "../lib/db";
 
 const tabs = [
   { id: "info", label: "معلوماتي" },
@@ -39,6 +40,15 @@ export default function ProfilePage() {
   const [saved, setSaved] = useState(true);
   const fileRef = useRef<HTMLInputElement>(null);
   const [notifs, setNotifs] = useState({ newAds: true, strategies: true, weeklyDigest: false });
+
+  const [savedAds, setSavedAds] = useState<Ad[]>([]);
+  const [savedStrategies, setSavedStrategies] = useState<Strategy[]>([]);
+
+  useEffect(() => {
+    // Load real data
+    fetchAds().then((all) => setSavedAds(all.slice(0, 6)));
+    fetchStrategies().then(setSavedStrategies);
+  }, []);
 
   const plan = user?.plan ?? "free";
   const isPro = plan === "pro" || plan === "enterprise" || plan === "admin";
@@ -234,9 +244,9 @@ export default function ProfilePage() {
         {/* Tab: المفضلة */}
         {activeTab === "saved" && (
           <div>
-            {mockAds.length > 0 ? (
+            {savedAds.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
-                {mockAds.slice(0, 3).map((ad) => (
+                {savedAds.slice(0, 3).map((ad) => (
                   <AdCard key={ad.id} ad={ad} onClick={setSelectedAd} />
                 ))}
               </div>
@@ -253,9 +263,9 @@ export default function ProfilePage() {
         {/* Tab: استراتيجياتي */}
         {activeTab === "strategies" && (
           <div>
-            {mockStrategies.length > 0 ? (
+            {savedStrategies.length > 0 ? (
               <div className="space-y-3">
-                {mockStrategies.map((s) => (
+                {savedStrategies.map((s) => (
                   <div key={s.id} className="rounded-xl p-4 flex items-center justify-between"
                     style={{ background: "#ffffff", border: "1px solid #e5e7eb" }}>
                     <div className="flex items-center gap-3">

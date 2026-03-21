@@ -1,12 +1,17 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { useAuth } from "../context/AuthContext";
+import { supabase, isSupabaseConfigured } from "../lib/supabase";
+
+type SearchResult = { id: string; title: string; type: "ad" | "strategy" | "influencer"; href: string };
 
 export default function Navbar({ onMenuClick }: { onMenuClick?: () => void }) {
   const { user, loading, logout } = useAuth();
   const [search, setSearch] = useState("");
+  const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
+  const [showSearch, setShowSearch] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -19,6 +24,25 @@ export default function Navbar({ onMenuClick }: { onMenuClick?: () => void }) {
     document.addEventListener("mousedown", handle);
     return () => document.removeEventListener("mousedown", handle);
   }, []);
+
+  // Debounced search
+  const doSearch = useCallback(async (q: string) => {
+    if (!q.trim() || !isSupabaseConfigured()) { setSearchResults([]); setShowSearch(false); return; }
+    const results: SearchResult[] = [];
+    const { data: ads } = await supabase.from("ads").select("id,title").ilike("title", `%${q}%`).limit(5);
+    if (ads) ads.forEach((a: { id: string; title: string }) => results.push({ id: a.id, title: a.title, type: "ad", href: "/library" }));
+    const { data: strats } = await supabase.from("strategies").select("id,title").ilike("title", `%${q}%`).limit(3);
+    if (strats) strats.forEach((s: { id: string; title: string }) => results.push({ id: s.id, title: s.title, type: "strategy", href: "/analysis" }));
+    const { data: infs } = await supabase.from("influencers").select("id,name").ilike("name", `%${q}%`).limit(3);
+    if (infs) infs.forEach((i: { id: string; name: string }) => results.push({ id: i.id, title: i.name, type: "influencer", href: "/influencers" }));
+    setSearchResults(results);
+    setShowSearch(results.length > 0);
+  }, []);
+
+  useEffect(() => {
+    const timer = setTimeout(() => doSearch(search), 300);
+    return () => clearTimeout(timer);
+  }, [search, doSearch]);
 
   const initials = user?.name
     ? user.name.trim().split(" ").map((w) => w[0]).join("").slice(0, 2).toUpperCase()
@@ -63,18 +87,39 @@ export default function Navbar({ onMenuClick }: { onMenuClick?: () => void }) {
       </Link>
 
       {/* Search */}
-      <div className="flex-1 min-w-0 mx-2">
+      <div className="flex-1 min-w-0 mx-2 relative">
         <div className="flex items-center gap-2 px-3 py-2 rounded-xl w-full"
           style={{ background: "rgba(255,255,255,0.7)", border: "1px solid rgba(137,87,246,0.15)" }}>
           <svg className="shrink-0" width="15" height="15" viewBox="0 0 24 24" fill="none"
             stroke="currentColor" strokeWidth="2" style={{ color: "#9ca3af" }}>
             <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
           </svg>
-          <input type="text" value={search} onChange={(e) => setSearch(e.target.value)}
+          <input type="text" value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            onFocus={() => searchResults.length > 0 && setShowSearch(true)}
+            onBlur={() => setTimeout(() => setShowSearch(false), 200)}
             placeholder="ابحث عن استراتيجية أو قطاع أو براند..."
             className="bg-transparent outline-none w-full min-w-0 text-sm placeholder:text-[#9ca3af]"
             style={{ color: "#1c1c1e" }} dir="rtl" />
         </div>
+        {showSearch && searchResults.length > 0 && (
+          <div className="absolute top-full mt-1 right-0 left-0 rounded-xl border shadow-lg overflow-hidden"
+            style={{ background: "#ffffff", borderColor: "#e5e7eb", zIndex: 9999 }}>
+            {searchResults.map((r) => (
+              <Link key={r.id} href={r.href}
+                onClick={() => { setShowSearch(false); setSearch(""); }}
+                className="flex items-center gap-2 px-4 py-2.5 text-sm hover:bg-gray-50 transition-colors"
+                style={{ color: "#1c1c1e" }}>
+                <span className="text-[10px] px-1.5 py-0.5 rounded font-bold"
+                  style={{ background: r.type === "ad" ? "#f7fee7" : r.type === "strategy" ? "#f3eeff" : "#eff6ff",
+                    color: r.type === "ad" ? "#84cc18" : r.type === "strategy" ? "#8957f6" : "#2563eb" }}>
+                  {r.type === "ad" ? "إعلان" : r.type === "strategy" ? "استراتيجية" : "مؤثر"}
+                </span>
+                <span className="truncate">{r.title}</span>
+              </Link>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Actions */}

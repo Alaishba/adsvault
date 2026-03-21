@@ -5,15 +5,37 @@ import AppLayout from "../components/AppLayout";
 import PlatformBadge from "../components/PlatformBadge";
 import { mockInfluencers, type Influencer, type Platform } from "../lib/mockData";
 import { fetchInfluencers } from "../lib/db";
+import { supabase, isSupabaseConfigured } from "../lib/supabase";
 
 function InfluencerModal({ inf, onClose }: { inf: Influencer; onClose: () => void }) {
   const [tab, setTab] = useState<"info" | "contact">("info");
   const [contactForm, setContactForm] = useState({ name: "", email: "", type: "", message: "" });
   const [submitted, setSubmitted] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [submitLoading, setSubmitLoading] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitted(true);
+    setSubmitLoading(true);
+    setSubmitError(null);
+    try {
+      if (isSupabaseConfigured()) {
+        const { error } = await supabase.from("contact_requests").insert({
+          name: contactForm.name,
+          email: contactForm.email,
+          company: contactForm.type,
+          message: `طلب تعاون مع ${inf.name}: ${contactForm.message}`,
+          created_at: new Date().toISOString(),
+        });
+        if (error) throw error;
+      }
+      setSubmitted(true);
+    } catch (err: unknown) {
+      setSubmitError(err instanceof Error ? err.message : "حدث خطأ، حاول مجدداً");
+    } finally {
+      setSubmitLoading(false);
+    }
   };
 
   return (
@@ -199,10 +221,13 @@ function InfluencerModal({ inf, onClose }: { inf: Influencer; onClose: () => voi
                     className="w-full px-3 py-2.5 rounded-xl border border-[--border] bg-[--surface2] outline-none text-sm resize-none focus:border-[#84cc18]/60 transition-colors"
                     style={{ color: "var(--text-primary)" }} />
                 </div>
-                <button type="submit"
-                  className="w-full py-3 rounded-xl font-bold text-sm transition-all hover:opacity-90"
+                {submitError && (
+                  <div className="px-3 py-2 rounded-lg text-xs" style={{ background: "#fef2f2", color: "#b91c1c" }}>{submitError}</div>
+                )}
+                <button type="submit" disabled={submitLoading}
+                  className="w-full py-3 rounded-xl font-bold text-sm transition-all hover:opacity-90 disabled:opacity-60"
                   style={{ background: "#84cc18", color: "#fff" }}>
-                  إرسال الطلب
+                  {submitLoading ? "جارٍ الإرسال..." : "إرسال الطلب"}
                 </button>
               </form>
             )}
