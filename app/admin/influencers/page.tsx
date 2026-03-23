@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { mockInfluencers, type Influencer, type Platform } from "../../lib/mockData";
+import { type Influencer, type Platform } from "../../lib/mockData";
 import { uploadFile } from "../../lib/storage";
 import { supabase, isSupabaseConfigured } from "../../lib/supabase";
 import { fetchInfluencers } from "../../lib/db";
@@ -20,7 +20,7 @@ const emptyForm = {
 const allPlatforms: Platform[] = ["Meta", "TikTok", "Snap", "YouTube", "Instagram"];
 
 export default function AdminInfluencersPage() {
-  const [influencers, setInfluencers] = useState<Influencer[]>(mockInfluencers);
+  const [influencers, setInfluencers] = useState<Influencer[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [editId, setEditId] = useState<string | null>(null);
   const [form, setForm] = useState(emptyForm);
@@ -62,7 +62,7 @@ export default function AdminInfluencersPage() {
   const reload = () => fetchInfluencers().then(setInfluencers);
 
   const handleDelete = async (id: string) => {
-    if (isSupabaseConfigured()) { await supabase.from("influencers").delete().eq("id", id); }
+    await supabase.from("influencers").delete().eq("id", id);
     setInfluencers((prev) => prev.filter((i) => i.id !== id));
   };
 
@@ -101,25 +101,12 @@ export default function AdminInfluencersPage() {
     };
 
     try {
-      if (isSupabaseConfigured()) {
-        if (editId) {
-          await supabase.from("influencers").update(infData).eq("id", editId);
-        } else {
-          await supabase.from("influencers").insert(infData);
-        }
-        await reload();
+      if (editId) {
+        await supabase.from("influencers").update(infData).eq("id", editId);
       } else {
-        const newInf = {
-          id: editId ?? Date.now().toString(), name: form.name,
-          initial: form.initial || form.name[0] || "?", color: form.color,
-          bio: form.bio, category: form.category, country: form.country,
-          followers: form.followers, engagement: form.engagement,
-          platforms: form.platforms, strengths: form.strengths, weaknesses: form.weaknesses,
-          audienceAge: [], audienceCountry: [],
-        } as unknown as Influencer;
-        if (editId) { setInfluencers((prev) => prev.map((i) => (i.id === editId ? newInf : i))); }
-        else { setInfluencers((prev) => [newInf, ...prev]); }
+        await supabase.from("influencers").insert(infData);
       }
+      await reload();
     } catch (err) { console.error("Save error:", err); }
     setShowForm(false);
     setEditId(null);

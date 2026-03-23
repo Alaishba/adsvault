@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { supabase, isSupabaseConfigured } from "../lib/supabase";
+import { supabase } from "../lib/supabase";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -15,12 +15,6 @@ export default function LoginPage() {
     setError(null);
     setLoading(true);
     try {
-      if (!isSupabaseConfigured()) {
-        // Dev mode: mock login
-        localStorage.setItem("mockUser", JSON.stringify({ email, name: "مستخدم تجريبي" }));
-        window.location.href = "/";
-        return;
-      }
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) throw error;
       window.location.href = "/";

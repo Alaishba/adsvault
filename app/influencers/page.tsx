@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import AppLayout from "../components/AppLayout";
 import PlatformBadge from "../components/PlatformBadge";
-import { mockInfluencers, type Influencer, type Platform } from "../lib/mockData";
+import { type Influencer, type Platform } from "../lib/mockData";
 import { fetchInfluencers } from "../lib/db";
 import { supabase, isSupabaseConfigured } from "../lib/supabase";
 
@@ -240,7 +240,7 @@ function InfluencerModal({ inf, onClose }: { inf: Influencer; onClose: () => voi
 
 export default function InfluencersPage() {
   const [selected, setSelected] = useState<Influencer | null>(null);
-  const [influencers, setInfluencers] = useState<Influencer[]>(mockInfluencers);
+  const [influencers, setInfluencers] = useState<Influencer[]>([]);
 
   useEffect(() => { fetchInfluencers().then(setInfluencers); }, []);
 

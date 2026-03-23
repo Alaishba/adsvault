@@ -5,7 +5,7 @@ import Link from "next/link";
 import AppLayout from "../components/AppLayout";
 import FilterBar from "../components/FilterBar";
 import { useAuth } from "../context/AuthContext";
-import { mockStrategies, type Strategy } from "../lib/mockData";
+import { type Strategy } from "../lib/mockData";
 import { fetchStrategies } from "../lib/db";
 
 const filterConfigs = [
@@ -94,7 +94,7 @@ export default function AnalysisPage() {
   const isPro = user?.plan === "pro" || user?.plan === "enterprise" || user?.plan === "admin";
   const [selected, setSelected] = useState<Strategy | null>(null);
   const [activeFilters, setActiveFilters] = useState<Record<string, string>>({});
-  const [allStrategies, setAllStrategies] = useState<Strategy[]>(mockStrategies);
+  const [allStrategies, setAllStrategies] = useState<Strategy[]>([]);
 
   useEffect(() => { fetchStrategies().then(setAllStrategies); }, []);
 

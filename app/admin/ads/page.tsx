@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { mockAds, type Ad } from "../../lib/mockData";
+import { type Ad } from "../../lib/mockData";
 import { uploadFile } from "../../lib/storage";
 import { supabase, isSupabaseConfigured } from "../../lib/supabase";
 import { fetchAds } from "../../lib/db";
@@ -91,7 +91,7 @@ function DynamicList({ items, onChange, placeholder }: { items: string[]; onChan
 }
 
 export default function AdminAdsPage() {
-  const [ads, setAds] = useState<Ad[]>(mockAds);
+  const [ads, setAds] = useState<Ad[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [editId, setEditId] = useState<string | null>(null);
   const [form, setForm] = useState<FormAd>(emptyForm);
@@ -119,9 +119,7 @@ export default function AdminAdsPage() {
   const openAdd = () => { setForm(emptyForm); setEditId(null); setImageFiles([]); setImagePreviews([]); setShowForm(true); };
   const openEdit = (ad: Ad) => { setForm({ ...ad, is_pro_only: false, pro_analysis: { ...emptyProAnalysis } }); setEditId(ad.id); setImageFiles([]); setImagePreviews(ad.images ?? []); setShowForm(true); };
   const handleDelete = async (id: string) => {
-    if (isSupabaseConfigured()) {
-      await supabase.from("ads").delete().eq("id", id);
-    }
+    await supabase.from("ads").delete().eq("id", id);
     setAds((prev) => prev.filter((a) => a.id !== id));
   };
 
@@ -173,22 +171,12 @@ export default function AdminAdsPage() {
         is_pro_only: form.is_pro_only ?? false,
       };
 
-      if (isSupabaseConfigured()) {
-        if (editId) {
-          await supabase.from("ads").update(adData).eq("id", editId);
-        } else {
-          await supabase.from("ads").insert(adData);
-        }
-        await reload();
+      if (editId) {
+        await supabase.from("ads").update(adData).eq("id", editId);
       } else {
-        // Local fallback
-        if (editId) {
-          setAds((prev) => prev.map((a) => (a.id === editId ? { ...a, ...form, images } as Ad : a)));
-        } else {
-          const newAd = { ...emptyForm, ...form, images, id: Date.now().toString(), views: "0", saved: 0, tags: form.tags ?? [], basic_analysis: form.basic_analysis ?? [], apply_idea: form.apply_idea ?? [] } as Ad;
-          setAds((prev) => [newAd, ...prev]);
-        }
+        await supabase.from("ads").insert(adData);
       }
+      await reload();
     } catch (err) {
       console.error("Save error:", err);
     }

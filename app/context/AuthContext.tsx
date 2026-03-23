@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
-import { supabase, isSupabaseConfigured } from "../lib/supabase";
+import { supabase } from "../lib/supabase";
 
 export interface AuthUser {
   id: string;
@@ -29,7 +29,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const loadProfile = async (uid: string, email: string) => {
+  const loadProfile = async (uid: string, email: string): Promise<AuthUser> => {
     const { data: profile } = await supabase
       .from("users")
       .select("full_name,plan,avatar_url")
@@ -45,42 +45,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const refreshUser = async () => {
-    if (!isSupabaseConfigured()) return;
     const { data } = await supabase.auth.getSession();
     if (data.session?.user) {
       const u = data.session.user;
-      const profile = await loadProfile(u.id, u.email ?? "");
-      setUser(profile);
+      setUser(await loadProfile(u.id, u.email ?? ""));
     }
   };
 
   useEffect(() => {
-    if (!isSupabaseConfigured()) {
-      try {
-        const mock = localStorage.getItem("mockUser");
-        if (mock) {
-          const parsed = JSON.parse(mock);
-          setUser({ id: "mock", email: parsed.email ?? "", name: parsed.name ?? parsed.email ?? "", plan: "free" });
-        }
-      } catch { /* */ }
-      setLoading(false);
-      return;
-    }
-
     supabase.auth.getSession().then(async ({ data }) => {
       if (data.session?.user) {
         const u = data.session.user;
-        const profile = await loadProfile(u.id, u.email ?? "");
-        setUser(profile);
+        setUser(await loadProfile(u.id, u.email ?? ""));
       }
       setLoading(false);
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
       if (session?.user) {
-        const u = session.user;
-        const profile = await loadProfile(u.id, u.email ?? "");
-        setUser(profile);
+        setUser(await loadProfile(session.user.id, session.user.email ?? ""));
       } else {
         setUser(null);
       }
@@ -90,12 +73,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const logout = async () => {
-    if (!isSupabaseConfigured()) {
-      localStorage.removeItem("mockUser");
-      setUser(null);
-      window.location.href = "/";
-      return;
-    }
     await supabase.auth.signOut();
     setUser(null);
     window.location.href = "/";

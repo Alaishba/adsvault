@@ -1,4 +1,4 @@
-import { supabase, isSupabaseConfigured } from "./supabase";
+import { supabase } from "./supabase";
 
 export type StorageBucket = "ads-images" | "influencer-photos" | "strategy-covers" | "user-avatars";
 
@@ -7,10 +7,6 @@ export async function uploadFile(
   file: File,
   path?: string
 ): Promise<{ url: string | null; error: string | null }> {
-  if (!isSupabaseConfigured()) {
-    // Return object URL for local preview when Supabase not configured
-    return { url: URL.createObjectURL(file), error: null };
-  }
   const filePath = path ?? `${Date.now()}-${file.name.replace(/[^a-zA-Z0-9._-]/g, "_")}`;
   const { data, error } = await supabase.storage
     .from(bucket)
@@ -21,6 +17,5 @@ export async function uploadFile(
 }
 
 export async function deleteFile(bucket: StorageBucket, path: string): Promise<void> {
-  if (!isSupabaseConfigured()) return;
   await supabase.storage.from(bucket).remove([path]);
 }

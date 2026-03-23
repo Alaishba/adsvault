@@ -6,7 +6,7 @@ import AppLayout from "./components/AppLayout";
 import AdCard from "./components/AdCard";
 import AdModal from "./components/AdModal";
 import PlatformBadge from "./components/PlatformBadge";
-import { mockAds, mockStrategies, type Ad, type Strategy } from "./lib/mockData";
+import { type Ad, type Strategy } from "./lib/mockData";
 import { fetchAds, fetchStrategies } from "./lib/db";
 
 /* ─── Animated counter hook ─── */
@@ -99,8 +99,8 @@ function StatCard({ stat }: { stat: typeof statsData[0] }) {
 
 export default function HomePage() {
   const [selectedAd, setSelectedAd] = useState<Ad | null>(null);
-  const [ads, setAds] = useState<Ad[]>(mockAds);
-  const [strategies, setStrategies] = useState<Strategy[]>(mockStrategies);
+  const [ads, setAds] = useState<Ad[]>([]);
+  const [strategies, setStrategies] = useState<Strategy[]>([]);
 
   useEffect(() => {
     fetchAds().then(setAds);
@@ -151,17 +151,23 @@ export default function HomePage() {
 
           {/* Stacked preview cards (glassmorphism) */}
           <div className="flex-1 w-full lg:max-w-sm relative pt-4 pl-4">
-            <div className="relative z-10 mx-8 animate-float-2">
-              <HeroAdPreview ad={mockAds[2]}
-                style={{ opacity: 0.6, transform: "scale(0.92)", transformOrigin: "top center" }} />
-            </div>
-            <div className="relative z-20 mx-4 -mt-10 animate-float-1">
-              <HeroAdPreview ad={mockAds[1]}
-                style={{ opacity: 0.82, transform: "scale(0.96)", transformOrigin: "top center" }} />
-            </div>
-            <div className="relative z-30 -mt-10 animate-float-0">
-              <HeroAdPreview ad={mockAds[0]} />
-            </div>
+            {ads.length >= 3 ? (
+              <>
+                <div className="relative z-10 mx-8 animate-float-2">
+                  <HeroAdPreview ad={ads[2]} style={{ opacity: 0.6, transform: "scale(0.92)", transformOrigin: "top center" }} />
+                </div>
+                <div className="relative z-20 mx-4 -mt-10 animate-float-1">
+                  <HeroAdPreview ad={ads[1]} style={{ opacity: 0.82, transform: "scale(0.96)", transformOrigin: "top center" }} />
+                </div>
+                <div className="relative z-30 -mt-10 animate-float-0">
+                  <HeroAdPreview ad={ads[0]} />
+                </div>
+              </>
+            ) : (
+              <div className="flex items-center justify-center h-64 rounded-2xl" style={{ background: "rgba(137,87,246,0.08)" }}>
+                <p className="text-sm font-semibold" style={{ color: "#8957f6" }}>أضف إعلانات من لوحة التحكم</p>
+              </div>
+            )}
             <div className="absolute top-0 left-0 px-3 py-1.5 rounded-xl text-xs font-bold shadow-lg z-40"
               style={{ background: "#84cc18", color: "#fff", animation: "pulse-badge 2s ease infinite" }}>
               +12,000 إعلان
@@ -188,9 +194,17 @@ export default function HomePage() {
             عرض الكل ←
           </Link>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
-          {ads.map((ad) => <AdCard key={ad.id} ad={ad} onClick={setSelectedAd} />)}
-        </div>
+        {ads.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+            {ads.map((ad) => <AdCard key={ad.id} ad={ad} onClick={setSelectedAd} />)}
+          </div>
+        ) : (
+          <div className="text-center py-12 rounded-2xl" style={{ background: "#ffffff", border: "1px solid #e5e7eb" }}>
+            <p className="text-3xl mb-2">📢</p>
+            <p className="font-bold" style={{ color: "#1c1c1e" }}>لا يوجد إعلانات بعد</p>
+            <p className="text-sm mt-1" style={{ color: "#6b7280" }}>أضف إعلانات من لوحة التحكم لتظهر هنا</p>
+          </div>
+        )}
       </section>
 
       {/* ── LATEST STRATEGIES ── */}

@@ -8,7 +8,7 @@ import AdModal from "../components/AdModal";
 import { useAuth } from "../context/AuthContext";
 import { uploadFile } from "../lib/storage";
 import { supabase, isSupabaseConfigured } from "../lib/supabase";
-import { mockAds, mockStrategies, type Ad, type Strategy } from "../lib/mockData";
+import { type Ad, type Strategy } from "../lib/mockData";
 import { fetchAds, fetchStrategies } from "../lib/db";
 
 const tabs = [

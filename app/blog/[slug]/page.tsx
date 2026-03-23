@@ -1,36 +1,59 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import AppLayout from "../../components/AppLayout";
-import { blogArticles, type BlogArticle } from "../../lib/blogData";
+import { type BlogArticle } from "../../lib/blogData";
+import { supabase } from "../../lib/supabase";
 
 export default function BlogArticlePage() {
   const { slug } = useParams<{ slug: string }>();
   const [copied, setCopied] = useState(false);
   const [pdfToast, setPdfToast] = useState(false);
+  const [article, setArticle] = useState<BlogArticle | null>(null);
+  const [relatedArticles, setRelatedArticles] = useState<BlogArticle[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const article: BlogArticle | undefined = blogArticles.find(
-    (a) => a.slug === slug
-  );
+  useEffect(() => {
+    supabase.from("blog_posts").select("*").eq("slug", slug).single().then(({ data }) => {
+      if (data) {
+        setArticle({
+          id: data.id, slug: data.slug ?? "", title: data.title ?? "",
+          excerpt: (data.content ?? "").slice(0, 120), category: data.category ?? "",
+          coverImage: data.banner_image ?? "#8957f6", author: data.author ?? "فريق AdVault",
+          date: (data.created_at ?? "").slice(0, 10), readTime: "5 دقائق",
+          tags: data.tags ?? [],
+        });
+      }
+      setLoading(false);
+    });
+    // Fetch related
+    supabase.from("blog_posts").select("*").eq("status", "published").limit(4).then(({ data }) => {
+      if (data) setRelatedArticles(data.filter((d: { slug: string }) => d.slug !== slug).slice(0, 3).map((d: Record<string, unknown>) => ({
+        id: d.id as number, slug: (d.slug as string) ?? "", title: (d.title as string) ?? "",
+        excerpt: ((d.content as string) ?? "").slice(0, 120), category: (d.category as string) ?? "",
+        coverImage: (d.banner_image as string) ?? "#8957f6", author: (d.author as string) ?? "",
+        date: ((d.created_at as string) ?? "").slice(0, 10), readTime: "5 دقائق", tags: (d.tags as string[]) ?? [],
+      })));
+    });
+  }, [slug]);
+
+  if (loading) {
+    return <AppLayout><div className="flex items-center justify-center min-h-[60vh]"><p style={{ color: "#6b7280" }}>جارٍ التحميل...</p></div></AppLayout>;
+  }
 
   if (!article) {
     return (
       <AppLayout>
         <div className="flex items-center justify-center min-h-[60vh]">
-          <p
-            className="text-lg font-bold"
-            style={{ color: "var(--text-primary)" }}
-          >
-            المقال غير موجود
-          </p>
+          <p className="text-lg font-bold" style={{ color: "#1c1c1e" }}>المقال غير موجود</p>
         </div>
       </AppLayout>
     );
   }
 
-  const related = blogArticles
+  const related = relatedArticles
     .filter((a) => a.id !== article.id)
     .slice(0, 3);
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { mockStrategies, type Strategy } from "../../lib/mockData";
+import { type Strategy } from "../../lib/mockData";
 import { uploadFile } from "../../lib/storage";
 import { supabase, isSupabaseConfigured } from "../../lib/supabase";
 import { fetchStrategies } from "../../lib/db";
@@ -18,7 +18,7 @@ const emptyForm = {
 };
 
 export default function AdminStrategiesPage() {
-  const [strategies, setStrategies] = useState<Strategy[]>(mockStrategies);
+  const [strategies, setStrategies] = useState<Strategy[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [editId, setEditId] = useState<string | null>(null);
   const [form, setForm] = useState(emptyForm);
@@ -58,7 +58,7 @@ export default function AdminStrategiesPage() {
   };
 
   const handleDelete = async (id: string) => {
-    if (isSupabaseConfigured()) { await supabase.from("strategies").delete().eq("id", id); }
+    await supabase.from("strategies").delete().eq("id", id);
     setStrategies((prev) => prev.filter((s) => s.id !== id));
   };
 
@@ -84,18 +84,12 @@ export default function AdminStrategiesPage() {
       is_pro_only: form.is_pro_only,
     };
     try {
-      if (isSupabaseConfigured()) {
-        if (editId) {
-          await supabase.from("strategies").update(stratData).eq("id", editId);
-        } else {
-          await supabase.from("strategies").insert(stratData);
-        }
-        await reload();
+      if (editId) {
+        await supabase.from("strategies").update(stratData).eq("id", editId);
       } else {
-        const newS = { id: editId ?? Date.now().toString(), brand: form.brand, brandInitial: form.brandInitial || form.brand[0] || "?", brandColor: form.brandColor, title: form.title, preview: form.preview, insights: form.insights, sector: form.sector, tags: form.tags, date: form.date, thumbnail: form.thumbnail, is_pro_only: form.is_pro_only } as unknown as Strategy;
-        if (editId) { setStrategies((prev) => prev.map((s) => (s.id === editId ? newS : s))); }
-        else { setStrategies((prev) => [newS, ...prev]); }
+        await supabase.from("strategies").insert(stratData);
       }
+      await reload();
     } catch (err) { console.error("Save error:", err); }
     setShowForm(false);
     setEditId(null);

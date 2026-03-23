@@ -6,7 +6,7 @@ import AdCard from "../components/AdCard";
 import AdModal from "../components/AdModal";
 import FilterBar from "../components/FilterBar";
 import { SkeletonList } from "../components/Skeleton";
-import { mockAds, type Ad } from "../lib/mockData";
+import { type Ad } from "../lib/mockData";
 import { fetchAds } from "../lib/db";
 
 const filterConfigs = [
@@ -23,7 +23,7 @@ const sortOptions = [
 ];
 
 export default function LibraryPage() {
-  const [ads, setAds] = useState<Ad[]>(mockAds);
+  const [ads, setAds] = useState<Ad[]>([]);
   const [selectedAd, setSelectedAd] = useState<Ad | null>(null);
   const [activeFilters, setActiveFilters] = useState<Record<string, string>>({});
   const [sort, setSort] = useState("newest");

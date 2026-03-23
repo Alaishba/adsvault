@@ -3,11 +3,11 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import AppLayout from "../components/AppLayout";
-import { blogArticles as defaultArticles, type BlogArticle } from "../lib/blogData";
+import { type BlogArticle } from "../lib/blogData";
 import { supabase, isSupabaseConfigured } from "../lib/supabase";
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const _blogDataBackup = [
+const _removed = [
   {
     id: 1,
     slug: "استراتيجيات-التسويق-الرقمي-2026",
@@ -100,7 +100,7 @@ function getInitials(title: string) {
 
 export default function BlogPage() {
   const [activeCategory, setActiveCategory] = useState("الكل");
-  const [blogArticles, setBlogArticles] = useState<BlogArticle[]>(defaultArticles);
+  const [blogArticles, setBlogArticles] = useState<BlogArticle[]>([]);
 
   useEffect(() => {
     if (!isSupabaseConfigured()) return;
@@ -120,38 +120,37 @@ export default function BlogPage() {
       });
   }, []);
 
-  const featured = blogArticles[0];
-  const filtered =
-    activeCategory === "الكل"
+  const featured = blogArticles.length > 0 ? blogArticles[0] : null;
+  const filtered = blogArticles.length > 0
+    ? (activeCategory === "الكل"
       ? blogArticles.slice(1)
-      : blogArticles.filter(
-          (a) => a.id !== featured.id && a.category === activeCategory
-        );
+      : blogArticles.filter((a) => a.id !== featured?.id && a.category === activeCategory))
+    : [];
 
   return (
     <AppLayout>
       <div className="p-4 sm:p-6 lg:p-8">
         {/* Hero – Featured Article */}
-        <Link href={`/blog/${featured.slug}`}>
-          <div
-            className="relative w-full rounded-2xl overflow-hidden mb-8"
-            style={{ minHeight: 360, background: featured.coverImage }}
-          >
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
-            <div className="absolute bottom-0 right-0 left-0 p-6 sm:p-10 text-white">
-              <span className="inline-block px-3 py-1 rounded-full text-xs font-bold bg-[#84cc18] text-white mb-3">
-                {featured.category}
-              </span>
-              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold mb-2 leading-tight">
-                {featured.title}
-              </h1>
-              <p className="text-sm sm:text-base text-white/80 max-w-2xl mb-3">
-                {featured.excerpt}
-              </p>
-              <span className="text-xs text-white/60">{featured.date}</span>
+        {featured ? (
+          <Link href={`/blog/${featured.slug}`}>
+            <div className="relative w-full rounded-2xl overflow-hidden mb-8"
+              style={{ minHeight: 360, background: featured.coverImage }}>
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+              <div className="absolute bottom-0 right-0 left-0 p-6 sm:p-10 text-white">
+                <span className="inline-block px-3 py-1 rounded-full text-xs font-bold bg-[#84cc18] text-white mb-3">{featured.category}</span>
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold mb-2 leading-tight">{featured.title}</h1>
+                <p className="text-sm sm:text-base text-white/80 max-w-2xl mb-3">{featured.excerpt}</p>
+                <span className="text-xs text-white/60">{featured.date}</span>
+              </div>
             </div>
+          </Link>
+        ) : (
+          <div className="text-center py-16 rounded-2xl mb-8" style={{ background: "#ffffff", border: "1px solid #e5e7eb" }}>
+            <p className="text-3xl mb-2">📝</p>
+            <p className="font-bold" style={{ color: "#1c1c1e" }}>لا يوجد مقالات منشورة بعد</p>
+            <p className="text-sm mt-1" style={{ color: "#6b7280" }}>أضف مقالات من لوحة التحكم</p>
           </div>
-        </Link>
+        )}
 
         {/* Category filter pills */}
         <div className="flex flex-wrap gap-2 mb-8">

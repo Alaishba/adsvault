@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { supabase, isSupabaseConfigured } from "../lib/supabase";
+import { supabase } from "../lib/supabase";
 
 export default function RegisterPage() {
   const [fullName, setFullName] = useState("");
@@ -20,11 +20,6 @@ export default function RegisterPage() {
     if (password.length < 8) { setError("يجب أن تكون كلمة المرور 8 أحرف على الأقل"); return; }
     setLoading(true);
     try {
-      if (!isSupabaseConfigured()) {
-        localStorage.setItem("mockUser", JSON.stringify({ email, name: fullName }));
-        window.location.href = "/";
-        return;
-      }
       const { data: authData, error } = await supabase.auth.signUp({
         email,
         password,
