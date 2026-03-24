@@ -10,6 +10,10 @@ export function createAdminClient() {
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
   const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
+  if (!serviceKey) {
+    console.warn("[AdminClient] SUPABASE_SERVICE_ROLE_KEY is NOT set — falling back to anon key. Uploads will fail due to RLS!");
+  }
+
   return createClient(url, serviceKey || anonKey, {
     auth: { persistSession: false },
   });

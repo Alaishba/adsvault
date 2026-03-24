@@ -5,9 +5,9 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import AppLayout from "../components/AppLayout";
 import { createClient } from "../lib/supabase/client";
-import { uploadFile } from "../lib/storage";
 import { getImageUrl } from "../lib/imageUrl";
 import { revalidate } from "../actions";
+import { uploadAdminFile } from "../actions/adminActions";
 
 const tabs = [
   { id: "info", label: "معلوماتي" },
@@ -84,12 +84,17 @@ export default function ProfilePage() {
     try {
       if (!userId) throw new Error("يجب تسجيل الدخول أولاً");
       console.log(`[Profile] Uploading avatar for user=${userId} size=${file.size}`);
-      const { url, error } = await uploadFile("user-avatars", file, `${userId}-avatar`);
-      if (error) {
-        console.error(`[Profile] Avatar upload failed:`, error);
-        throw new Error(error);
+      const fd = new FormData();
+      fd.append("file", file);
+      fd.append("bucket", "user-avatars");
+      fd.append("path", `${userId}-avatar`);
+      const result = await uploadAdminFile(fd);
+      if (result.error) {
+        console.error(`[Profile] Avatar upload failed:`, result.error);
+        throw new Error(result.error);
       }
-      if (!url) throw new Error("فشل رفع الصورة");
+      if (!result.url) throw new Error("فشل رفع الصورة");
+      const url = result.url;
       console.log(`[Profile] Avatar uploaded: ${url}`);
       setAvatarUrl(url);
       const { error: dbErr } = await supabase.from("users").update({ avatar_url: url }).eq("id", userId);
