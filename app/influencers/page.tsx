@@ -6,6 +6,7 @@ import PlatformBadge from "../components/PlatformBadge";
 import { type Influencer, type Platform } from "../lib/mockData";
 import { fetchInfluencers } from "../lib/db";
 import { supabase, isSupabaseConfigured } from "../lib/supabase";
+import { getImageUrl } from "../lib/imageUrl";
 
 function InfluencerModal({ inf, onClose }: { inf: Influencer; onClose: () => void }) {
   const [tab, setTab] = useState<"info" | "contact">("info");
@@ -53,12 +54,16 @@ function InfluencerModal({ inf, onClose }: { inf: Influencer; onClose: () => voi
         {/* Header */}
         <div className="flex items-center justify-between px-6 pt-6 pb-4">
           <div className="flex items-center gap-4">
-            <div
-              className="w-16 h-16 rounded-2xl flex items-center justify-center text-2xl font-black text-white shrink-0"
-              style={{ background: inf.color }}
-            >
-              {inf.initial}
-            </div>
+            {(inf as unknown as Record<string, string>).profile_image ? (
+              <img src={getImageUrl("influencer-photos", (inf as unknown as Record<string, string>).profile_image)}
+                alt={inf.name} className="w-16 h-16 rounded-2xl object-cover shrink-0"
+                onError={(e) => { e.currentTarget.src = "/fallback.png"; e.currentTarget.style.display = "block"; }} />
+            ) : (
+              <div className="w-16 h-16 rounded-2xl flex items-center justify-center text-2xl font-black text-white shrink-0"
+                style={{ background: inf.color }}>
+                {inf.initial}
+              </div>
+            )}
             <div>
               <h2 className="text-lg font-extrabold text-[#1c1c1e]">{inf.name}</h2>
               <p className="text-sm text-[#6b7280]">{inf.category} · {inf.country}</p>
@@ -262,12 +267,16 @@ export default function InfluencersPage() {
             >
               {/* Header */}
               <div className="flex items-center gap-3 mb-4">
-                <div
-                  className="w-12 h-12 rounded-2xl flex items-center justify-center text-lg font-black text-white shrink-0"
-                  style={{ background: inf.color }}
-                >
-                  {inf.initial}
-                </div>
+                {(inf as unknown as Record<string, string>).profile_image ? (
+                  <img src={getImageUrl("influencer-photos", (inf as unknown as Record<string, string>).profile_image)}
+                    alt={inf.name} className="w-12 h-12 rounded-2xl object-cover shrink-0"
+                    onError={(e) => { e.currentTarget.src = "/fallback.png"; e.currentTarget.style.display = "block"; }} />
+                ) : (
+                  <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-lg font-black text-white shrink-0"
+                    style={{ background: inf.color }}>
+                    {inf.initial}
+                  </div>
+                )}
                 <div>
                   <p className="font-bold text-sm transition-colors group-hover:text-[#84cc18]" style={{ color: "#1c1c1e" }}>{inf.name}</p>
                   <p className="text-xs text-[#6b7280]">{inf.category} · {inf.country}</p>

@@ -1,8 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect, type ChangeEvent } from "react";
-import { uploadFile } from "../../lib/storage";
-import { saveAdminBlogPost, deleteAdminBlogPost, fetchAdminBlogPosts } from "../../actions/adminActions";
+import { saveAdminBlogPost, deleteAdminBlogPost, fetchAdminBlogPosts, uploadAdminFile } from "../../actions/adminActions";
 
 interface AdminArticle {
   id: number;
@@ -185,10 +184,17 @@ export default function AdminBlogPage() {
     const file = e.target.files?.[0];
     if (!file) return;
     setUploading(true);
-    const { url } = await uploadFile("ads-images", file);
-    if (url) {
-      setForm((f) => ({ ...f, coverImage: url }));
-      setImagePreview(url);
+    const fd = new FormData();
+    fd.append("file", file);
+    fd.append("bucket", "blog-images");
+    fd.append("path", `blog-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`);
+    const result = await uploadAdminFile(fd);
+    if (result.error) {
+      console.error("[AdminBlog] Image upload failed:", result.error);
+    } else if (result.url) {
+      console.log("[AdminBlog] Image uploaded:", result.url);
+      setForm((f) => ({ ...f, coverImage: result.url! }));
+      setImagePreview(result.url);
     }
     setUploading(false);
   };

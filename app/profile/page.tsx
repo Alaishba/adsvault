@@ -83,12 +83,21 @@ export default function ProfilePage() {
     setAvatarError(null);
     try {
       if (!userId) throw new Error("يجب تسجيل الدخول أولاً");
+      console.log(`[Profile] Uploading avatar for user=${userId} size=${file.size}`);
       const { url, error } = await uploadFile("user-avatars", file, `${userId}-avatar`);
-      if (error) throw new Error(error);
+      if (error) {
+        console.error(`[Profile] Avatar upload failed:`, error);
+        throw new Error(error);
+      }
       if (!url) throw new Error("فشل رفع الصورة");
+      console.log(`[Profile] Avatar uploaded: ${url}`);
       setAvatarUrl(url);
       const { error: dbErr } = await supabase.from("users").update({ avatar_url: url }).eq("id", userId);
-      if (dbErr) throw new Error(dbErr.message);
+      if (dbErr) {
+        console.error(`[Profile] DB update failed:`, dbErr.message);
+        throw new Error(dbErr.message);
+      }
+      console.log(`[Profile] Avatar saved to DB`);
       await revalidate("/profile");
       router.refresh();
     } catch (err: unknown) {
@@ -138,7 +147,8 @@ export default function ProfilePage() {
         }}>
           <div className="relative shrink-0 group">
             {avatarUrl ? (
-              <img src={getImageUrl("user-avatars", avatarUrl)} alt="avatar" className="w-20 h-20 rounded-2xl object-cover" style={{ border: "3px solid #84cc18" }} />
+              <img src={getImageUrl("user-avatars", avatarUrl)} alt="avatar" className="w-20 h-20 rounded-2xl object-cover" style={{ border: "3px solid #84cc18" }}
+                onError={(e) => { e.currentTarget.src = "/fallback.png"; e.currentTarget.style.display = "block"; }} />
             ) : (
               <div className="w-20 h-20 rounded-2xl flex items-center justify-center text-2xl font-black text-white"
                 style={{ background: "#8957f6", border: "3px solid #84cc18" }}>{initials}</div>

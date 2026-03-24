@@ -6,6 +6,7 @@ import Link from "next/link";
 import AppLayout from "../../components/AppLayout";
 import { type BlogArticle } from "../../lib/blogData";
 import { supabase } from "../../lib/supabase";
+import { getImageUrl } from "../../lib/imageUrl";
 
 export default function BlogArticlePage() {
   const { slug } = useParams<{ slug: string }>();
@@ -76,9 +77,14 @@ export default function BlogArticlePage() {
     <AppLayout>
       {/* Hero banner */}
       <div
-        className="w-full relative"
-        style={{ height: 300, background: article.coverImage }}
+        className="w-full relative overflow-hidden"
+        style={{ height: 300, background: article.coverImage.startsWith("#") ? article.coverImage : "#8957f6" }}
       >
+        {!article.coverImage.startsWith("#") && (
+          <img src={getImageUrl("blog-images", article.coverImage)} alt={article.title}
+            className="absolute inset-0 w-full h-full object-cover"
+            onError={(e) => { e.currentTarget.style.display = "none"; }} />
+        )}
         <div className="absolute inset-0 bg-black/40" />
         <div className="absolute bottom-6 right-6 left-6 text-white">
           <span className="inline-block px-3 py-1 rounded-full text-xs font-bold bg-[#84cc18] mb-2">
@@ -227,12 +233,17 @@ export default function BlogArticlePage() {
                   }}
                 >
                   <div
-                    className="flex items-center justify-center"
+                    className="flex items-center justify-center relative overflow-hidden"
                     style={{
                       aspectRatio: "16/9",
-                      background: a.coverImage,
+                      background: a.coverImage.startsWith("#") ? a.coverImage : "#8957f6",
                     }}
                   >
+                    {!a.coverImage.startsWith("#") && (
+                      <img src={getImageUrl("blog-images", a.coverImage)} alt={a.title}
+                        className="absolute inset-0 w-full h-full object-cover"
+                        onError={(e) => { e.currentTarget.style.display = "none"; }} />
+                    )}
                     <span className="text-white/30 text-3xl font-extrabold select-none">
                       {a.title
                         .split(" ")

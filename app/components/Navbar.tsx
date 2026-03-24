@@ -106,6 +106,7 @@ export default function Navbar({ onMenuClick }: { onMenuClick?: () => void }) {
 
       {/* Logo desktop */}
       <Link href="/" className="hidden lg:flex items-center gap-3 shrink-0 min-w-0">
+        <img src="/logo.svg" alt="AdVault" className="h-8 w-auto" onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
         <div className="min-w-0">
           <p className="font-black text-base leading-tight whitespace-nowrap" style={{ color: "#1c1c1e" }}>
             AdVault <span style={{ color: "#84cc18" }}>MENA</span>
@@ -177,7 +178,8 @@ export default function Navbar({ onMenuClick }: { onMenuClick?: () => void }) {
               className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold text-white cursor-pointer shrink-0 hover:opacity-90 transition-all overflow-hidden"
               style={{ background: "#8957f6" }}>
               {userInfo.avatar ? (
-                <img src={getImageUrl("user-avatars", userInfo.avatar)} alt="" className="w-full h-full object-cover" />
+                <img src={getImageUrl("user-avatars", userInfo.avatar)} alt="" className="w-full h-full object-cover"
+                  onError={(e) => { e.currentTarget.src = "/fallback.png"; e.currentTarget.style.display = "block"; }} />
               ) : initials}
             </button>
             {dropdownOpen && (

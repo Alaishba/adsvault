@@ -5,6 +5,7 @@ import Link from "next/link";
 import AppLayout from "../components/AppLayout";
 import { type BlogArticle } from "../lib/blogData";
 import { supabase, isSupabaseConfigured } from "../lib/supabase";
+import { getImageUrl } from "../lib/imageUrl";
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const _removed = [
@@ -134,7 +135,12 @@ export default function BlogPage() {
         {featured ? (
           <Link href={`/blog/${featured.slug}`}>
             <div className="relative w-full rounded-2xl overflow-hidden mb-8"
-              style={{ minHeight: 360, background: featured.coverImage }}>
+              style={{ minHeight: 360, background: featured.coverImage.startsWith("#") ? featured.coverImage : "#8957f6" }}>
+              {!featured.coverImage.startsWith("#") && (
+                <img src={getImageUrl("blog-images", featured.coverImage)} alt={featured.title}
+                  className="absolute inset-0 w-full h-full object-cover"
+                  onError={(e) => { e.currentTarget.style.display = "none"; }} />
+              )}
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
               <div className="absolute bottom-0 right-0 left-0 p-6 sm:p-10 text-white">
                 <span className="inline-block px-3 py-1 rounded-full text-xs font-bold bg-[#84cc18] text-white mb-3">{featured.category}</span>
@@ -187,12 +193,17 @@ export default function BlogPage() {
               >
                 {/* Cover */}
                 <div
-                  className="flex items-center justify-center relative"
+                  className="flex items-center justify-center relative overflow-hidden"
                   style={{
                     aspectRatio: "16/9",
-                    background: article.coverImage,
+                    background: article.coverImage.startsWith("#") ? article.coverImage : "#8957f6",
                   }}
                 >
+                  {!article.coverImage.startsWith("#") && (
+                    <img src={getImageUrl("blog-images", article.coverImage)} alt={article.title}
+                      className="absolute inset-0 w-full h-full object-cover"
+                      onError={(e) => { e.currentTarget.style.display = "none"; }} />
+                  )}
                   <span className="text-white/30 text-4xl font-extrabold select-none">
                     {getInitials(article.title)}
                   </span>

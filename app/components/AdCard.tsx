@@ -62,7 +62,7 @@ export default function AdCard({ ad, onClick }: { ad: Ad; onClick: (ad: Ad) => v
       >
         {(ad.images ?? []).length > 0 ? (
           <img src={getImageUrl("ads-images", (ad.images ?? [])[0])} alt={ad.title}
-            className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
+            className="w-full h-full object-cover" onError={(e) => { e.currentTarget.src = "/fallback.png"; e.currentTarget.style.display = "block"; }} />
         ) : (
           <div className="w-12 h-12 rounded-xl flex items-center justify-center text-lg font-black text-white"
             style={{ background: ad.brandColor ?? "#84cc18" }}>

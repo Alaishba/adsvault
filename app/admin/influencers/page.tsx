@@ -2,9 +2,8 @@
 
 import { useState, useRef, useEffect } from "react";
 import { type Influencer, type Platform } from "../../lib/mockData";
-import { uploadFile } from "../../lib/storage";
 import { getImageUrl } from "../../lib/imageUrl";
-import { saveAdminInfluencer, deleteAdminInfluencer, fetchAdminInfluencers } from "../../actions/adminActions";
+import { saveAdminInfluencer, deleteAdminInfluencer, fetchAdminInfluencers, uploadAdminFile } from "../../actions/adminActions";
 
 const emptyForm = {
   name: "", bio: "", category: "", country: "",
@@ -76,20 +75,34 @@ export default function AdminInfluencersPage() {
     }));
   };
 
+  const [uploadError, setUploadError] = useState<string | null>(null);
+
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     setUploading(true);
-    const { url } = await uploadFile("influencer-photos", file, `influencer-${Date.now()}`);
-    if (url) {
-      setImagePreview(url);
-      setForm((f) => ({ ...f, profileImage: url }));
+    setUploadError(null);
+    const fd = new FormData();
+    fd.append("file", file);
+    fd.append("bucket", "influencer-photos");
+    fd.append("path", `influencer-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`);
+    const result = await uploadAdminFile(fd);
+    if (result.error) {
+      console.error("[AdminInfluencers] Image upload failed:", result.error);
+      setUploadError(`فشل رفع الصورة: ${result.error}`);
+    } else if (result.url) {
+      console.log("[AdminInfluencers] Image uploaded:", result.url);
+      setImagePreview(result.url);
+      setForm((f) => ({ ...f, profileImage: result.url! }));
     }
     setUploading(false);
   };
 
+  const [saveError, setSaveError] = useState<string | null>(null);
+
   const handleSave = async () => {
     if (!form.name) return;
+    setSaveError(null);
     const infData = {
       name: form.name, bio: form.bio,
       platform: form.platforms.join(","),
@@ -101,13 +114,22 @@ export default function AdminInfluencersPage() {
       contact_email: form.contactEmail || null,
     };
 
+    console.log("[AdminInfluencers] Saving influencer:", { ...infData, profile_image: infData.profile_image ? "(set)" : "(null)" });
     try {
       const result = await saveAdminInfluencer(infData, editId);
-      if ("error" in result) { console.error("Save error:", result.error); }
+      if ("error" in result) {
+        console.error("[AdminInfluencers] DB save error:", result.error);
+        setSaveError(`فشل الحفظ: ${result.error}`);
+        return;
+      }
+      console.log("[AdminInfluencers] Saved successfully");
       await reload();
-    } catch (err) { console.error("Save error:", err); }
-    setShowForm(false);
-    setEditId(null);
+      setShowForm(false);
+      setEditId(null);
+    } catch (err) {
+      console.error("[AdminInfluencers] Unexpected error:", err);
+      setSaveError(`خطأ غير متوقع: ${err instanceof Error ? err.message : String(err)}`);
+    }
   };
 
   return (
@@ -314,6 +336,12 @@ export default function AdminInfluencersPage() {
                   className="w-full px-3 py-2 rounded-xl border outline-none text-sm text-[#1c1c1e] placeholder:text-[#9ca3af]"
                   style={{ background: "#ffffff", borderColor: "#e5e7eb" }} />
               </div>
+
+              {(uploadError || saveError) && (
+                <div className="col-span-2 px-3 py-2 rounded-lg text-xs font-semibold" style={{ background: "#fef2f2", color: "#ef4444" }}>
+                  {uploadError || saveError}
+                </div>
+              )}
 
               <div className="col-span-2 flex gap-3 pt-2">
                 <button onClick={handleSave}

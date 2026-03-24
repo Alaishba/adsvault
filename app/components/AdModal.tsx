@@ -27,7 +27,7 @@ function MediaSwiper({ colors, brandColor }: { colors: string[]; brandColor: str
     <div className="relative w-full h-full min-h-[220px] flex items-center justify-center overflow-hidden rounded-xl"
       style={{ background: isUrl ? "#f3f5f9" : (current + "22") }}>
       {isUrl ? (
-        <img src={current} alt="" className="w-full h-full object-cover" />
+        <img src={current} alt="" className="w-full h-full object-cover" onError={(e) => { e.currentTarget.src = "/fallback.png"; e.currentTarget.style.display = "block"; }} />
       ) : (
         <div className="w-20 h-20 rounded-2xl flex items-center justify-center text-4xl font-black text-white opacity-80"
           style={{ background: current }}>▶</div>

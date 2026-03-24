@@ -2,8 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { type Ad } from "../../lib/mockData";
-import { uploadFile } from "../../lib/storage";
-import { saveAdminAd, deleteAdminAd, fetchAdminAds } from "../../actions/adminActions";
+import { saveAdminAd, deleteAdminAd, fetchAdminAds, uploadAdminFile } from "../../actions/adminActions";
 
 const platforms = ["Meta", "TikTok", "Snap", "YouTube", "Instagram"];
 const sectors = ["تجزئة", "اتصالات", "تجارة إلكترونية", "مواد استهلاكية", "خدمات مالية", "مطاعم", "عقارات", "تعليم"];
@@ -132,27 +131,59 @@ export default function AdminAdsPage() {
   const handleAnalysisImages = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files ?? []).slice(0, 3);
     for (const file of files) {
-      const { url } = await uploadFile("ads-images", file, `analysis-${Date.now()}`);
-      if (url) setPro({ analysis_images: [...pro.analysis_images, url] });
+      const fd = new FormData();
+      fd.append("file", file);
+      fd.append("bucket", "ads-images");
+      fd.append("path", `analysis-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`);
+      const result = await uploadAdminFile(fd);
+      if (result.error) { console.error("[AdminAds] Analysis image upload failed:", result.error); continue; }
+      if (result.url) setPro({ analysis_images: [...pro.analysis_images, result.url] });
     }
   };
 
   const handleAttachments = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files ?? []).slice(0, 2);
     for (const file of files) {
-      const { url } = await uploadFile("ads-images", file, `attach-${Date.now()}`);
-      if (url) setPro({ attachments: [...pro.attachments, url] });
+      const fd = new FormData();
+      fd.append("file", file);
+      fd.append("bucket", "ads-images");
+      fd.append("path", `attach-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`);
+      const result = await uploadAdminFile(fd);
+      if (result.error) { console.error("[AdminAds] Attachment upload failed:", result.error); continue; }
+      if (result.url) setPro({ attachments: [...pro.attachments, result.url] });
     }
   };
+
+  const [saveError, setSaveError] = useState<string | null>(null);
 
   const handleSave = async () => {
     if (!form.title || !form.brand) return;
     setUploading(true);
+    setSaveError(null);
     try {
       let images = form.images ?? [];
       if (imageFiles.length > 0) {
-        const uploads = await Promise.all(imageFiles.map((f) => uploadFile("ads-images", f)));
-        images = uploads.filter((u) => u.url).map((u) => u.url as string);
+        console.log(`[AdminAds] Uploading ${imageFiles.length} image(s)...`);
+        const uploadedUrls: string[] = [];
+        for (const file of imageFiles) {
+          const fd = new FormData();
+          fd.append("file", file);
+          fd.append("bucket", "ads-images");
+          fd.append("path", `ad-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`);
+          const result = await uploadAdminFile(fd);
+          if (result.error) {
+            console.error(`[AdminAds] Image upload failed:`, result.error);
+            setSaveError(`فشل رفع الصورة: ${result.error}`);
+            setUploading(false);
+            return;
+          }
+          if (result.url) {
+            console.log(`[AdminAds] Image uploaded: ${result.url}`);
+            uploadedUrls.push(result.url);
+          }
+        }
+        images = uploadedUrls;
+        console.log(`[AdminAds] All images uploaded:`, images);
       }
       const adData = {
         title: form.title, brand: form.brand,
@@ -170,15 +201,23 @@ export default function AdminAdsPage() {
         is_pro_only: form.is_pro_only ?? false,
       };
 
+      console.log(`[AdminAds] Saving ad with ${images.length} image(s)...`);
       const result = await saveAdminAd(adData, editId);
-      if ("error" in result) { console.error("Save error:", result.error); }
+      if ("error" in result) {
+        console.error("[AdminAds] DB save error:", result.error);
+        setSaveError(`فشل حفظ الإعلان: ${result.error}`);
+        setUploading(false);
+        return;
+      }
+      console.log("[AdminAds] Ad saved successfully");
       await reload();
+      setShowForm(false);
+      setEditId(null);
     } catch (err) {
-      console.error("Save error:", err);
+      console.error("[AdminAds] Unexpected error:", err);
+      setSaveError(`خطأ غير متوقع: ${err instanceof Error ? err.message : String(err)}`);
     }
     setUploading(false);
-    setShowForm(false);
-    setEditId(null);
   };
 
   const inputCls = "w-full px-3 py-2 rounded-xl border border-[#e5e7eb] bg-white outline-none text-sm text-[#1c1c1e] focus:border-[#84cc18]/60 transition-colors";
@@ -514,6 +553,12 @@ export default function AdminAdsPage() {
                   <span className="text-sm text-[#1c1c1e]">إعلان Pro فقط</span>
                 </label>
               </div>
+
+              {saveError && (
+                <div className="px-3 py-2 rounded-lg text-xs font-semibold" style={{ background: "#fef2f2", color: "#ef4444" }}>
+                  {saveError}
+                </div>
+              )}
 
               <div className="flex gap-3 pt-2">
                 <button onClick={handleSave} disabled={uploading}

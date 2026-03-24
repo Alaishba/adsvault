@@ -3,8 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { type Strategy } from "../../lib/mockData";
-import { uploadFile } from "../../lib/storage";
-import { saveAdminStrategy, deleteAdminStrategy, fetchAdminStrategies } from "../../actions/adminActions";
+import { saveAdminStrategy, deleteAdminStrategy, fetchAdminStrategies, uploadAdminFile } from "../../actions/adminActions";
 
 const emptyForm = {
   brand: "", brandInitial: "", brandColor: "#8957f6",
@@ -72,10 +71,19 @@ export default function AdminStrategiesPage() {
     const file = e.target.files?.[0];
     if (!file) return;
     setUploading(true);
-    const { url } = await uploadFile("strategy-covers", file, `strategy-${Date.now()}`);
-    if (url) {
-      setThumbPreview(url);
-      setForm((f) => ({ ...f, thumbnail: url }));
+    setErrorMsg(null);
+    const fd = new FormData();
+    fd.append("file", file);
+    fd.append("bucket", "strategy-covers");
+    fd.append("path", `strategy-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`);
+    const result = await uploadAdminFile(fd);
+    if (result.error) {
+      console.error("[AdminStrategies] Thumbnail upload failed:", result.error);
+      setErrorMsg(`فشل رفع الصورة: ${result.error}`);
+    } else if (result.url) {
+      console.log("[AdminStrategies] Thumbnail uploaded:", result.url);
+      setThumbPreview(result.url);
+      setForm((f) => ({ ...f, thumbnail: result.url! }));
     }
     setUploading(false);
   };
@@ -90,8 +98,14 @@ export default function AdminStrategiesPage() {
       thumbnail: form.thumbnail || null,
       is_pro_only: form.is_pro_only,
     };
+    console.log("[AdminStrategies] Saving strategy:", { ...stratData, thumbnail: stratData.thumbnail ? "(set)" : "(null)" });
     const result = await saveAdminStrategy(stratData, editId);
-    if ("error" in result) { setErrorMsg(result.error); return; }
+    if ("error" in result) {
+      console.error("[AdminStrategies] DB save error:", result.error);
+      setErrorMsg(result.error);
+      return;
+    }
+    console.log("[AdminStrategies] Saved successfully");
     await reload();
     router.refresh();
     setShowForm(false);

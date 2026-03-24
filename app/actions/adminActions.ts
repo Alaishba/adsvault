@@ -5,6 +5,48 @@ import { createAdminClient } from "../lib/supabase/admin";
 
 type Result = { success: true } | { error: string };
 
+// ─── Admin File Upload (bypasses RLS via service role key) ───
+
+export async function uploadAdminFile(
+  formData: FormData
+): Promise<{ url: string | null; path: string | null; error: string | null }> {
+  const file = formData.get("file") as File | null;
+  const bucket = formData.get("bucket") as string;
+  const filePath = formData.get("path") as string | null;
+
+  if (!file || !bucket) {
+    console.error("[AdminUpload] Missing file or bucket");
+    return { url: null, path: null, error: "Missing file or bucket" };
+  }
+
+  const ext = file.name.includes(".") ? file.name.substring(file.name.lastIndexOf(".")) : "";
+  const finalPath = filePath
+    ? (filePath.includes(".") ? filePath : `${filePath}${ext}`)
+    : `${Date.now()}-${file.name.replace(/[^a-zA-Z0-9._-]/g, "_")}`;
+
+  console.log(`[AdminUpload] bucket="${bucket}" path="${finalPath}" size=${file.size} type=${file.type}`);
+
+  const supabase = createAdminClient();
+  const arrayBuffer = await file.arrayBuffer();
+  const buffer = Buffer.from(arrayBuffer);
+
+  const { data, error } = await supabase.storage
+    .from(bucket)
+    .upload(finalPath, buffer, {
+      upsert: true,
+      contentType: file.type || "application/octet-stream",
+    });
+
+  if (error) {
+    console.error(`[AdminUpload] FAILED bucket="${bucket}" path="${finalPath}":`, error.message);
+    return { url: null, path: null, error: error.message };
+  }
+
+  const { data: publicData } = supabase.storage.from(bucket).getPublicUrl(data.path);
+  console.log(`[AdminUpload] OK url="${publicData.publicUrl}"`);
+  return { url: publicData.publicUrl, path: data.path, error: null };
+}
+
 // ─── Strategies ───
 
 export async function saveAdminStrategy(
@@ -12,13 +54,15 @@ export async function saveAdminStrategy(
   editId?: string | null
 ): Promise<Result> {
   const supabase = createAdminClient();
+  console.log(`[saveAdminStrategy] ${editId ? "UPDATE" : "INSERT"} thumbnail=${data.thumbnail ? "(set)" : "(null)"}`);
   if (editId) {
     const { error } = await supabase.from("strategies").update(data).eq("id", editId);
-    if (error) return { error: error.message };
+    if (error) { console.error("[saveAdminStrategy] UPDATE error:", error.message); return { error: error.message }; }
   } else {
     const { error } = await supabase.from("strategies").insert(data);
-    if (error) return { error: error.message };
+    if (error) { console.error("[saveAdminStrategy] INSERT error:", error.message); return { error: error.message }; }
   }
+  console.log("[saveAdminStrategy] Success");
   revalidatePath("/admin/strategies");
   revalidatePath("/analysis");
   return { success: true };
@@ -40,13 +84,16 @@ export async function saveAdminAd(
   editId?: string | null
 ): Promise<Result> {
   const supabase = createAdminClient();
+  const images = data.images as string[] | undefined;
+  console.log(`[saveAdminAd] ${editId ? "UPDATE" : "INSERT"} images=${JSON.stringify(images?.length ?? 0)} keys=${Object.keys(data).join(",")}`);
   if (editId) {
     const { error } = await supabase.from("ads").update(data).eq("id", editId);
-    if (error) return { error: error.message };
+    if (error) { console.error("[saveAdminAd] UPDATE error:", error.message); return { error: error.message }; }
   } else {
     const { error } = await supabase.from("ads").insert(data);
-    if (error) return { error: error.message };
+    if (error) { console.error("[saveAdminAd] INSERT error:", error.message); return { error: error.message }; }
   }
+  console.log("[saveAdminAd] Success");
   revalidatePath("/admin/ads");
   revalidatePath("/");
   revalidatePath("/library");
@@ -70,13 +117,15 @@ export async function saveAdminInfluencer(
   editId?: string | null
 ): Promise<Result> {
   const supabase = createAdminClient();
+  console.log(`[saveAdminInfluencer] ${editId ? "UPDATE" : "INSERT"} profile_image=${data.profile_image ? "(set)" : "(null)"}`);
   if (editId) {
     const { error } = await supabase.from("influencers").update(data).eq("id", editId);
-    if (error) return { error: error.message };
+    if (error) { console.error("[saveAdminInfluencer] UPDATE error:", error.message); return { error: error.message }; }
   } else {
     const { error } = await supabase.from("influencers").insert(data);
-    if (error) return { error: error.message };
+    if (error) { console.error("[saveAdminInfluencer] INSERT error:", error.message); return { error: error.message }; }
   }
+  console.log("[saveAdminInfluencer] Success");
   revalidatePath("/admin/influencers");
   revalidatePath("/influencers");
   return { success: true };
