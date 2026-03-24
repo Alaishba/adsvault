@@ -5,6 +5,7 @@ import Link from "next/link";
 import type { Ad, FunnelStage } from "../lib/mockData";
 import PlatformBadge from "./PlatformBadge";
 import { createClient } from "../lib/supabase/client";
+import { getImageUrl } from "../lib/imageUrl";
 import PaywallModal from "./PaywallModal";
 
 const funnelConfig: Record<FunnelStage, { label: string; color: string; bg: string }> = {
@@ -15,7 +16,11 @@ const funnelConfig: Record<FunnelStage, { label: string; color: string; bg: stri
 
 function MediaSwiper({ colors, brandColor }: { colors: string[]; brandColor: string }) {
   const [idx, setIdx] = useState(0);
-  const items = colors.length ? colors : [brandColor ?? "#84cc18"];
+  const rawItems = colors.length ? colors : [brandColor ?? "#84cc18"];
+  const items = rawItems.map((item) => {
+    if (!item || item.startsWith("#")) return item;
+    return getImageUrl("ads-images", item);
+  });
   const current = items[idx] ?? "";
   const isUrl = current.startsWith("http") || current.startsWith("blob:") || current.startsWith("data:");
   return (

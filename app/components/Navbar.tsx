@@ -4,9 +4,10 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "../lib/supabase/client";
+import { getImageUrl } from "../lib/imageUrl";
 
 type SearchResult = { id: string; title: string; type: "ad" | "strategy" | "influencer"; href: string };
-type UserInfo = { name: string; plan: string } | null;
+type UserInfo = { name: string; plan: string; avatar?: string } | null;
 
 export default function Navbar({ onMenuClick }: { onMenuClick?: () => void }) {
   const router = useRouter();
@@ -25,8 +26,8 @@ export default function Navbar({ onMenuClick }: { onMenuClick?: () => void }) {
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
         const { data: profile } = await supabase
-          .from("users").select("full_name,plan").eq("id", user.id).single();
-        setUserInfo({ name: profile?.full_name ?? user.email ?? "", plan: profile?.plan ?? "free" });
+          .from("users").select("full_name,plan,avatar_url").eq("id", user.id).single();
+        setUserInfo({ name: profile?.full_name ?? user.email ?? "", plan: profile?.plan ?? "free", avatar: profile?.avatar_url ?? undefined });
       }
       setAuthLoading(false);
     })();
@@ -34,8 +35,8 @@ export default function Navbar({ onMenuClick }: { onMenuClick?: () => void }) {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event: string, session: { user: { id: string; email?: string } } | null) => {
       if (session?.user) {
         const { data: profile } = await supabase
-          .from("users").select("full_name,plan").eq("id", session.user.id).single();
-        setUserInfo({ name: profile?.full_name ?? session.user.email ?? "", plan: profile?.plan ?? "free" });
+          .from("users").select("full_name,plan,avatar_url").eq("id", session.user.id).single();
+        setUserInfo({ name: profile?.full_name ?? session.user.email ?? "", plan: profile?.plan ?? "free", avatar: profile?.avatar_url ?? undefined });
       } else {
         setUserInfo(null);
       }
@@ -99,7 +100,7 @@ export default function Navbar({ onMenuClick }: { onMenuClick?: () => void }) {
 
       {/* Logo mobile */}
       <Link href="/" className="lg:hidden flex items-center gap-2 shrink-0">
-        <div className="w-8 h-8 rounded-lg flex items-center justify-center text-xs font-black" style={{ background: "#84cc18", color: "#fff" }}>AV</div>
+        <img src="/logo.svg" alt="AdVault" className="h-8 w-auto" onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
         <span className="font-black text-sm" style={{ color: "#1c1c1e" }}>AdVault</span>
       </Link>
 
@@ -173,8 +174,12 @@ export default function Navbar({ onMenuClick }: { onMenuClick?: () => void }) {
         {!authLoading && userInfo && (
           <div className="relative" ref={dropdownRef}>
             <button onClick={() => setDropdownOpen(!dropdownOpen)}
-              className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold text-white cursor-pointer shrink-0 hover:opacity-90 transition-all"
-              style={{ background: "#8957f6" }}>{initials}</button>
+              className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold text-white cursor-pointer shrink-0 hover:opacity-90 transition-all overflow-hidden"
+              style={{ background: "#8957f6" }}>
+              {userInfo.avatar ? (
+                <img src={getImageUrl("user-avatars", userInfo.avatar)} alt="" className="w-full h-full object-cover" />
+              ) : initials}
+            </button>
             {dropdownOpen && (
               <div className="absolute top-full mt-2 left-0 w-48 rounded-xl border shadow-lg overflow-hidden z-50"
                 style={{ background: "#ffffff", borderColor: "#e5e7eb" }}>

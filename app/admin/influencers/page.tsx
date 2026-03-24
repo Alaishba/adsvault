@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { type Influencer, type Platform } from "../../lib/mockData";
 import { uploadFile } from "../../lib/storage";
+import { getImageUrl } from "../../lib/imageUrl";
 import { saveAdminInfluencer, deleteAdminInfluencer, fetchAdminInfluencers } from "../../actions/adminActions";
 
 const emptyForm = {
@@ -151,9 +152,9 @@ export default function AdminInfluencersPage() {
                 <tr key={inf.id} className="hover:bg-[#f3f5f9] transition-colors">
                   <td className="px-5 py-3">
                     <div className="flex items-center gap-2">
-                      {(inf as unknown as Record<string, string>).profileImage ? (
-                        <img src={(inf as unknown as Record<string, string>).profileImage}
-                          alt={inf.name}
+                      {((inf as unknown as Record<string, string>).profile_image || (inf as unknown as Record<string, string>).profileImage) ? (
+                        <img src={getImageUrl("influencer-photos", (inf as unknown as Record<string, string>).profile_image || (inf as unknown as Record<string, string>).profileImage)}
+                          alt={inf.name ?? ""}
                           className="w-8 h-8 rounded-full object-cover flex-shrink-0" />
                       ) : (
                         <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-black text-white flex-shrink-0"

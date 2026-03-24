@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import AppLayout from "../components/AppLayout";
 import { createClient } from "../lib/supabase/client";
 import { uploadFile } from "../lib/storage";
+import { getImageUrl } from "../lib/imageUrl";
 import { revalidate } from "../actions";
 
 const tabs = [
@@ -137,7 +138,7 @@ export default function ProfilePage() {
         }}>
           <div className="relative shrink-0 group">
             {avatarUrl ? (
-              <img src={avatarUrl} alt="avatar" className="w-20 h-20 rounded-2xl object-cover" style={{ border: "3px solid #84cc18" }} />
+              <img src={getImageUrl("user-avatars", avatarUrl)} alt="avatar" className="w-20 h-20 rounded-2xl object-cover" style={{ border: "3px solid #84cc18" }} />
             ) : (
               <div className="w-20 h-20 rounded-2xl flex items-center justify-center text-2xl font-black text-white"
                 style={{ background: "#8957f6", border: "3px solid #84cc18" }}>{initials}</div>
