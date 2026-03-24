@@ -15,12 +15,18 @@ const funnelConfig: Record<FunnelStage, { label: string; color: string; bg: stri
 
 function MediaSwiper({ colors, brandColor }: { colors: string[]; brandColor: string }) {
   const [idx, setIdx] = useState(0);
-  const items = colors.length ? colors : [brandColor];
+  const items = colors.length ? colors : [brandColor ?? "#84cc18"];
+  const current = items[idx] ?? "";
+  const isUrl = current.startsWith("http") || current.startsWith("blob:") || current.startsWith("data:");
   return (
     <div className="relative w-full h-full min-h-[220px] flex items-center justify-center overflow-hidden rounded-xl"
-      style={{ background: items[idx] + "22" }}>
-      <div className="w-20 h-20 rounded-2xl flex items-center justify-center text-4xl font-black text-white opacity-80 transition-all duration-300"
-        style={{ background: items[idx] }}>▶</div>
+      style={{ background: isUrl ? "#f3f5f9" : (current + "22") }}>
+      {isUrl ? (
+        <img src={current} alt="" className="w-full h-full object-cover" />
+      ) : (
+        <div className="w-20 h-20 rounded-2xl flex items-center justify-center text-4xl font-black text-white opacity-80"
+          style={{ background: current }}>▶</div>
+      )}
       {items.length > 1 && (
         <>
           <button onClick={() => setIdx((i) => (i === 0 ? items.length - 1 : i - 1))}

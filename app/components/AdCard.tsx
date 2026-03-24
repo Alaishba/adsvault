@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import type { Ad } from "../lib/mockData";
 import PlatformBadge from "./PlatformBadge";
+import { getImageUrl } from "../lib/imageUrl";
 
 function BookmarkButton({ adId }: { adId: string }) {
   const [saved, setSaved] = useState(false);
@@ -57,14 +58,17 @@ export default function AdCard({ ad, onClick }: { ad: Ad; onClick: (ad: Ad) => v
       {/* Thumbnail */}
       <div
         className="w-full h-36 flex items-center justify-center relative overflow-hidden"
-        style={{ background: `${ad.brandColor}18` }}
+        style={{ background: `${ad.brandColor ?? "#84cc18"}18` }}
       >
-        <div
-          className="w-12 h-12 rounded-xl flex items-center justify-center text-lg font-black text-white"
-          style={{ background: ad.brandColor }}
-        >
-          {ad.brandInitial}
-        </div>
+        {(ad.images ?? []).length > 0 ? (
+          <img src={getImageUrl("ads-images", (ad.images ?? [])[0])} alt={ad.title}
+            className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
+        ) : (
+          <div className="w-12 h-12 rounded-xl flex items-center justify-center text-lg font-black text-white"
+            style={{ background: ad.brandColor ?? "#84cc18" }}>
+            {ad.brandInitial ?? (ad.brand ?? "?")[0]}
+          </div>
+        )}
         <div className="absolute top-3 left-3">
           <PlatformBadge platform={ad.platform} />
         </div>

@@ -62,23 +62,30 @@ function HeroAdPreview({ ad, style }: { ad: Ad; style?: React.CSSProperties }) {
   );
 }
 
-/* ─── Stats ─── */
-const statsData = [
-  { target: 12000, prefix: "+", suffix: "", label: "إعلان محلي", sub: "من كبرى العلامات التجارية",
-    icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#84cc18" strokeWidth="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg> },
-  { target: 22, prefix: "", suffix: "", label: "دولة عربية", sub: "تغطية شاملة لمنطقة MENA",
-    icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#84cc18" strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg> },
-  { target: 85, prefix: "+", suffix: "", label: "قطاع تجاري", sub: "من التقنية إلى العقارات",
-    icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#84cc18" strokeWidth="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg> },
-  { target: 49, prefix: "", suffix: "", label: "تقييم المستخدمين", sub: "رضا عملائنا أولويتنا",
-    icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#84cc18" strokeWidth="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> },
+/* ─── Stats icons ─── */
+const statIcons = [
+  <svg key="ads" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#84cc18" strokeWidth="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>,
+  <svg key="countries" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#84cc18" strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>,
+  <svg key="sectors" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#84cc18" strokeWidth="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>,
+  <svg key="strats" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#84cc18" strokeWidth="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>,
 ];
 
-function StatCard({ stat }: { stat: typeof statsData[0] }) {
+function buildStatsData(ads: Ad[], strategies: Strategy[]) {
+  const uniqueCountries = new Set(ads.map((a) => a.country).filter(Boolean));
+  const uniqueSectors = new Set(ads.map((a) => a.sector).filter(Boolean));
+  return [
+    { target: ads.length, prefix: "+", suffix: "", label: "إعلان", sub: "من كبرى العلامات التجارية", icon: statIcons[0] },
+    { target: uniqueCountries.size || 0, prefix: "", suffix: "", label: "دولة", sub: "تغطية شاملة لمنطقة MENA", icon: statIcons[1] },
+    { target: uniqueSectors.size || 0, prefix: "", suffix: "", label: "قطاع تجاري", sub: "من التقنية إلى العقارات", icon: statIcons[2] },
+    { target: strategies.length, prefix: "", suffix: "", label: "استراتيجية", sub: "تحليلات عميقة للحملات", icon: statIcons[3] },
+  ];
+}
+
+type StatItem = { target: number; prefix: string; suffix: string; label: string; sub: string; icon: React.ReactNode };
+
+function StatCard({ stat }: { stat: StatItem }) {
   const { count, ref } = useCountUp(stat.target);
-  const display = stat.target === 49
-    ? `${(count / 10).toFixed(1)}`
-    : `${stat.prefix}${count.toLocaleString()}${stat.suffix}`;
+  const display = `${stat.prefix}${count.toLocaleString()}${stat.suffix}`;
   return (
     <div ref={ref} className="rounded-xl p-2.5 flex items-center gap-2.5" style={{
       background: "rgba(255,255,255,0.6)",
@@ -170,7 +177,7 @@ export default function HomePage() {
             )}
             <div className="absolute top-0 left-0 px-3 py-1.5 rounded-xl text-xs font-bold shadow-lg z-40"
               style={{ background: "#84cc18", color: "#fff", animation: "pulse-badge 2s ease infinite" }}>
-              +12,000 إعلان
+              {ads.length > 0 ? `+${ads.length} إعلان` : "AdVault"}
             </div>
           </div>
         </div>
@@ -179,7 +186,7 @@ export default function HomePage() {
       {/* ── STATS (glassmorphism, smaller) ── */}
       <section className="px-6 lg:px-10 pb-10">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-          {statsData.map((s, i) => <StatCard key={i} stat={s} />)}
+          {buildStatsData(ads, strategies).map((s, i) => <StatCard key={i} stat={s} />)}
         </div>
       </section>
 

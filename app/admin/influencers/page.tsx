@@ -28,8 +28,8 @@ export default function AdminInfluencersPage() {
   const [uploading, setUploading] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
-  const filtered = influencers.filter(
-    (i) => i.name.includes(search) || i.category.includes(search) || i.country.includes(search)
+  const filtered = (influencers ?? []).filter(
+    (i) => (i.name ?? "").includes(search) || (i.category ?? "").includes(search) || (i.country ?? "").includes(search)
   );
 
   const openAdd = () => {
@@ -41,15 +41,15 @@ export default function AdminInfluencersPage() {
 
   const openEdit = (inf: Influencer) => {
     setForm({
-      name: inf.name, bio: inf.bio ?? "",
-      category: inf.category, country: inf.country,
-      followers: inf.followers, engagement: inf.engagement,
+      name: inf.name ?? "", bio: inf.bio ?? "",
+      category: inf.category ?? "", country: inf.country ?? "",
+      followers: inf.followers ?? "", engagement: inf.engagement ?? "",
       platforms: inf.platforms ?? [],
       strengths: inf.strengths ?? [],
       weaknesses: inf.weaknesses ?? [],
       contactEmail: (inf as unknown as Record<string, string>).contactEmail ?? "",
       profileImage: (inf as unknown as Record<string, string>).profileImage ?? "",
-      initial: inf.initial, color: inf.color,
+      initial: inf.initial ?? (inf.name ?? "?")[0], color: inf.color ?? "#8957f6",
     });
     setImagePreview((inf as unknown as Record<string, string>).profileImage ?? null);
     setEditId(inf.id);
@@ -157,15 +157,15 @@ export default function AdminInfluencersPage() {
                           className="w-8 h-8 rounded-full object-cover flex-shrink-0" />
                       ) : (
                         <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-black text-white flex-shrink-0"
-                          style={{ background: inf.color }}>{inf.initial}</div>
+                          style={{ background: inf.color ?? "#8957f6" }}>{inf.initial ?? (inf.name ?? "?")[0]}</div>
                       )}
                       <span className="font-semibold text-[#1c1c1e]">{inf.name}</span>
                     </div>
                   </td>
-                  <td className="px-5 py-3" style={{ color: "#6b7280" }}>{inf.category}</td>
+                  <td className="px-5 py-3" style={{ color: "#6b7280" }}>{inf.category ?? "—"}</td>
                   <td className="px-5 py-3">
                     <div className="flex gap-1 flex-wrap">
-                      {inf.platforms.map((p) => (
+                      {(inf.platforms ?? []).map((p) => (
                         <span key={p} className="px-1.5 py-0.5 rounded text-xs font-medium"
                           style={{ background: "#f3f5f9", color: "#6b7280" }}>{p}</span>
                       ))}
@@ -173,7 +173,7 @@ export default function AdminInfluencersPage() {
                   </td>
                   <td className="px-5 py-3 font-bold text-[#1c1c1e]">{inf.followers}</td>
                   <td className="px-5 py-3" style={{ color: "#84cc18" }}>{inf.engagement}</td>
-                  <td className="px-5 py-3" style={{ color: "#6b7280" }}>{inf.country}</td>
+                  <td className="px-5 py-3" style={{ color: "#6b7280" }}>{inf.country ?? "—"}</td>
                   <td className="px-5 py-3">
                     <div className="flex gap-2">
                       <button onClick={() => openEdit(inf)}
