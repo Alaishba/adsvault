@@ -129,7 +129,7 @@ export default function AdminBlogPage() {
   // Load from Supabase
   useEffect(() => {
     if (!isSupabaseConfigured()) return;
-    supabase.from("blog_posts").select("*").order("created_at", { ascending: false }).then(({ data }) => {
+    supabase.from("blog_posts").select("*").order("created_at", { ascending: false }).then(({ data }: { data: Record<string, unknown>[] | null }) => {
       if (data && data.length > 0) {
         setArticles(data.map((d: Record<string, unknown>) => ({
           id: d.id as number, slug: d.slug as string, title: d.title as string,
@@ -145,7 +145,7 @@ export default function AdminBlogPage() {
   }, []);
   const reloadBlog = () => {
     if (!isSupabaseConfigured()) return;
-    supabase.from("blog_posts").select("*").order("created_at", { ascending: false }).then(({ data }) => {
+    supabase.from("blog_posts").select("*").order("created_at", { ascending: false }).then(({ data }: { data: Record<string, unknown>[] | null }) => {
       if (data && data.length > 0) {
         setArticles(data.map((d: Record<string, unknown>) => ({
           id: d.id as number, slug: d.slug as string, title: d.title as string,

@@ -69,14 +69,15 @@ export default function AdModal({ ad, onClose }: { ad: Ad | null; onClose: () =>
   const [isPro, setIsPro] = useState(false);
 
   useEffect(() => {
-    const supabase = createClient();
-    supabase.auth.getUser().then(async ({ data: { user: u } }) => {
+    (async () => {
+      const supabase = createClient();
+      const { data: { user: u } } = await supabase.auth.getUser();
       if (u) {
-        const { data } = await supabase.from("users").select("plan").eq("id", u.id).single();
-        const p = data?.plan ?? "free";
+        const { data: profile } = await supabase.from("users").select("plan").eq("id", u.id).single();
+        const p = profile?.plan ?? "free";
         setIsPro(p === "pro" || p === "enterprise" || p === "admin");
       }
-    });
+    })();
   }, []);
 
   useEffect(() => {

@@ -21,16 +21,17 @@ export default function Navbar({ onMenuClick }: { onMenuClick?: () => void }) {
 
   // Load user on mount
   useEffect(() => {
-    supabase.auth.getUser().then(async ({ data: { user } }) => {
+    (async () => {
+      const { data: { user } } = await supabase.auth.getUser();
       if (user) {
         const { data: profile } = await supabase
           .from("users").select("full_name,plan").eq("id", user.id).single();
         setUserInfo({ name: profile?.full_name ?? user.email ?? "", plan: profile?.plan ?? "free" });
       }
       setAuthLoading(false);
-    });
+    })();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event: string, session: { user: { id: string; email?: string } } | null) => {
       if (session?.user) {
         const { data: profile } = await supabase
           .from("users").select("full_name,plan").eq("id", session.user.id).single();
@@ -41,7 +42,8 @@ export default function Navbar({ onMenuClick }: { onMenuClick?: () => void }) {
     });
 
     return () => subscription.unsubscribe();
-  }, [supabase]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Close dropdown on outside click
   useEffect(() => {

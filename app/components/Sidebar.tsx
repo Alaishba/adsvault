@@ -31,14 +31,15 @@ export default function Sidebar({ mobileOpen, onClose }: { mobileOpen?: boolean;
   const [userPlan, setUserPlan] = useState<string | null>(null);
 
   useEffect(() => {
-    const supabase = createClient();
-    supabase.auth.getUser().then(async ({ data: { user: u } }) => {
+    (async () => {
+      const supabase = createClient();
+      const { data: { user: u } } = await supabase.auth.getUser();
       if (u) {
-        const { data } = await supabase.from("users").select("full_name,plan").eq("id", u.id).single();
-        setUserName(data?.full_name ?? u.email ?? null);
-        setUserPlan(data?.plan ?? "free");
+        const { data: profile } = await supabase.from("users").select("full_name,plan").eq("id", u.id).single();
+        setUserName(profile?.full_name ?? u.email ?? null);
+        setUserPlan(profile?.plan ?? "free");
       }
-    });
+    })();
   }, []);
 
   const isPro = userPlan === "pro" || userPlan === "enterprise" || userPlan === "admin";

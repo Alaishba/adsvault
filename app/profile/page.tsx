@@ -49,9 +49,10 @@ export default function ProfilePage() {
   const [savedAds, setSavedAds] = useState<Ad[]>([]);
   const [savedStrategies, setSavedStrategies] = useState<Strategy[]>([]);
 
-  // Load user session + profile from Supabase
+  // Load user session + profile (critical path — unblocks page)
   useEffect(() => {
-    supabase.auth.getUser().then(async ({ data: { user: authUser } }) => {
+    (async () => {
+      const { data: { user: authUser } } = await supabase.auth.getUser();
       if (!authUser) { setPageLoading(false); return; }
       setUserId(authUser.id);
       setEmail(authUser.email ?? "");
@@ -63,10 +64,17 @@ export default function ProfilePage() {
         setAvatarUrl(profile.avatar_url ?? null);
       }
       setPageLoading(false);
-    });
-    fetchAds().then((all) => setSavedAds(all.slice(0, 6)));
-    fetchStrategies().then(setSavedStrategies);
-  }, [supabase]);
+    })();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Non-blocking: load ads/strategies in background after page renders
+  useEffect(() => {
+    if (!pageLoading) {
+      fetchAds().then((all) => setSavedAds(all.slice(0, 6)));
+      fetchStrategies().then(setSavedStrategies);
+    }
+  }, [pageLoading]);
 
   const isPro = plan === "pro" || plan === "enterprise" || plan === "admin";
   const planInfo = planLabels[plan] ?? planLabels.free;
@@ -112,7 +120,12 @@ export default function ProfilePage() {
       const { data: { user: freshUser } } = await supabase.auth.getUser();
       if (!freshUser) throw new Error("يجب تسجيل الدخول أولاً");
       const uid = freshUser.id;
-      const { error } = await supabase.from("users").update({ full_name: name }).eq("id", uid);
+      const { error } = await supabase.from("users").update({
+        full_name: name,
+        ...(phone && { phone }),
+        ...(company && { company }),
+        ...(jobTitle && { job_title: jobTitle }),
+      }).eq("id", uid);
       if (error) throw new Error(error.message);
       await revalidate("/profile");
       router.refresh();

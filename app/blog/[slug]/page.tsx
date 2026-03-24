@@ -16,21 +16,21 @@ export default function BlogArticlePage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    supabase.from("blog_posts").select("*").eq("slug", slug).single().then(({ data }) => {
+    supabase.from("blog_posts").select("*").eq("slug", slug).single().then(({ data }: { data: Record<string, unknown> | null }) => {
       if (data) {
         setArticle({
-          id: data.id, slug: data.slug ?? "", title: data.title ?? "",
-          excerpt: (data.content ?? "").slice(0, 120), category: data.category ?? "",
-          coverImage: data.banner_image ?? "#8957f6", author: data.author ?? "فريق AdVault",
-          date: (data.created_at ?? "").slice(0, 10), readTime: "5 دقائق",
-          tags: data.tags ?? [],
+          id: data.id as number, slug: (data.slug as string) ?? "", title: (data.title as string) ?? "",
+          excerpt: ((data.content as string) ?? "").slice(0, 120), category: (data.category as string) ?? "",
+          coverImage: (data.banner_image as string) ?? "#8957f6", author: (data.author as string) ?? "فريق AdVault",
+          date: ((data.created_at as string) ?? "").slice(0, 10), readTime: "5 دقائق",
+          tags: (data.tags as string[]) ?? [],
         });
       }
       setLoading(false);
     });
     // Fetch related
-    supabase.from("blog_posts").select("*").eq("status", "published").limit(4).then(({ data }) => {
-      if (data) setRelatedArticles(data.filter((d: { slug: string }) => d.slug !== slug).slice(0, 3).map((d: Record<string, unknown>) => ({
+    supabase.from("blog_posts").select("*").eq("status", "published").limit(4).then(({ data }: { data: Record<string, unknown>[] | null }) => {
+      if (data) setRelatedArticles(data.filter((d) => (d.slug as string) !== slug).slice(0, 3).map((d) => ({
         id: d.id as number, slug: (d.slug as string) ?? "", title: (d.title as string) ?? "",
         excerpt: ((d.content as string) ?? "").slice(0, 120), category: (d.category as string) ?? "",
         coverImage: (d.banner_image as string) ?? "#8957f6", author: (d.author as string) ?? "",

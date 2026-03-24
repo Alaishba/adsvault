@@ -105,7 +105,7 @@ export default function BlogPage() {
   useEffect(() => {
     if (!isSupabaseConfigured()) return;
     supabase.from("blog_posts").select("*").eq("status", "published").order("created_at", { ascending: false })
-      .then(({ data }) => {
+      .then(({ data }: { data: Record<string, unknown>[] | null }) => {
         if (data && data.length > 0) {
           setBlogArticles(data.map((d: Record<string, unknown>) => ({
             id: d.id as number, slug: (d.slug as string) ?? "",
