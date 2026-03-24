@@ -23,13 +23,13 @@ const kpiIcons = [
   <svg key="5" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#84cc18" strokeWidth="2"><circle cx="12" cy="8" r="4"/><path d="M20 21a8 8 0 1 0-16 0"/></svg>,
 ];
 
-const defaultKpis = [
-  { label: "إجمالي المستخدمين", value: "1,247", change: "+12%", up: true },
-  { label: "المشتركون Pro", value: "423", change: "+8%", up: true },
-  { label: "الإيراد الشهري (MRR)", value: "12,450 ر.س", change: "+8.3%", up: true },
-  { label: "إعلانات مضافة", value: "38", change: "+5", up: true },
-  { label: "استراتيجيات", value: "24", change: "+3", up: true },
-  { label: "مؤثرون", value: "156", change: "+12", up: true },
+const kpiLabels = [
+  { label: "إجمالي المستخدمين", change: "+12%", up: true },
+  { label: "المشتركون Pro", change: "+8%", up: true },
+  { label: "الإيراد الشهري (MRR)", change: "+8.3%", up: true },
+  { label: "إعلانات مضافة", change: "+5", up: true },
+  { label: "استراتيجيات", change: "+3", up: true },
+  { label: "مؤثرون", change: "+12", up: true },
 ];
 
 /* Simple bar chart */
@@ -65,7 +65,8 @@ export default function AdminDashboardPage() {
   const [users, setUsers] = useState<User[]>([]);
   const [recentAds, setRecentAds] = useState<{ title: string; brand: string; date: string }[]>([]);
   const [contactReqs, setContactReqs] = useState<{ name: string; email: string; message: string; date: string }[]>([]);
-  const [kpis, setKpis] = useState(defaultKpis);
+  const [kpiValues, setKpiValues] = useState<(string | null)[]>([null, null, null, null, null, null]);
+  const kpisLoaded = kpiValues.some((v) => v !== null);
 
   useEffect(() => {
     fetchAdminUsers().then((u) => setUsers(u.map((r: Record<string, string>) => ({
@@ -77,14 +78,14 @@ export default function AdminDashboardPage() {
 
   useEffect(() => {
     fetchAdminDashboardCounts().then((c) => {
-      setKpis((prev) => prev.map((k, i) => {
-        if (i === 0) return { ...k, value: c.totalUsers.toLocaleString() };
-        if (i === 1) return { ...k, value: c.proUsers.toLocaleString() };
-        if (i === 3) return { ...k, value: c.totalAds.toLocaleString() };
-        if (i === 4) return { ...k, value: c.totalStrategies.toLocaleString() };
-        if (i === 5) return { ...k, value: c.totalInfluencers.toLocaleString() };
-        return k;
-      }));
+      setKpiValues([
+        c.totalUsers.toLocaleString(),
+        c.proUsers.toLocaleString(),
+        "—",
+        c.totalAds.toLocaleString(),
+        c.totalStrategies.toLocaleString(),
+        c.totalInfluencers.toLocaleString(),
+      ]);
     });
   }, []);
 
@@ -99,14 +100,20 @@ export default function AdminDashboardPage() {
 
       {/* Row 1: KPIs */}
       <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3 mb-6">
-        {kpis.map((k, i) => (
+        {kpiLabels.map((k, i) => (
           <div key={i} className="rounded-2xl border p-4" style={{ background: "#ffffff", borderColor: "#e5e7eb" }}>
             <div className="flex items-center justify-between mb-2">
               <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: "#f7fee7" }}>{kpiIcons[i]}</div>
-              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full"
-                style={{ background: k.up ? "#f7fee7" : "#fef2f2", color: k.up ? "#84cc18" : "#ef4444" }}>{k.change}</span>
+              {kpisLoaded && (
+                <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full"
+                  style={{ background: k.up ? "#f7fee7" : "#fef2f2", color: k.up ? "#84cc18" : "#ef4444" }}>{k.change}</span>
+              )}
             </div>
-            <p className="text-xl font-extrabold text-[#1c1c1e] mb-0.5">{k.value}</p>
+            {!kpisLoaded ? (
+              <div className="h-7 w-16 rounded-lg animate-pulse mb-0.5" style={{ background: "#e5e7eb" }} />
+            ) : (
+              <p className="text-xl font-extrabold text-[#1c1c1e] mb-0.5">{kpiValues[i] ?? "—"}</p>
+            )}
             <p className="text-[10px]" style={{ color: "#6b7280" }}>{k.label}</p>
           </div>
         ))}
