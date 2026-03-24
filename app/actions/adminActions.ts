@@ -10,41 +10,47 @@ type Result = { success: true } | { error: string };
 export async function uploadAdminFile(
   formData: FormData
 ): Promise<{ url: string | null; path: string | null; error: string | null }> {
-  const file = formData.get("file") as File | null;
-  const bucket = formData.get("bucket") as string;
-  const filePath = formData.get("path") as string | null;
+  try {
+    const file = formData.get("file") as File | null;
+    const bucket = formData.get("bucket") as string;
+    const filePath = formData.get("path") as string | null;
 
-  if (!file || !bucket) {
-    console.error("[AdminUpload] Missing file or bucket");
-    return { url: null, path: null, error: "Missing file or bucket" };
+    if (!file || !bucket) {
+      console.error("[AdminUpload] Missing file or bucket");
+      return { url: null, path: null, error: "Missing file or bucket" };
+    }
+
+    const ext = file.name.includes(".") ? file.name.substring(file.name.lastIndexOf(".")) : "";
+    const finalPath = filePath
+      ? (filePath.includes(".") ? filePath : `${filePath}${ext}`)
+      : `${Date.now()}-${file.name.replace(/[^a-zA-Z0-9._-]/g, "_")}`;
+
+    console.log(`[AdminUpload] bucket="${bucket}" path="${finalPath}" size=${file.size} type=${file.type}`);
+
+    const supabase = createAdminClient();
+    const arrayBuffer = await file.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+
+    const { data, error } = await supabase.storage
+      .from(bucket)
+      .upload(finalPath, buffer, {
+        upsert: true,
+        contentType: file.type || "application/octet-stream",
+      });
+
+    if (error) {
+      console.error(`[AdminUpload] FAILED bucket="${bucket}" path="${finalPath}":`, error.message);
+      return { url: null, path: null, error: error.message };
+    }
+
+    const { data: publicData } = supabase.storage.from(bucket).getPublicUrl(data.path);
+    console.log(`[AdminUpload] OK url="${publicData.publicUrl}"`);
+    return { url: publicData.publicUrl, path: data.path, error: null };
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : "Upload failed unexpectedly";
+    console.error("[AdminUpload] Uncaught error:", msg);
+    return { url: null, path: null, error: msg };
   }
-
-  const ext = file.name.includes(".") ? file.name.substring(file.name.lastIndexOf(".")) : "";
-  const finalPath = filePath
-    ? (filePath.includes(".") ? filePath : `${filePath}${ext}`)
-    : `${Date.now()}-${file.name.replace(/[^a-zA-Z0-9._-]/g, "_")}`;
-
-  console.log(`[AdminUpload] bucket="${bucket}" path="${finalPath}" size=${file.size} type=${file.type}`);
-
-  const supabase = createAdminClient();
-  const arrayBuffer = await file.arrayBuffer();
-  const buffer = Buffer.from(arrayBuffer);
-
-  const { data, error } = await supabase.storage
-    .from(bucket)
-    .upload(finalPath, buffer, {
-      upsert: true,
-      contentType: file.type || "application/octet-stream",
-    });
-
-  if (error) {
-    console.error(`[AdminUpload] FAILED bucket="${bucket}" path="${finalPath}":`, error.message);
-    return { url: null, path: null, error: error.message };
-  }
-
-  const { data: publicData } = supabase.storage.from(bucket).getPublicUrl(data.path);
-  console.log(`[AdminUpload] OK url="${publicData.publicUrl}"`);
-  return { url: publicData.publicUrl, path: data.path, error: null };
 }
 
 // ─── Strategies ───
