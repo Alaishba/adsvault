@@ -7,7 +7,7 @@ import AdCard from "../components/AdCard";
 import AdModal from "../components/AdModal";
 import { useAuth } from "../context/AuthContext";
 import { uploadFile } from "../lib/storage";
-import { supabase, isSupabaseConfigured } from "../lib/supabase";
+import { supabase } from "../lib/supabase";
 import { type Ad, type Strategy } from "../lib/mockData";
 import { fetchAds, fetchStrategies } from "../lib/db";
 
@@ -65,8 +65,9 @@ export default function ProfilePage() {
       if (url) {
         setAvatarUrl(url);
         // Persist avatar URL to Supabase
-        if (isSupabaseConfigured() && user?.id) {
-          await supabase.from("users").update({ avatar_url: url }).eq("id", user.id);
+        if (user?.id) {
+          const { error: avatarErr } = await supabase.from("users").update({ avatar_url: url }).eq("id", user.id);
+          if (avatarErr) console.error("Avatar save error:", avatarErr.message);
         }
       }
     } catch { /* silent */ }
@@ -79,12 +80,11 @@ export default function ProfilePage() {
     setSaved(false);
     setSaveError(null);
     try {
-      if (isSupabaseConfigured() && user?.id) {
-        const { error } = await supabase.from("users").update({
-          full_name: name,
-        }).eq("id", user.id);
-        if (error) throw error;
-      }
+      if (!user?.id) throw new Error("يجب تسجيل الدخول أولاً");
+      const { error } = await supabase.from("users").update({
+        full_name: name,
+      }).eq("id", user.id);
+      if (error) throw new Error(error.message);
       setTimeout(() => setSaved(true), 1500);
     } catch (err: unknown) {
       setSaveError(err instanceof Error ? err.message : "حدث خطأ في حفظ البيانات");
@@ -188,6 +188,9 @@ export default function ProfilePage() {
                   style={{ background: "#f3f5f9", border: "1px solid #e5e7eb", color: "#1c1c1e" }} />
               </div>
             </div>
+            {saveError && (
+              <p className="text-red-500 text-sm font-semibold mb-3 mt-4">{saveError}</p>
+            )}
             <button onClick={handleSaveInfo}
               className="mt-5 px-6 py-2.5 rounded-xl font-bold text-sm text-white hover:opacity-90 transition-all"
               style={{ background: saved ? "#84cc18" : "#059669" }}>

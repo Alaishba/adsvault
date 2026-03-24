@@ -25,6 +25,7 @@ export default function AdminStrategiesPage() {
   const [search, setSearch] = useState("");
   const [thumbPreview, setThumbPreview] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => { fetchStrategies().then(setStrategies); }, []);
@@ -38,6 +39,7 @@ export default function AdminStrategiesPage() {
     setForm(emptyForm);
     setEditId(null);
     setThumbPreview(null);
+    setErrorMsg(null);
     setShowForm(true);
   };
 
@@ -54,11 +56,13 @@ export default function AdminStrategiesPage() {
     });
     setThumbPreview(s.thumbnail ?? null);
     setEditId(s.id);
+    setErrorMsg(null);
     setShowForm(true);
   };
 
   const handleDelete = async (id: string) => {
-    await supabase.from("strategies").delete().eq("id", id);
+    const { error } = await supabase.from("strategies").delete().eq("id", id);
+    if (error) { window.alert("خطأ في الحذف: " + error.message); return; }
     setStrategies((prev) => prev.filter((s) => s.id !== id));
   };
 
@@ -76,6 +80,7 @@ export default function AdminStrategiesPage() {
 
   const handleSave = async () => {
     if (!form.title || !form.brand) return;
+    setErrorMsg(null);
     const stratData = {
       title: form.title, brand: form.brand,
       description: form.preview,
@@ -83,14 +88,16 @@ export default function AdminStrategiesPage() {
       thumbnail: form.thumbnail || null,
       is_pro_only: form.is_pro_only,
     };
-    try {
-      if (editId) {
-        await supabase.from("strategies").update(stratData).eq("id", editId);
-      } else {
-        await supabase.from("strategies").insert(stratData);
-      }
-      await reload();
-    } catch (err) { console.error("Save error:", err); }
+    let error: string | null = null;
+    if (editId) {
+      const res = await supabase.from("strategies").update(stratData).eq("id", editId);
+      if (res.error) error = res.error.message;
+    } else {
+      const res = await supabase.from("strategies").insert(stratData);
+      if (res.error) error = res.error.message;
+    }
+    if (error) { setErrorMsg(error); return; }
+    await reload();
     setShowForm(false);
     setEditId(null);
   };
@@ -298,6 +305,12 @@ export default function AdminStrategiesPage() {
                     style={{ right: form.is_pro_only ? "2px" : "auto", left: form.is_pro_only ? "auto" : "2px" }} />
                 </button>
               </div>
+
+              {errorMsg && (
+                <div className="col-span-2 px-3 py-2 rounded-lg text-xs" style={{ background: "#fef2f2", color: "#ef4444" }}>
+                  {errorMsg}
+                </div>
+              )}
 
               <div className="col-span-2 flex gap-3 pt-2">
                 <button onClick={handleSave}
