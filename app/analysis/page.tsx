@@ -62,7 +62,7 @@ function StrategyModal({ s, onClose, isPro }: { s: Strategy; onClose: () => void
             <div style={isLocked ? { filter: "blur(5px)", userSelect: "none", pointerEvents: "none" } : {}}>
               <p className="text-xs font-extrabold mb-3" style={{ color: "var(--text-primary)" }}>الرؤى الرئيسية</p>
               <ul className="space-y-2">
-                {s.insights.map((insight, i) => (
+                {(s.insights ?? []).map((insight, i) => (
                   <li key={i} className="flex items-start gap-2.5 text-sm" style={{ color: "var(--text-secondary)" }}>
                     <span className="mt-0.5 w-4 h-4 rounded-full flex items-center justify-center shrink-0 text-xs font-bold"
                       style={{ background: "var(--accent-light)", color: "var(--accent-text)" }}>✓</span>
@@ -73,7 +73,7 @@ function StrategyModal({ s, onClose, isPro }: { s: Strategy; onClose: () => void
             </div>
           </div>
           <div className="flex flex-wrap gap-1.5 mb-5">
-            {s.tags.map((tag) => (
+            {(s.tags ?? []).map((tag) => (
               <span key={tag} className="px-2.5 py-1 text-xs rounded-full font-medium"
                 style={{ background: "var(--accent-light)", color: "var(--accent-text)" }}>#{tag}</span>
             ))}
@@ -118,7 +118,7 @@ export default function AnalysisPage() {
   const filtered = useMemo(() => {
     return allStrategies.filter((s) => {
       if (activeFilters.sector && s.sector !== activeFilters.sector) return false;
-      if (activeFilters.tag && !s.tags.includes(activeFilters.tag)) return false;
+      if (activeFilters.tag && !(s.tags ?? []).includes(activeFilters.tag)) return false;
       return true;
     });
   }, [allStrategies, activeFilters]);
@@ -179,7 +179,7 @@ export default function AnalysisPage() {
                   <h3 className="font-extrabold text-sm leading-snug mb-2 line-clamp-2 group-hover:text-[#84cc18] transition-colors"
                     style={{ color: "var(--text-primary)" }}>{s.title}</h3>
                   <div className="space-y-1 mb-3">
-                    {s.insights.slice(0, 2).map((insight, i) => (
+                    {(s.insights ?? []).slice(0, 2).map((insight, i) => (
                       <p key={i} className="text-[11px] truncate flex items-center gap-1.5" style={{ color: "var(--text-secondary)" }}>
                         <span className="w-1 h-1 rounded-full shrink-0" style={{ background: "#84cc18" }} />
                         {insight}
@@ -187,7 +187,7 @@ export default function AnalysisPage() {
                     ))}
                   </div>
                   <div className="flex flex-wrap gap-1">
-                    {s.tags.slice(0, 3).map((tag) => (
+                    {(s.tags ?? []).slice(0, 3).map((tag) => (
                       <span key={tag} className="px-2 py-0.5 text-[10px] rounded-full font-medium"
                         style={{ background: "var(--accent-light)", color: "var(--accent-text)" }}>{tag}</span>
                     ))}

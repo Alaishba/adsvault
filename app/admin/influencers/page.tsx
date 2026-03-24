@@ -3,8 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { type Influencer, type Platform } from "../../lib/mockData";
 import { uploadFile } from "../../lib/storage";
-import { supabase, isSupabaseConfigured } from "../../lib/supabase";
-import { fetchInfluencers } from "../../lib/db";
+import { saveAdminInfluencer, deleteAdminInfluencer, fetchAdminInfluencers } from "../../actions/adminActions";
 
 const emptyForm = {
   name: "", bio: "", category: "", country: "",
@@ -58,11 +57,12 @@ export default function AdminInfluencersPage() {
   };
 
   // Load from Supabase on mount
-  useEffect(() => { fetchInfluencers().then(setInfluencers); }, []);
-  const reload = () => fetchInfluencers().then(setInfluencers);
+  useEffect(() => { fetchAdminInfluencers().then((d) => setInfluencers(d as Influencer[])); }, []);
+  const reload = () => fetchAdminInfluencers().then((d) => setInfluencers(d as Influencer[]));
 
   const handleDelete = async (id: string) => {
-    await supabase.from("influencers").delete().eq("id", id);
+    const result = await deleteAdminInfluencer(id);
+    if ("error" in result) { window.alert("خطأ في الحذف: " + result.error); return; }
     setInfluencers((prev) => prev.filter((i) => i.id !== id));
   };
 
@@ -101,11 +101,8 @@ export default function AdminInfluencersPage() {
     };
 
     try {
-      if (editId) {
-        await supabase.from("influencers").update(infData).eq("id", editId);
-      } else {
-        await supabase.from("influencers").insert(infData);
-      }
+      const result = await saveAdminInfluencer(infData, editId);
+      if ("error" in result) { console.error("Save error:", result.error); }
       await reload();
     } catch (err) { console.error("Save error:", err); }
     setShowForm(false);

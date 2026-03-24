@@ -4,9 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { type Strategy } from "../../lib/mockData";
 import { uploadFile } from "../../lib/storage";
-import { supabase } from "../../lib/supabase";
-import { fetchStrategies } from "../../lib/db";
-import { revalidate } from "../../actions";
+import { saveAdminStrategy, deleteAdminStrategy, fetchAdminStrategies } from "../../actions/adminActions";
 
 const emptyForm = {
   brand: "", brandInitial: "", brandColor: "#8957f6",
@@ -31,8 +29,8 @@ export default function AdminStrategiesPage() {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => { fetchStrategies().then(setStrategies); }, []);
-  const reload = () => fetchStrategies().then(setStrategies);
+  useEffect(() => { fetchAdminStrategies().then((d) => setStrategies(d as Strategy[])); }, []);
+  const reload = () => fetchAdminStrategies().then((d) => setStrategies(d as Strategy[]));
 
   const filtered = strategies.filter(
     (s) => s.title.includes(search) || s.brand.includes(search) || s.sector.includes(search)
@@ -64,11 +62,9 @@ export default function AdminStrategiesPage() {
   };
 
   const handleDelete = async (id: string) => {
-    const { error } = await supabase.from("strategies").delete().eq("id", id);
-    if (error) { window.alert("خطأ في الحذف: " + error.message); return; }
+    const result = await deleteAdminStrategy(id);
+    if ("error" in result) { window.alert("خطأ في الحذف: " + result.error); return; }
     setStrategies((prev) => prev.filter((s) => s.id !== id));
-    await revalidate("/admin/strategies");
-    await revalidate("/analysis");
     router.refresh();
   };
 
@@ -94,18 +90,9 @@ export default function AdminStrategiesPage() {
       thumbnail: form.thumbnail || null,
       is_pro_only: form.is_pro_only,
     };
-    let error: string | null = null;
-    if (editId) {
-      const res = await supabase.from("strategies").update(stratData).eq("id", editId);
-      if (res.error) error = res.error.message;
-    } else {
-      const res = await supabase.from("strategies").insert(stratData);
-      if (res.error) error = res.error.message;
-    }
-    if (error) { setErrorMsg(error); return; }
+    const result = await saveAdminStrategy(stratData, editId);
+    if ("error" in result) { setErrorMsg(result.error); return; }
     await reload();
-    await revalidate("/admin/strategies");
-    await revalidate("/analysis");
     router.refresh();
     setShowForm(false);
     setEditId(null);

@@ -3,8 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { type Ad } from "../../lib/mockData";
 import { uploadFile } from "../../lib/storage";
-import { supabase, isSupabaseConfigured } from "../../lib/supabase";
-import { fetchAds } from "../../lib/db";
+import { saveAdminAd, deleteAdminAd, fetchAdminAds } from "../../actions/adminActions";
 
 const platforms = ["Meta", "TikTok", "Snap", "YouTube", "Instagram"];
 const sectors = ["تجزئة", "اتصالات", "تجارة إلكترونية", "مواد استهلاكية", "خدمات مالية", "مطاعم", "عقارات", "تعليم"];
@@ -107,10 +106,9 @@ export default function AdminAdsPage() {
   const setPro = (update: Partial<ProAnalysis>) =>
     setForm((f) => ({ ...f, pro_analysis: { ...(f.pro_analysis ?? emptyProAnalysis), ...update } }));
 
-  // Load from Supabase on mount
-  useEffect(() => { fetchAds().then(setAds); }, []);
+  useEffect(() => { fetchAdminAds().then((d) => setAds(d as Ad[])); }, []);
 
-  const reload = () => fetchAds().then(setAds);
+  const reload = () => fetchAdminAds().then((d) => setAds(d as Ad[]));
 
   const filtered = ads.filter((a) =>
     a.title.includes(search) || a.brand.includes(search) || a.sector.includes(search)
@@ -119,7 +117,8 @@ export default function AdminAdsPage() {
   const openAdd = () => { setForm(emptyForm); setEditId(null); setImageFiles([]); setImagePreviews([]); setShowForm(true); };
   const openEdit = (ad: Ad) => { setForm({ ...ad, is_pro_only: false, pro_analysis: { ...emptyProAnalysis } }); setEditId(ad.id); setImageFiles([]); setImagePreviews(ad.images ?? []); setShowForm(true); };
   const handleDelete = async (id: string) => {
-    await supabase.from("ads").delete().eq("id", id);
+    const result = await deleteAdminAd(id);
+    if ("error" in result) { window.alert("خطأ في الحذف: " + result.error); return; }
     setAds((prev) => prev.filter((a) => a.id !== id));
   };
 
@@ -171,11 +170,8 @@ export default function AdminAdsPage() {
         is_pro_only: form.is_pro_only ?? false,
       };
 
-      if (editId) {
-        await supabase.from("ads").update(adData).eq("id", editId);
-      } else {
-        await supabase.from("ads").insert(adData);
-      }
+      const result = await saveAdminAd(adData, editId);
+      if ("error" in result) { console.error("Save error:", result.error); }
       await reload();
     } catch (err) {
       console.error("Save error:", err);

@@ -235,7 +235,7 @@ export default function HomePage() {
                 </h3>
                 <p className="text-xs leading-relaxed mb-3 line-clamp-2" style={{ color: "var(--text-secondary)" }}>{s.preview}</p>
                 <div className="flex flex-wrap gap-1">
-                  {s.tags.slice(0, 3).map((tag) => (
+                  {(s.tags ?? []).slice(0, 3).map((tag) => (
                     <span key={tag} className="px-2 py-0.5 text-xs rounded-full font-medium"
                       style={{ background: "var(--accent-light)", color: "var(--accent-text)" }}>{tag}</span>
                   ))}

@@ -63,7 +63,7 @@ function InfluencerModal({ inf, onClose }: { inf: Influencer; onClose: () => voi
               <h2 className="text-lg font-extrabold text-[#1c1c1e]">{inf.name}</h2>
               <p className="text-sm text-[#6b7280]">{inf.category} · {inf.country}</p>
               <div className="flex gap-1 mt-1">
-                {inf.platforms.map((p) => <PlatformBadge key={p} platform={p as Platform} />)}
+                {(inf.platforms ?? []).map((p) => <PlatformBadge key={p} platform={p as Platform} />)}
               </div>
             </div>
           </div>
@@ -110,7 +110,7 @@ function InfluencerModal({ inf, onClose }: { inf: Influencer; onClose: () => voi
             <div>
               <p className="text-xs font-bold text-[#1c1c1e] mb-2">توزيع الجمهور حسب العمر</p>
               <div className="space-y-2">
-                {inf.audienceAge.map((a) => (
+                {(inf.audienceAge ?? []).map((a) => (
                   <div key={a.label} className="flex items-center gap-3">
                     <span className="text-xs text-[#6b7280] w-12 text-left">{a.label}</span>
                     <div className="flex-1 h-2 rounded-full bg-[--surface2] overflow-hidden">
@@ -145,7 +145,7 @@ function InfluencerModal({ inf, onClose }: { inf: Influencer; onClose: () => voi
               <div>
                 <p className="text-xs font-bold text-[#1c1c1e] mb-2">نقاط قوة</p>
                 <div className="flex flex-wrap gap-1">
-                  {inf.strengths.map((s) => (
+                  {(inf.strengths ?? []).map((s) => (
                     <span key={s} className="px-2 py-0.5 text-xs rounded-full font-medium" style={{ background: "#f0faf0", color: "#15803d" }}>{s}</span>
                   ))}
                 </div>
@@ -153,7 +153,7 @@ function InfluencerModal({ inf, onClose }: { inf: Influencer; onClose: () => voi
               <div>
                 <p className="text-xs font-bold text-[#1c1c1e] mb-2">نقاط ضعف</p>
                 <div className="flex flex-wrap gap-1">
-                  {inf.weaknesses.map((w) => (
+                  {(inf.weaknesses ?? []).map((w) => (
                     <span key={w} className="px-2 py-0.5 text-xs rounded-full font-medium" style={{ background: "#fef2f2", color: "#b91c1c" }}>{w}</span>
                   ))}
                 </div>
@@ -276,7 +276,7 @@ export default function InfluencersPage() {
 
               {/* Platform badges */}
               <div className="flex flex-wrap gap-1 mb-4">
-                {inf.platforms.map((p) => <PlatformBadge key={p} platform={p as Platform} />)}
+                {(inf.platforms ?? []).map((p) => <PlatformBadge key={p} platform={p as Platform} />)}
               </div>
 
               {/* Stats row */}
@@ -294,10 +294,10 @@ export default function InfluencersPage() {
 
               {/* Strength tags */}
               <div className="flex flex-wrap gap-1">
-                {inf.strengths.slice(0, 2).map((s) => (
+                {(inf.strengths ?? []).slice(0, 2).map((s) => (
                   <span key={s} className="px-2 py-0.5 text-xs rounded-full font-medium" style={{ background: "#f0faf0", color: "#15803d" }}>{s}</span>
                 ))}
-                {inf.weaknesses.slice(0, 1).map((w) => (
+                {(inf.weaknesses ?? []).slice(0, 1).map((w) => (
                   <span key={w} className="px-2 py-0.5 text-xs rounded-full font-medium" style={{ background: "#fef2f2", color: "#b91c1c" }}>{w}</span>
                 ))}
               </div>

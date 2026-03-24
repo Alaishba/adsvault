@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect, type ChangeEvent } from "react";
 import { uploadFile } from "../../lib/storage";
-import { supabase, isSupabaseConfigured } from "../../lib/supabase";
+import { saveAdminBlogPost, deleteAdminBlogPost, fetchAdminBlogPosts } from "../../actions/adminActions";
 
 interface AdminArticle {
   id: number;
@@ -126,38 +126,22 @@ const emptyForm = {
 export default function AdminBlogPage() {
   const [articles, setArticles] = useState<AdminArticle[]>(initialArticles);
 
-  // Load from Supabase
+  const mapPosts = (data: Record<string, unknown>[]) =>
+    data.map((d) => ({
+      id: d.id as number, slug: (d.slug as string) ?? "", title: (d.title as string) ?? "",
+      excerpt: ((d.content as string) ?? "").slice(0, 120),
+      category: (d.category as string) ?? "", coverImage: (d.banner_image as string) ?? "#8957f6",
+      author: (d.author as string) ?? "مدير المحتوى",
+      date: ((d.created_at as string) ?? "").slice(0, 10),
+      readTime: "5 دقائق", tags: (d.tags as string[]) ?? [],
+      content: (d.content as string) ?? "", status: (d.status as "published" | "draft") ?? "draft",
+    }));
+
   useEffect(() => {
-    if (!isSupabaseConfigured()) return;
-    supabase.from("blog_posts").select("*").order("created_at", { ascending: false }).then(({ data }: { data: Record<string, unknown>[] | null }) => {
-      if (data && data.length > 0) {
-        setArticles(data.map((d: Record<string, unknown>) => ({
-          id: d.id as number, slug: d.slug as string, title: d.title as string,
-          excerpt: ((d.content as string) ?? "").slice(0, 120),
-          category: d.category as string, coverImage: (d.banner_image as string) ?? "#8957f6",
-          author: (d.author as string) ?? "مدير المحتوى",
-          date: ((d.created_at as string) ?? "").slice(0, 10),
-          readTime: "5 دقائق", tags: (d.tags as string[]) ?? [],
-          content: d.content as string, status: (d.status as "published" | "draft") ?? "draft",
-        })));
-      }
-    });
+    fetchAdminBlogPosts().then((d) => { if (d.length > 0) setArticles(mapPosts(d as Record<string, unknown>[])); });
   }, []);
   const reloadBlog = () => {
-    if (!isSupabaseConfigured()) return;
-    supabase.from("blog_posts").select("*").order("created_at", { ascending: false }).then(({ data }: { data: Record<string, unknown>[] | null }) => {
-      if (data && data.length > 0) {
-        setArticles(data.map((d: Record<string, unknown>) => ({
-          id: d.id as number, slug: d.slug as string, title: d.title as string,
-          excerpt: ((d.content as string) ?? "").slice(0, 120),
-          category: d.category as string, coverImage: (d.banner_image as string) ?? "#8957f6",
-          author: (d.author as string) ?? "مدير المحتوى",
-          date: ((d.created_at as string) ?? "").slice(0, 10),
-          readTime: "5 دقائق", tags: (d.tags as string[]) ?? [],
-          content: d.content as string, status: (d.status as "published" | "draft") ?? "draft",
-        })));
-      }
-    });
+    fetchAdminBlogPosts().then((d) => { if (d.length > 0) setArticles(mapPosts(d as Record<string, unknown>[])); });
   };
 
   const [showModal, setShowModal] = useState(false);
@@ -192,7 +176,8 @@ export default function AdminBlogPage() {
   };
 
   const handleDelete = async (id: number) => {
-    if (isSupabaseConfigured()) { await supabase.from("blog_posts").delete().eq("id", id); }
+    const result = await deleteAdminBlogPost(id);
+    if ("error" in result) { window.alert("خطأ في الحذف: " + result.error); return; }
     setArticles((prev) => prev.filter((a) => a.id !== id));
   };
 
@@ -224,22 +209,9 @@ export default function AdminBlogPage() {
     };
 
     try {
-      if (isSupabaseConfigured()) {
-        if (editingId !== null) {
-          await supabase.from("blog_posts").update(postData).eq("id", editingId);
-        } else {
-          await supabase.from("blog_posts").insert(postData);
-        }
-        reloadBlog();
-      } else {
-        // Local fallback
-        if (editingId !== null) {
-          setArticles((prev) => prev.map((a) => a.id === editingId ? { ...a, title: form.title, slug, category: form.category, coverImage: form.coverImage || a.coverImage, content: form.content, tags: tagsArr, status: form.status } : a));
-        } else {
-          const newArticle: AdminArticle = { id: Date.now(), slug, title: form.title, excerpt: form.content.slice(0, 120), category: form.category, coverImage: form.coverImage || "#8957f6", author: "مدير المحتوى", date: new Date().toISOString().slice(0, 10), readTime: "5 دقائق", tags: tagsArr, content: form.content, status: form.status };
-          setArticles((prev) => [newArticle, ...prev]);
-        }
-      }
+      const result = await saveAdminBlogPost(postData, editingId);
+      if ("error" in result) { console.error("Blog save error:", result.error); }
+      reloadBlog();
     } catch (err) { console.error("Blog save error:", err); }
     setShowModal(false);
   };

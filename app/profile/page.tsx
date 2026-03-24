@@ -4,19 +4,13 @@ import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import AppLayout from "../components/AppLayout";
-import AdCard from "../components/AdCard";
-import AdModal from "../components/AdModal";
 import { createClient } from "../lib/supabase/client";
 import { uploadFile } from "../lib/storage";
-import { type Ad, type Strategy } from "../lib/mockData";
-import { fetchAds, fetchStrategies } from "../lib/db";
 import { revalidate } from "../actions";
 
 const tabs = [
   { id: "info", label: "معلوماتي" },
   { id: "subscription", label: "اشتراكي" },
-  { id: "saved", label: "المفضلة" },
-  { id: "strategies", label: "استراتيجياتي" },
   { id: "preferences", label: "التفضيلات" },
 ];
 
@@ -32,7 +26,6 @@ export default function ProfilePage() {
   const supabase = createClient();
   const [userId, setUserId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState("info");
-  const [selectedAd, setSelectedAd] = useState<Ad | null>(null);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const [name, setName] = useState("");
@@ -46,8 +39,6 @@ export default function ProfilePage() {
   const fileRef = useRef<HTMLInputElement>(null);
   const [notifs, setNotifs] = useState({ newAds: true, strategies: true, weeklyDigest: false });
 
-  const [savedAds, setSavedAds] = useState<Ad[]>([]);
-  const [savedStrategies, setSavedStrategies] = useState<Strategy[]>([]);
 
   // Load user session + profile (critical path — unblocks page)
   useEffect(() => {
@@ -57,24 +48,20 @@ export default function ProfilePage() {
       setUserId(authUser.id);
       setEmail(authUser.email ?? "");
       const { data: profile } = await supabase
-        .from("users").select("full_name,plan,avatar_url").eq("id", authUser.id).single();
+        .from("users").select("full_name,plan,avatar_url,phone,company,job_title").eq("id", authUser.id).single();
       if (profile) {
         setName(profile.full_name ?? "");
         setPlan(profile.plan ?? "free");
         setAvatarUrl(profile.avatar_url ?? null);
+        setPhone(profile.phone ?? "");
+        setCompany(profile.company ?? "");
+        setJobTitle(profile.job_title ?? "");
       }
       setPageLoading(false);
     })();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Non-blocking: load ads/strategies in background after page renders
-  useEffect(() => {
-    if (!pageLoading) {
-      fetchAds().then((all) => setSavedAds(all.slice(0, 6)));
-      fetchStrategies().then(setSavedStrategies);
-    }
-  }, [pageLoading]);
 
   const isPro = plan === "pro" || plan === "enterprise" || plan === "admin";
   const planInfo = planLabels[plan] ?? planLabels.free;
@@ -94,14 +81,12 @@ export default function ProfilePage() {
     setUploading(true);
     setAvatarError(null);
     try {
-      const { data: { user: freshUser } } = await supabase.auth.getUser();
-      if (!freshUser) throw new Error("يجب تسجيل الدخول أولاً");
-      const uid = freshUser.id;
-      const { url, error } = await uploadFile("user-avatars", file, `${uid}-avatar`);
+      if (!userId) throw new Error("يجب تسجيل الدخول أولاً");
+      const { url, error } = await uploadFile("user-avatars", file, `${userId}-avatar`);
       if (error) throw new Error(error);
       if (!url) throw new Error("فشل رفع الصورة");
       setAvatarUrl(url);
-      const { error: dbErr } = await supabase.from("users").update({ avatar_url: url }).eq("id", uid);
+      const { error: dbErr } = await supabase.from("users").update({ avatar_url: url }).eq("id", userId);
       if (dbErr) throw new Error(dbErr.message);
       await revalidate("/profile");
       router.refresh();
@@ -117,15 +102,13 @@ export default function ProfilePage() {
     setSaved(false);
     setSaveError(null);
     try {
-      const { data: { user: freshUser } } = await supabase.auth.getUser();
-      if (!freshUser) throw new Error("يجب تسجيل الدخول أولاً");
-      const uid = freshUser.id;
+      if (!userId) throw new Error("يجب تسجيل الدخول أولاً");
       const { error } = await supabase.from("users").update({
         full_name: name,
-        ...(phone && { phone }),
-        ...(company && { company }),
-        ...(jobTitle && { job_title: jobTitle }),
-      }).eq("id", uid);
+        phone: phone || null,
+        company: company || null,
+        job_title: jobTitle || null,
+      }).eq("id", userId);
       if (error) throw new Error(error.message);
       await revalidate("/profile");
       router.refresh();
@@ -175,11 +158,6 @@ export default function ProfilePage() {
             <p className="text-sm" style={{ color: "#6b7280" }}>{email}</p>
             <span className="inline-flex items-center gap-1 mt-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold"
               style={{ background: planInfo.bg, color: planInfo.color }}>{planInfo.label}</span>
-            <div className="flex gap-5 mt-3">
-              <div><span className="text-sm font-extrabold" style={{ color: "#84cc18" }}>3</span> <span className="text-xs" style={{ color: "#6b7280" }}>محفوظات</span></div>
-              <div><span className="text-sm font-extrabold" style={{ color: "#84cc18" }}>2</span> <span className="text-xs" style={{ color: "#6b7280" }}>استراتيجيات</span></div>
-              <div><span className="text-xs" style={{ color: "#6b7280" }}>انضم مارس 2025</span></div>
-            </div>
           </div>
           <button onClick={handleLogout}
             className="px-4 py-2 rounded-xl text-sm font-semibold transition-all"
@@ -292,54 +270,6 @@ export default function ProfilePage() {
           </div>
         )}
 
-        {/* Tab: المفضلة */}
-        {activeTab === "saved" && (
-          <div>
-            {savedAds.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
-                {savedAds.slice(0, 3).map((ad) => (
-                  <AdCard key={ad.id} ad={ad} onClick={setSelectedAd} />
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-16 rounded-2xl" style={{ background: "rgba(255,255,255,0.8)", border: "1px solid rgba(209,209,214,0.4)" }}>
-                <div className="text-4xl mb-3">📌</div>
-                <p className="font-bold" style={{ color: "#1c1c1e" }}>لم تحفظ أي إعلان بعد</p>
-                <p className="text-sm mt-1" style={{ color: "#6b7280" }}>احفظ الإعلانات التي تعجبك لتعود إليها لاحقاً</p>
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* Tab: استراتيجياتي */}
-        {activeTab === "strategies" && (
-          <div>
-            {savedStrategies.length > 0 ? (
-              <div className="space-y-3">
-                {savedStrategies.map((s) => (
-                  <div key={s.id} className="rounded-xl p-4 flex items-center justify-between"
-                    style={{ background: "#ffffff", border: "1px solid #e5e7eb" }}>
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-lg flex items-center justify-center text-sm font-black text-white"
-                        style={{ background: s.brandColor }}>{s.brandInitial}</div>
-                      <div>
-                        <p className="font-bold text-sm" style={{ color: "#1c1c1e" }}>{s.title}</p>
-                        <p className="text-xs" style={{ color: "#6b7280" }}>{s.brand} · {s.sector}</p>
-                      </div>
-                    </div>
-                    <span className="text-xs px-2 py-1 rounded-lg" style={{ background: "#f7fee7", color: "#84cc18" }}>محفوظة</span>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-16 rounded-2xl" style={{ background: "rgba(255,255,255,0.8)", border: "1px solid rgba(209,209,214,0.4)" }}>
-                <div className="text-4xl mb-3">📊</div>
-                <p className="font-bold" style={{ color: "#1c1c1e" }}>لم تحفظ أي استراتيجية بعد</p>
-                <p className="text-sm mt-1" style={{ color: "#6b7280" }}>استكشف الاستراتيجيات واحفظ ما يناسبك</p>
-              </div>
-            )}
-          </div>
-        )}
 
         {/* Tab: التفضيلات */}
         {activeTab === "preferences" && (
@@ -374,7 +304,6 @@ export default function ProfilePage() {
         )}
       </div>
 
-      <AdModal ad={selectedAd} onClose={() => setSelectedAd(null)} />
     </AppLayout>
   );
 }

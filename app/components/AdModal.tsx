@@ -5,6 +5,7 @@ import Link from "next/link";
 import type { Ad, FunnelStage } from "../lib/mockData";
 import PlatformBadge from "./PlatformBadge";
 import { createClient } from "../lib/supabase/client";
+import PaywallModal from "./PaywallModal";
 
 const funnelConfig: Record<FunnelStage, { label: string; color: string; bg: string }> = {
   awareness:  { label: "وعي",    color: "#1d4ed8", bg: "#eff6ff" },
@@ -45,7 +46,7 @@ function MediaSwiper({ colors, brandColor }: { colors: string[]; brandColor: str
   );
 }
 
-function ProBlurOverlay({ children }: { children: React.ReactNode }) {
+function ProBlurOverlay({ children, onUpgrade }: { children: React.ReactNode; onUpgrade: () => void }) {
   return (
     <div className="relative overflow-hidden rounded-xl">
       <div style={{ filter: "blur(5px)", userSelect: "none", pointerEvents: "none" }}>
@@ -55,11 +56,11 @@ function ProBlurOverlay({ children }: { children: React.ReactNode }) {
         style={{ background: "linear-gradient(to top, rgba(137,87,246,0.92) 0%, rgba(137,87,246,0.4) 100%)" }}>
         <p className="text-white font-extrabold text-sm mb-1 text-center px-4">🔓 احصل على التحليل الكامل</p>
         <p className="text-white/80 text-xs mb-4 text-center px-4">ترقية إلى Pro للوصول الكامل</p>
-        <Link href="/pricing"
+        <button onClick={onUpgrade}
           className="px-5 py-2.5 rounded-xl text-sm font-bold text-white transition-all hover:opacity-90"
           style={{ background: "rgba(255,255,255,0.2)", border: "1px solid rgba(255,255,255,0.4)" }}>
           ترقية إلى Pro →
-        </Link>
+        </button>
       </div>
     </div>
   );
@@ -67,6 +68,7 @@ function ProBlurOverlay({ children }: { children: React.ReactNode }) {
 
 export default function AdModal({ ad, onClose }: { ad: Ad | null; onClose: () => void }) {
   const [isPro, setIsPro] = useState(false);
+  const [showPaywall, setShowPaywall] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -111,7 +113,7 @@ export default function AdModal({ ad, onClose }: { ad: Ad | null; onClose: () =>
             <span>💡</span> كيف تطبق هذه الفكرة على مشروعك؟
           </p>
           <ol className="space-y-2">
-            {ad.apply_idea.map((step, i) => (
+            {(ad.apply_idea ?? []).map((step, i) => (
               <li key={i} className="flex items-start gap-2 text-xs" style={{ color: "var(--text-secondary)" }}>
                 <span className="mt-0.5 w-4 h-4 rounded-full flex items-center justify-center shrink-0 text-[10px] font-bold text-white"
                   style={{ background: "#84cc18" }}>{i + 1}</span>
@@ -168,9 +170,9 @@ export default function AdModal({ ad, onClose }: { ad: Ad | null; onClose: () =>
               </button>
             </div>
 
-            {ad.tags.length > 0 && (
+            {(ad.tags ?? []).length > 0 && (
               <div className="flex flex-wrap gap-1">
-                {ad.tags.map((tag) => (
+                {(ad.tags ?? []).map((tag) => (
                   <span key={tag} className="px-2 py-0.5 text-xs rounded-full font-medium"
                     style={{ background: "var(--primary-light)", color: "var(--primary-text)" }}>#{tag}</span>
                 ))}
@@ -222,7 +224,7 @@ export default function AdModal({ ad, onClose }: { ad: Ad | null; onClose: () =>
                 <span>⚡</span> التحليل الأساسي
               </p>
               <ul className="space-y-2">
-                {ad.basic_analysis.map((item, i) => (
+                {(ad.basic_analysis ?? []).map((item, i) => (
                   <li key={i} className="flex items-start gap-2 text-xs" style={{ color: "var(--text-secondary)" }}>
                     <span className="mt-0.5 w-4 h-4 rounded-full flex items-center justify-center shrink-0 text-[10px] font-bold"
                       style={{ background: "var(--primary-light)", color: "var(--primary-text)" }}>{i + 1}</span>
@@ -235,10 +237,11 @@ export default function AdModal({ ad, onClose }: { ad: Ad | null; onClose: () =>
 
           {/* Pro analysis — blurred for free users */}
           {(ad.apply_idea?.length || ad.recommended_action) && (
-            isPro ? proContent : <ProBlurOverlay>{proContent}</ProBlurOverlay>
+            isPro ? proContent : <ProBlurOverlay onUpgrade={() => setShowPaywall(true)}>{proContent}</ProBlurOverlay>
           )}
         </div>
       </div>
+      {showPaywall && <PaywallModal onClose={() => setShowPaywall(false)} />}
     </div>
   );
 }

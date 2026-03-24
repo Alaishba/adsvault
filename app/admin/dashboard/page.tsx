@@ -2,23 +2,10 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { fetchUsers } from "../../lib/db";
-import { supabase, isSupabaseConfigured } from "../../lib/supabase";
+import { fetchAdminDashboardCounts, fetchAdminUsers, fetchAdminRecentAds, fetchAdminContactRequests } from "../../actions/adminActions";
 
 type User = { id: string; email: string; full_name: string; plan: string; created_at: string };
 
-const mockUsers: User[] = [
-  { id: "1", email: "ahmed@example.com", full_name: "أحمد محمد", plan: "pro", created_at: "2024-03-15" },
-  { id: "2", email: "fatima@example.com", full_name: "فاطمة العلي", plan: "free", created_at: "2024-03-14" },
-  { id: "3", email: "khalid@example.com", full_name: "خالد المنصور", plan: "pro", created_at: "2024-03-13" },
-  { id: "4", email: "nour@example.com", full_name: "نور الهاشمي", plan: "enterprise", created_at: "2024-03-12" },
-  { id: "5", email: "sara@example.com", full_name: "سارة البلوشي", plan: "free", created_at: "2024-03-11" },
-  { id: "6", email: "fahad@example.com", full_name: "فهد الدوسري", plan: "pro", created_at: "2024-03-10" },
-  { id: "7", email: "layla@example.com", full_name: "ليلى السالم", plan: "free", created_at: "2024-03-09" },
-  { id: "8", email: "omar@example.com", full_name: "عمر الحربي", plan: "pro", created_at: "2024-03-08" },
-  { id: "9", email: "mariam@example.com", full_name: "مريم الشمري", plan: "free", created_at: "2024-03-07" },
-  { id: "10", email: "youssef@example.com", full_name: "يوسف القحطاني", plan: "enterprise", created_at: "2024-03-06" },
-];
 
 const planStyle: Record<string, { bg: string; color: string }> = {
   pro:        { bg: "#f3eeff", color: "#8957f6" },
@@ -74,53 +61,31 @@ const quickActions = [
   { href: "/admin/appsflyer", label: "إعدادات AppsFlyer", icon: "🔗" },
 ];
 
-const mockRecentAds = [
-  { title: "عرض رمضان الخاص", brand: "جرير", date: "2024-03-15" },
-  { title: "تخفيضات الصيف", brand: "نمشي", date: "2024-03-14" },
-  { title: "إطلاق المنتج الجديد", brand: "STC", date: "2024-03-13" },
-  { title: "حملة العودة للمدرسة", brand: "إكسترا", date: "2024-03-12" },
-  { title: "يوم التأسيس", brand: "الراجحي", date: "2024-03-11" },
-];
-
-const mockContactRequests = [
-  { name: "محمد أحمد", email: "m@example.com", message: "استفسار عن الباقات", date: "2024-03-15" },
-  { name: "سارة خالد", email: "s@example.com", message: "طلب عرض سعر Enterprise", date: "2024-03-14" },
-  { name: "فهد العتيبي", email: "f@example.com", message: "مشكلة في تسجيل الدخول", date: "2024-03-13" },
-];
-
 export default function AdminDashboardPage() {
-  const [users, setUsers] = useState<User[]>(mockUsers);
+  const [users, setUsers] = useState<User[]>([]);
+  const [recentAds, setRecentAds] = useState<{ title: string; brand: string; date: string }[]>([]);
+  const [contactReqs, setContactReqs] = useState<{ name: string; email: string; message: string; date: string }[]>([]);
   const [kpis, setKpis] = useState(defaultKpis);
 
   useEffect(() => {
-    fetchUsers().then((u) => { if (u.length) setUsers(u); });
+    fetchAdminUsers().then((u) => setUsers(u.map((r: Record<string, string>) => ({
+      id: r.id, email: r.email, full_name: r.full_name, plan: r.plan, created_at: r.created_at,
+    }))));
+    fetchAdminRecentAds().then(setRecentAds);
+    fetchAdminContactRequests().then(setContactReqs);
   }, []);
 
   useEffect(() => {
-    if (!isSupabaseConfigured()) return;
-    async function loadCounts() {
-      const [adsRes, strategiesRes, influencersRes, usersRes, proRes] = await Promise.all([
-        supabase.from("ads").select("id", { count: "exact", head: true }),
-        supabase.from("strategies").select("id", { count: "exact", head: true }),
-        supabase.from("influencers").select("id", { count: "exact", head: true }),
-        supabase.from("users").select("id", { count: "exact", head: true }),
-        supabase.from("users").select("id", { count: "exact", head: true }).eq("plan", "pro"),
-      ]);
-      const totalUsers = usersRes.count ?? 0;
-      const proUsers = proRes.count ?? 0;
-      const adsCount = adsRes.count ?? 0;
-      const strategiesCount = strategiesRes.count ?? 0;
-      const influencersCount = influencersRes.count ?? 0;
+    fetchAdminDashboardCounts().then((c) => {
       setKpis((prev) => prev.map((k, i) => {
-        if (i === 0) return { ...k, value: totalUsers.toLocaleString() };
-        if (i === 1) return { ...k, value: proUsers.toLocaleString() };
-        if (i === 3) return { ...k, value: adsCount.toLocaleString() };
-        if (i === 4) return { ...k, value: strategiesCount.toLocaleString() };
-        if (i === 5) return { ...k, value: influencersCount.toLocaleString() };
+        if (i === 0) return { ...k, value: c.totalUsers.toLocaleString() };
+        if (i === 1) return { ...k, value: c.proUsers.toLocaleString() };
+        if (i === 3) return { ...k, value: c.totalAds.toLocaleString() };
+        if (i === 4) return { ...k, value: c.totalStrategies.toLocaleString() };
+        if (i === 5) return { ...k, value: c.totalInfluencers.toLocaleString() };
         return k;
       }));
-    }
-    loadCounts();
+    });
   }, []);
 
   return (
@@ -242,7 +207,7 @@ export default function AdminDashboardPage() {
             <Link href="/admin/ads" className="text-[10px] font-bold" style={{ color: "#84cc18" }}>عرض الكل</Link>
           </div>
           <div className="divide-y" style={{ borderColor: "#e5e7eb" }}>
-            {mockRecentAds.map((ad, i) => (
+            {recentAds.map((ad, i) => (
               <div key={i} className="px-5 py-2.5 flex items-center justify-between">
                 <div>
                   <p className="text-xs font-semibold text-[#1c1c1e]">{ad.title}</p>
@@ -260,7 +225,7 @@ export default function AdminDashboardPage() {
             <h3 className="font-bold text-sm text-[#1c1c1e]">طلبات التواصل</h3>
           </div>
           <div className="divide-y" style={{ borderColor: "#e5e7eb" }}>
-            {mockContactRequests.map((r, i) => (
+            {contactReqs.map((r, i) => (
               <div key={i} className="px-5 py-2.5">
                 <div className="flex items-center justify-between mb-0.5">
                   <p className="text-xs font-semibold text-[#1c1c1e]">{r.name}</p>
