@@ -1,6 +1,6 @@
 import { createClient } from "./supabase/client";
 
-type Bucket = "ads-images" | "influencer-photos" | "strategy-covers" | "user-avatars" | "blog-images";
+type Bucket = "ads-images" | "influencer-photos" | "strategy-covers" | "user-avatars" | "Blog-images";
 
 /**
  * Get public URL for a Supabase Storage file.

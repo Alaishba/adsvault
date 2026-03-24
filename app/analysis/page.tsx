@@ -7,6 +7,7 @@ import FilterBar from "../components/FilterBar";
 import { createClient } from "../lib/supabase/client";
 import { type Strategy } from "../lib/mockData";
 import { fetchStrategies } from "../lib/db";
+import { getImageUrl } from "../lib/imageUrl";
 
 const filterConfigs = [
   { key: "sector", label: "القطاع", options: ["مطاعم", "أزياء رياضية", "خدمات مالية", "تجارة إلكترونية", "اتصالات"] },
@@ -39,8 +40,13 @@ function StrategyModal({ s, onClose, isPro }: { s: Strategy; onClose: () => void
       <div className="w-full max-w-xl rounded-2xl shadow-2xl overflow-hidden"
         style={{ background: "var(--card)", animation: "modalIn 0.2s cubic-bezier(0.34,1.56,0.64,1)" }}>
         <style>{`@keyframes modalIn{from{opacity:0;transform:scale(0.95) translateY(8px)}to{opacity:1;transform:scale(1) translateY(0)}}`}</style>
-        <div className="w-full h-40 flex items-center justify-center" style={{ background: "#0f0f0f" }}>
-          <div className="w-16 h-16 rounded-2xl flex items-center justify-center text-2xl font-black"
+        <div className="w-full h-40 flex items-center justify-center relative overflow-hidden" style={{ background: "#0f0f0f" }}>
+          {s.thumbnail && !s.thumbnail.startsWith("#") ? (
+            <img src={getImageUrl("strategy-covers", s.thumbnail)} alt={s.title}
+              className="absolute inset-0 w-full h-full object-cover"
+              onError={(e) => { e.currentTarget.style.display = "none"; }} />
+          ) : null}
+          <div className="w-16 h-16 rounded-2xl flex items-center justify-center text-2xl font-black relative"
             style={{ background: s.brandColor === "#000000" ? "#1a1a1a" : `${s.brandColor}22`, color: s.brandColor === "#000000" ? "#fff" : s.brandColor }}>
             {s.brandInitial}
           </div>
@@ -144,7 +150,12 @@ export default function AnalysisPage() {
               <div key={s.id} onClick={() => setSelected(s)}
                 className="card-base card-hover cursor-pointer group p-0 overflow-hidden relative">
                 {/* Cover image area */}
-                <div className="relative w-full" style={{ aspectRatio: "16/9", background: "#0f0f0f" }}>
+                <div className="relative w-full overflow-hidden" style={{ aspectRatio: "16/9", background: "#0f0f0f" }}>
+                  {s.thumbnail && !s.thumbnail.startsWith("#") ? (
+                    <img src={getImageUrl("strategy-covers", s.thumbnail)} alt={s.title}
+                      className="absolute inset-0 w-full h-full object-cover"
+                      onError={(e) => { e.currentTarget.style.display = "none"; }} />
+                  ) : null}
                   <div className="absolute inset-0 flex items-center justify-center">
                     <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl font-black"
                       style={{ background: s.brandColor === "#000000" ? "#1a1a1a" : `${s.brandColor}22`, color: s.brandColor === "#000000" ? "#fff" : s.brandColor }}>

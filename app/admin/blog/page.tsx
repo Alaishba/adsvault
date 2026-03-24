@@ -186,7 +186,7 @@ export default function AdminBlogPage() {
     setUploading(true);
     const fd = new FormData();
     fd.append("file", file);
-    fd.append("bucket", "blog-images");
+    fd.append("bucket", "Blog-images");
     fd.append("path", `blog-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`);
     const result = await uploadAdminFile(fd);
     if (result.error) {

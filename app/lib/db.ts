@@ -1,5 +1,77 @@
 import { supabase } from "./supabase";
-import type { Ad, Influencer, Strategy } from "./mockData";
+import type { Ad, Influencer, Strategy, Platform } from "./mockData";
+
+/* ─── DB → TS mappers ─── */
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function mapDbAd(row: any): Ad {
+  return {
+    id: row.id,
+    brand: row.brand ?? "",
+    brandInitial: row.brand_initial ?? (row.brand ?? "?")[0],
+    brandColor: row.brand_color ?? "#84cc18",
+    title: row.title ?? "",
+    description: row.description ?? "",
+    platform: row.platform ?? "Meta",
+    sector: row.sector ?? "",
+    country: row.country ?? "",
+    date: (row.created_at ?? "").slice(0, 10),
+    tags: row.tags ?? [],
+    views: String(row.views ?? "0"),
+    saved: Number(row.saved ?? 0),
+    images: row.images ?? [],
+    source_url: row.source_url ?? "",
+    basic_analysis: row.basic_analysis ?? [],
+    apply_idea: row.apply_idea ?? [],
+    recommended_action: row.recommended_action ?? "",
+    ad_goal: row.ad_goal ?? "",
+    funnel_stage: row.funnel_stage ?? undefined,
+    season: row.season ?? "",
+  };
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function mapDbInfluencer(row: any): Influencer & { profile_image?: string } {
+  const platformStr: string = row.platform ?? "";
+  const platforms: Platform[] = platformStr
+    ? (platformStr.split(",").map((p: string) => p.trim()).filter(Boolean) as Platform[])
+    : [];
+  return {
+    id: row.id,
+    name: row.name ?? "",
+    initial: (row.name ?? "?")[0],
+    color: "#8957f6",
+    platforms,
+    followers: row.follower_count ?? "0",
+    engagement: row.engagement_rate ?? "0%",
+    category: row.category ?? "",
+    country: row.country ?? "",
+    bio: row.bio ?? "",
+    strengths: row.strengths ?? [],
+    weaknesses: row.weaknesses ?? [],
+    audienceAge: row.audience_age ?? [],
+    audienceCountry: row.audience_country ?? [],
+    profile_image: row.profile_image ?? null,
+  };
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function mapDbStrategy(row: any): Strategy {
+  return {
+    id: row.id,
+    brand: row.brand ?? "",
+    brandInitial: (row.brand ?? "?")[0],
+    brandColor: "#8957f6",
+    title: row.title ?? "",
+    preview: row.description ?? "",
+    insights: row.insights ?? [],
+    sector: row.sector ?? "",
+    tags: row.tags ?? [],
+    date: (row.created_at ?? "").slice(0, 10),
+    thumbnail: row.thumbnail ?? undefined,
+    is_pro_only: row.is_pro_only ?? false,
+  };
+}
 
 /* ─── Ads ─── */
 
@@ -9,13 +81,13 @@ export async function fetchAds(): Promise<Ad[]> {
     .select("*")
     .order("created_at", { ascending: false });
   if (error) { console.error("fetchAds error:", error.message); return []; }
-  return (data ?? []) as Ad[];
+  return (data ?? []).map(mapDbAd);
 }
 
 export async function fetchAdById(id: string): Promise<Ad | null> {
   const { data, error } = await supabase.from("ads").select("*").eq("id", id).single();
   if (error) return null;
-  return data as Ad;
+  return mapDbAd(data);
 }
 
 export async function createAd(ad: Omit<Ad, "id">): Promise<{ error: string | null }> {
@@ -35,10 +107,10 @@ export async function deleteAd(id: string): Promise<{ error: string | null }> {
 
 /* ─── Influencers ─── */
 
-export async function fetchInfluencers(): Promise<Influencer[]> {
+export async function fetchInfluencers(): Promise<(Influencer & { profile_image?: string })[]> {
   const { data, error } = await supabase.from("influencers").select("*");
   if (error) { console.error("fetchInfluencers error:", error.message); return []; }
-  return (data ?? []) as Influencer[];
+  return (data ?? []).map(mapDbInfluencer);
 }
 
 export async function createInfluencer(inf: Omit<Influencer, "id">): Promise<{ error: string | null }> {
@@ -61,7 +133,7 @@ export async function deleteInfluencer(id: string): Promise<{ error: string | nu
 export async function fetchStrategies(): Promise<Strategy[]> {
   const { data, error } = await supabase.from("strategies").select("*");
   if (error) { console.error("fetchStrategies error:", error.message); return []; }
-  return (data ?? []) as Strategy[];
+  return (data ?? []).map(mapDbStrategy);
 }
 
 export async function createStrategy(s: Omit<Strategy, "id">): Promise<{ error: string | null }> {

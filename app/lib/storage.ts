@@ -1,6 +1,6 @@
 import { supabase } from "./supabase";
 
-export type StorageBucket = "ads-images" | "influencer-photos" | "strategy-covers" | "user-avatars" | "blog-images";
+export type StorageBucket = "ads-images" | "influencer-photos" | "strategy-covers" | "user-avatars" | "Blog-images";
 
 export async function uploadFile(
   bucket: StorageBucket,

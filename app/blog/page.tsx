@@ -137,7 +137,7 @@ export default function BlogPage() {
             <div className="relative w-full rounded-2xl overflow-hidden mb-8"
               style={{ minHeight: 360, background: featured.coverImage.startsWith("#") ? featured.coverImage : "#8957f6" }}>
               {!featured.coverImage.startsWith("#") && (
-                <img src={getImageUrl("blog-images", featured.coverImage)} alt={featured.title}
+                <img src={getImageUrl("Blog-images", featured.coverImage)} alt={featured.title}
                   className="absolute inset-0 w-full h-full object-cover"
                   onError={(e) => { e.currentTarget.style.display = "none"; }} />
               )}
@@ -200,7 +200,7 @@ export default function BlogPage() {
                   }}
                 >
                   {!article.coverImage.startsWith("#") && (
-                    <img src={getImageUrl("blog-images", article.coverImage)} alt={article.title}
+                    <img src={getImageUrl("Blog-images", article.coverImage)} alt={article.title}
                       className="absolute inset-0 w-full h-full object-cover"
                       onError={(e) => { e.currentTarget.style.display = "none"; }} />
                   )}

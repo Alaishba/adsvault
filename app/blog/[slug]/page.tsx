@@ -81,7 +81,7 @@ export default function BlogArticlePage() {
         style={{ height: 300, background: article.coverImage.startsWith("#") ? article.coverImage : "#8957f6" }}
       >
         {!article.coverImage.startsWith("#") && (
-          <img src={getImageUrl("blog-images", article.coverImage)} alt={article.title}
+          <img src={getImageUrl("Blog-images", article.coverImage)} alt={article.title}
             className="absolute inset-0 w-full h-full object-cover"
             onError={(e) => { e.currentTarget.style.display = "none"; }} />
         )}
@@ -240,7 +240,7 @@ export default function BlogArticlePage() {
                     }}
                   >
                     {!a.coverImage.startsWith("#") && (
-                      <img src={getImageUrl("blog-images", a.coverImage)} alt={a.title}
+                      <img src={getImageUrl("Blog-images", a.coverImage)} alt={a.title}
                         className="absolute inset-0 w-full h-full object-cover"
                         onError={(e) => { e.currentTarget.style.display = "none"; }} />
                     )}
