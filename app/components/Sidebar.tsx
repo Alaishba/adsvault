@@ -1,8 +1,9 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useAuth } from "../context/AuthContext";
+import { createClient } from "../lib/supabase/client";
 
 const mainNav = [
   { href: "/", label: "الرئيسية", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg> },
@@ -26,8 +27,21 @@ const bottomNav = [
 
 export default function Sidebar({ mobileOpen, onClose }: { mobileOpen?: boolean; onClose?: () => void }) {
   const pathname = usePathname();
-  const { user } = useAuth();
-  const isPro = user?.plan === "pro" || user?.plan === "enterprise" || user?.plan === "admin";
+  const [userName, setUserName] = useState<string | null>(null);
+  const [userPlan, setUserPlan] = useState<string | null>(null);
+
+  useEffect(() => {
+    const supabase = createClient();
+    supabase.auth.getUser().then(async ({ data: { user: u } }) => {
+      if (u) {
+        const { data } = await supabase.from("users").select("full_name,plan").eq("id", u.id).single();
+        setUserName(data?.full_name ?? u.email ?? null);
+        setUserPlan(data?.plan ?? "free");
+      }
+    });
+  }, []);
+
+  const isPro = userPlan === "pro" || userPlan === "enterprise" || userPlan === "admin";
   const isActive = (href: string) => {
     if (href === "/library?saved=true") return false;
     return pathname === href;
@@ -102,10 +116,10 @@ export default function Sidebar({ mobileOpen, onClose }: { mobileOpen?: boolean;
           </ul>
 
           {/* Welcome message */}
-          {user && (
+          {userName && (
             <div className="mt-3 mx-1 px-3 py-2 rounded-xl" style={{ background: "rgba(255,255,255,0.5)" }}>
               <p className="text-xs font-semibold" style={{ color: "#1c1c1e" }}>
-                مرحباً {user.name || "بك"} 👋
+                مرحباً {userName} 👋
               </p>
             </div>
           )}

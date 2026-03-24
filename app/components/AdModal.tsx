@@ -1,11 +1,10 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import type { Ad, FunnelStage } from "../lib/mockData";
 import PlatformBadge from "./PlatformBadge";
-import { useAuth } from "../context/AuthContext";
-import { useState } from "react";
+import { createClient } from "../lib/supabase/client";
 
 const funnelConfig: Record<FunnelStage, { label: string; color: string; bg: string }> = {
   awareness:  { label: "وعي",    color: "#1d4ed8", bg: "#eff6ff" },
@@ -67,8 +66,18 @@ function ProBlurOverlay({ children }: { children: React.ReactNode }) {
 }
 
 export default function AdModal({ ad, onClose }: { ad: Ad | null; onClose: () => void }) {
-  const { user } = useAuth();
-  const isPro = user?.plan === "pro" || user?.plan === "enterprise" || user?.plan === "admin";
+  const [isPro, setIsPro] = useState(false);
+
+  useEffect(() => {
+    const supabase = createClient();
+    supabase.auth.getUser().then(async ({ data: { user: u } }) => {
+      if (u) {
+        const { data } = await supabase.from("users").select("plan").eq("id", u.id).single();
+        const p = data?.plan ?? "free";
+        setIsPro(p === "pro" || p === "enterprise" || p === "admin");
+      }
+    });
+  }, []);
 
   useEffect(() => {
     if (!ad) return;

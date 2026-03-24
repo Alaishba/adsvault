@@ -2,14 +2,15 @@
 
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import AppLayout from "../components/AppLayout";
 import AdCard from "../components/AdCard";
 import AdModal from "../components/AdModal";
-import { useAuth } from "../context/AuthContext";
+import { createClient } from "../lib/supabase/client";
 import { uploadFile } from "../lib/storage";
-import { supabase } from "../lib/supabase";
 import { type Ad, type Strategy } from "../lib/mockData";
 import { fetchAds, fetchStrategies } from "../lib/db";
+import { revalidate } from "../actions";
 
 const tabs = [
   { id: "info", label: "معلوماتي" },
@@ -27,50 +28,78 @@ const planLabels: Record<string, { label: string; color: string; bg: string }> =
 };
 
 export default function ProfilePage() {
-  const { user, logout } = useAuth();
+  const router = useRouter();
+  const supabase = createClient();
+  const [userId, setUserId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState("info");
   const [selectedAd, setSelectedAd] = useState<Ad | null>(null);
-  const [avatarUrl, setAvatarUrl] = useState<string | null>(user?.avatar ?? null);
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
-  const [name, setName] = useState(user?.name ?? "");
-  const [email] = useState(user?.email ?? "");
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [plan, setPlan] = useState("free");
   const [phone, setPhone] = useState("");
   const [company, setCompany] = useState("");
   const [jobTitle, setJobTitle] = useState("");
   const [saved, setSaved] = useState(true);
+  const [pageLoading, setPageLoading] = useState(true);
   const fileRef = useRef<HTMLInputElement>(null);
   const [notifs, setNotifs] = useState({ newAds: true, strategies: true, weeklyDigest: false });
 
   const [savedAds, setSavedAds] = useState<Ad[]>([]);
   const [savedStrategies, setSavedStrategies] = useState<Strategy[]>([]);
 
+  // Load user session + profile from Supabase
   useEffect(() => {
-    // Load real data
+    supabase.auth.getUser().then(async ({ data: { user: authUser } }) => {
+      if (!authUser) { setPageLoading(false); return; }
+      setUserId(authUser.id);
+      setEmail(authUser.email ?? "");
+      const { data: profile } = await supabase
+        .from("users").select("full_name,plan,avatar_url").eq("id", authUser.id).single();
+      if (profile) {
+        setName(profile.full_name ?? "");
+        setPlan(profile.plan ?? "free");
+        setAvatarUrl(profile.avatar_url ?? null);
+      }
+      setPageLoading(false);
+    });
     fetchAds().then((all) => setSavedAds(all.slice(0, 6)));
     fetchStrategies().then(setSavedStrategies);
-  }, []);
+  }, [supabase]);
 
-  const plan = user?.plan ?? "free";
   const isPro = plan === "pro" || plan === "enterprise" || plan === "admin";
   const planInfo = planLabels[plan] ?? planLabels.free;
   const initials = name.trim().split(" ").map((w) => w[0]).join("").slice(0, 2).toUpperCase() || "؟";
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    router.push("/");
+    router.refresh();
+  };
+
+  const [avatarError, setAvatarError] = useState<string | null>(null);
 
   const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     setUploading(true);
+    setAvatarError(null);
     try {
-      const { url, error } = await uploadFile("user-avatars", file, `${user?.id ?? "anon"}-avatar`);
+      const { data: { user: freshUser } } = await supabase.auth.getUser();
+      if (!freshUser) throw new Error("يجب تسجيل الدخول أولاً");
+      const uid = freshUser.id;
+      const { url, error } = await uploadFile("user-avatars", file, `${uid}-avatar`);
       if (error) throw new Error(error);
-      if (url) {
-        setAvatarUrl(url);
-        // Persist avatar URL to Supabase
-        if (user?.id) {
-          const { error: avatarErr } = await supabase.from("users").update({ avatar_url: url }).eq("id", user.id);
-          if (avatarErr) console.error("Avatar save error:", avatarErr.message);
-        }
-      }
-    } catch { /* silent */ }
+      if (!url) throw new Error("فشل رفع الصورة");
+      setAvatarUrl(url);
+      const { error: dbErr } = await supabase.from("users").update({ avatar_url: url }).eq("id", uid);
+      if (dbErr) throw new Error(dbErr.message);
+      await revalidate("/profile");
+      router.refresh();
+    } catch (err: unknown) {
+      setAvatarError(err instanceof Error ? err.message : "خطأ في رفع الصورة");
+    }
     setUploading(false);
   };
 
@@ -80,17 +109,23 @@ export default function ProfilePage() {
     setSaved(false);
     setSaveError(null);
     try {
-      if (!user?.id) throw new Error("يجب تسجيل الدخول أولاً");
-      const { error } = await supabase.from("users").update({
-        full_name: name,
-      }).eq("id", user.id);
+      const { data: { user: freshUser } } = await supabase.auth.getUser();
+      if (!freshUser) throw new Error("يجب تسجيل الدخول أولاً");
+      const uid = freshUser.id;
+      const { error } = await supabase.from("users").update({ full_name: name }).eq("id", uid);
       if (error) throw new Error(error.message);
-      setTimeout(() => setSaved(true), 1500);
+      await revalidate("/profile");
+      router.refresh();
+      setSaved(true);
     } catch (err: unknown) {
       setSaveError(err instanceof Error ? err.message : "حدث خطأ في حفظ البيانات");
       setSaved(true);
     }
   };
+
+  if (pageLoading) {
+    return <AppLayout><div className="flex items-center justify-center min-h-[60vh]"><p style={{ color: "#6b7280" }}>جارٍ التحميل...</p></div></AppLayout>;
+  }
 
   const inputStyle = { background: "#ffffff", border: "1px solid #e5e7eb", color: "#1c1c1e" };
 
@@ -133,7 +168,7 @@ export default function ProfilePage() {
               <div><span className="text-xs" style={{ color: "#6b7280" }}>انضم مارس 2025</span></div>
             </div>
           </div>
-          <button onClick={logout}
+          <button onClick={handleLogout}
             className="px-4 py-2 rounded-xl text-sm font-semibold transition-all"
             style={{ color: "#ef4444", border: "1px solid #e5e7eb" }}>
             تسجيل الخروج

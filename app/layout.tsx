@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { ThemeProvider } from "./context/ThemeContext";
-import { AuthProvider } from "./context/AuthContext";
 import ScrollProgress from "./components/ScrollProgress";
 import { ToastProvider } from "./components/Toast";
 
@@ -15,12 +14,10 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     <html lang="ar" dir="rtl" suppressHydrationWarning>
       <body>
         <ThemeProvider>
-          <AuthProvider>
-            <ToastProvider>
-              <ScrollProgress />
-              {children}
-            </ToastProvider>
-          </AuthProvider>
+          <ToastProvider>
+            <ScrollProgress />
+            {children}
+          </ToastProvider>
         </ThemeProvider>
       </body>
     </html>

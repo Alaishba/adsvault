@@ -1,9 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { supabase, isSupabaseConfigured } from "../../lib/supabase";
+import { useRouter } from "next/navigation";
+import { createClient } from "../../lib/supabase/client";
 
 export default function AdminLoginPage() {
+  const router = useRouter();
+  const supabase = createClient();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -17,26 +20,19 @@ export default function AdminLoginPage() {
     setSuccess(null);
     setLoading(true);
     try {
-      if (!isSupabaseConfigured()) {
-        localStorage.setItem("adminSession", JSON.stringify({ email, role: "admin" }));
-        window.location.href = "/admin/dashboard";
-        return;
-      }
       const { data, error: authError } = await supabase.auth.signInWithPassword({ email, password });
       if (authError) throw authError;
       if (!data.session) throw new Error("فشل تسجيل الدخول");
 
       const { data: profile } = await supabase
-        .from("users")
-        .select("plan")
-        .eq("id", data.session.user.id)
-        .single();
+        .from("users").select("plan").eq("id", data.session.user.id).single();
 
       if (profile?.plan !== "admin") {
         await supabase.auth.signOut();
         throw new Error("ليس لديك صلاحية الوصول للوحة الإدارة. خطتك الحالية: " + (profile?.plan ?? "غير محدد"));
       }
-      window.location.href = "/admin/dashboard";
+      router.refresh();
+      router.push("/admin/dashboard");
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "حدث خطأ، حاول مجدداً");
     } finally {
@@ -51,21 +47,12 @@ export default function AdminLoginPage() {
     if (password.length < 6) { setError("كلمة المرور يجب أن تكون 6 أحرف على الأقل"); return; }
     setLoading(true);
     try {
-      if (!isSupabaseConfigured()) {
-        setError("Supabase غير مُعَد");
-        return;
-      }
-      // Create auth account
       const { data: authData, error: authError } = await supabase.auth.signUp({ email, password });
       if (authError) throw authError;
-
       if (authData.user) {
-        // Create/update user profile as admin
         await supabase.from("users").upsert({
-          id: authData.user.id,
-          email,
-          full_name: "Admin",
-          plan: "admin",
+          id: authData.user.id, email,
+          full_name: "Admin", plan: "admin",
           created_at: new Date().toISOString(),
         });
         setSuccess("تم إنشاء الحساب بنجاح! سجّل الدخول الآن.");
@@ -79,8 +66,7 @@ export default function AdminLoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4"
-      style={{ background: "#f3f5f9" }}>
+    <div className="min-h-screen flex items-center justify-center px-4" style={{ background: "#f3f5f9" }}>
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
           <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-lg font-black text-white mx-auto mb-4"
@@ -109,13 +95,12 @@ export default function AdminLoginPage() {
             </div>
 
             {error && (
-              <div className="px-3 py-2 rounded-lg text-xs" style={{ background: "#fef2f2", color: "#ef4444" }}>
+              <div className="px-3 py-2 rounded-lg text-xs font-semibold" style={{ background: "#fef2f2", color: "#dc2626" }}>
                 {error}
               </div>
             )}
-
             {success && (
-              <div className="px-3 py-2 rounded-lg text-xs" style={{ background: "#f7fee7", color: "#84cc18" }}>
+              <div className="px-3 py-2 rounded-lg text-xs font-semibold" style={{ background: "#f7fee7", color: "#84cc18" }}>
                 {success}
               </div>
             )}
@@ -128,15 +113,12 @@ export default function AdminLoginPage() {
           </form>
 
           <button onClick={() => { setMode(mode === "login" ? "register" : "login"); setError(null); setSuccess(null); }}
-            className="w-full text-center text-xs mt-4 font-semibold"
-            style={{ color: "#8957f6" }}>
+            className="w-full text-center text-xs mt-4 font-semibold" style={{ color: "#8957f6" }}>
             {mode === "login" ? "أول مرة؟ أنشئ حساب مشرف" : "عندك حساب؟ سجّل دخول"}
           </button>
         </div>
 
-        <p className="text-center text-xs mt-4" style={{ color: "#9ca3af" }}>
-          هذه الصفحة مخصصة لمشرفي المنصة فقط
-        </p>
+        <p className="text-center text-xs mt-4" style={{ color: "#9ca3af" }}>هذه الصفحة مخصصة لمشرفي المنصة فقط</p>
       </div>
     </div>
   );

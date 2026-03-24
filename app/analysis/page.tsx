@@ -4,7 +4,7 @@ import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 import AppLayout from "../components/AppLayout";
 import FilterBar from "../components/FilterBar";
-import { useAuth } from "../context/AuthContext";
+import { createClient } from "../lib/supabase/client";
 import { type Strategy } from "../lib/mockData";
 import { fetchStrategies } from "../lib/db";
 
@@ -30,9 +30,7 @@ function ProBlurOverlay() {
   );
 }
 
-function StrategyModal({ s, onClose }: { s: Strategy; onClose: () => void }) {
-  const { user } = useAuth();
-  const isPro = user?.plan === "pro" || user?.plan === "enterprise" || user?.plan === "admin";
+function StrategyModal({ s, onClose, isPro }: { s: Strategy; onClose: () => void; isPro: boolean }) {
   const isLocked = !isPro && s.is_pro_only;
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4"
@@ -90,13 +88,22 @@ function StrategyModal({ s, onClose }: { s: Strategy; onClose: () => void }) {
 }
 
 export default function AnalysisPage() {
-  const { user } = useAuth();
-  const isPro = user?.plan === "pro" || user?.plan === "enterprise" || user?.plan === "admin";
+  const [isPro, setIsPro] = useState(false);
   const [selected, setSelected] = useState<Strategy | null>(null);
   const [activeFilters, setActiveFilters] = useState<Record<string, string>>({});
   const [allStrategies, setAllStrategies] = useState<Strategy[]>([]);
 
-  useEffect(() => { fetchStrategies().then(setAllStrategies); }, []);
+  useEffect(() => {
+    fetchStrategies().then(setAllStrategies);
+    const supabase = createClient();
+    supabase.auth.getUser().then(async ({ data: { user: u } }) => {
+      if (u) {
+        const { data } = await supabase.from("users").select("plan").eq("id", u.id).single();
+        const p = data?.plan ?? "free";
+        setIsPro(p === "pro" || p === "enterprise" || p === "admin");
+      }
+    });
+  }, []);
 
   const handleFilterChange = (key: string, value: string | null) => {
     setActiveFilters((prev) => {
@@ -192,7 +199,7 @@ export default function AnalysisPage() {
         </div>
       </div>
 
-      {selected && <StrategyModal s={selected} onClose={() => setSelected(null)} />}
+      {selected && <StrategyModal s={selected} onClose={() => setSelected(null)} isPro={isPro} />}
     </AppLayout>
   );
 }

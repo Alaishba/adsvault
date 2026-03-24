@@ -1,10 +1,12 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { type Strategy } from "../../lib/mockData";
 import { uploadFile } from "../../lib/storage";
-import { supabase, isSupabaseConfigured } from "../../lib/supabase";
+import { supabase } from "../../lib/supabase";
 import { fetchStrategies } from "../../lib/db";
+import { revalidate } from "../../actions";
 
 const emptyForm = {
   brand: "", brandInitial: "", brandColor: "#8957f6",
@@ -18,6 +20,7 @@ const emptyForm = {
 };
 
 export default function AdminStrategiesPage() {
+  const router = useRouter();
   const [strategies, setStrategies] = useState<Strategy[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [editId, setEditId] = useState<string | null>(null);
@@ -64,6 +67,9 @@ export default function AdminStrategiesPage() {
     const { error } = await supabase.from("strategies").delete().eq("id", id);
     if (error) { window.alert("خطأ في الحذف: " + error.message); return; }
     setStrategies((prev) => prev.filter((s) => s.id !== id));
+    await revalidate("/admin/strategies");
+    await revalidate("/analysis");
+    router.refresh();
   };
 
   const handleThumbnailChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -98,6 +104,9 @@ export default function AdminStrategiesPage() {
     }
     if (error) { setErrorMsg(error); return; }
     await reload();
+    await revalidate("/admin/strategies");
+    await revalidate("/analysis");
+    router.refresh();
     setShowForm(false);
     setEditId(null);
   };

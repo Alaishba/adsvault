@@ -1,14 +1,9 @@
-import { createClient } from "@supabase/supabase-js";
+// Backward-compatible re-export using @supabase/ssr browser client.
+import { createClient } from "./supabase/client";
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? "";
+export const supabase = createClient();
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
-
-/** Returns true when real Supabase env vars are set */
+/** @deprecated Always returns true in production. */
 export function isSupabaseConfigured(): boolean {
-  return (
-    supabaseUrl.startsWith("https://") &&
-    supabaseAnonKey.length > 20
-  );
+  return true;
 }
