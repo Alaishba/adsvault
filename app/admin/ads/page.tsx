@@ -2,7 +2,8 @@
 
 import { useState, useRef, useEffect } from "react";
 import { type Ad } from "../../lib/mockData";
-import { saveAdminAd, deleteAdminAd, fetchAdminAds, uploadAdminFile } from "../../actions/adminActions";
+import { saveAdminAd, deleteAdminAd, fetchAdminAds } from "../../actions/adminActions";
+import { uploadViaSignedUrl } from "../../lib/uploadViaSignedUrl";
 
 const platforms = ["Meta", "TikTok", "Snap", "YouTube", "Instagram"];
 const sectors = ["تجزئة", "اتصالات", "تجارة إلكترونية", "مواد استهلاكية", "خدمات مالية", "مطاعم", "عقارات", "تعليم"];
@@ -131,11 +132,7 @@ export default function AdminAdsPage() {
   const handleAnalysisImages = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files ?? []).slice(0, 3);
     for (const file of files) {
-      const fd = new FormData();
-      fd.append("file", file);
-      fd.append("bucket", "ads-images");
-      fd.append("path", `analysis-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`);
-      const result = await uploadAdminFile(fd);
+      const result = await uploadViaSignedUrl("ads-images", file, `analysis-${Date.now()}`);
       if (result.error) { console.error("[AdminAds] Analysis image upload failed:", result.error); continue; }
       if (result.url) {
         setForm((f) => ({
@@ -152,11 +149,7 @@ export default function AdminAdsPage() {
   const handleAttachments = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files ?? []).slice(0, 2);
     for (const file of files) {
-      const fd = new FormData();
-      fd.append("file", file);
-      fd.append("bucket", "ads-images");
-      fd.append("path", `attach-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`);
-      const result = await uploadAdminFile(fd);
+      const result = await uploadViaSignedUrl("ads-images", file, `attach-${Date.now()}`);
       if (result.error) { console.error("[AdminAds] Attachment upload failed:", result.error); continue; }
       if (result.url) {
         setForm((f) => ({
@@ -179,14 +172,10 @@ export default function AdminAdsPage() {
     try {
       let images = form.images ?? [];
       if (imageFiles.length > 0) {
-        console.log(`[AdminAds] Uploading ${imageFiles.length} image(s)...`);
+        console.log(`[AdminAds] Uploading ${imageFiles.length} image(s) via signed URL...`);
         const uploadedUrls: string[] = [];
         for (const file of imageFiles) {
-          const fd = new FormData();
-          fd.append("file", file);
-          fd.append("bucket", "ads-images");
-          fd.append("path", `ad-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`);
-          const result = await uploadAdminFile(fd);
+          const result = await uploadViaSignedUrl("ads-images", file, `ad-${Date.now()}`);
           if (result.error) {
             console.error(`[AdminAds] Image upload failed:`, result.error);
             setSaveError(`فشل رفع الصورة: ${result.error}`);

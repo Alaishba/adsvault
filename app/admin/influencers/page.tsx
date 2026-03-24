@@ -3,7 +3,8 @@
 import { useState, useRef, useEffect } from "react";
 import { type Influencer, type Platform } from "../../lib/mockData";
 import { getImageUrl } from "../../lib/imageUrl";
-import { saveAdminInfluencer, deleteAdminInfluencer, fetchAdminInfluencers, uploadAdminFile } from "../../actions/adminActions";
+import { saveAdminInfluencer, deleteAdminInfluencer, fetchAdminInfluencers } from "../../actions/adminActions";
+import { uploadViaSignedUrl } from "../../lib/uploadViaSignedUrl";
 
 const emptyForm = {
   name: "", bio: "", category: "", country: "",
@@ -82,11 +83,7 @@ export default function AdminInfluencersPage() {
     if (!file) return;
     setUploading(true);
     setUploadError(null);
-    const fd = new FormData();
-    fd.append("file", file);
-    fd.append("bucket", "influencer-photos");
-    fd.append("path", `influencer-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`);
-    const result = await uploadAdminFile(fd);
+    const result = await uploadViaSignedUrl("influencer-photos", file, `influencer-${Date.now()}`);
     if (result.error) {
       console.error("[AdminInfluencers] Image upload failed:", result.error);
       setUploadError(`فشل رفع الصورة: ${result.error}`);

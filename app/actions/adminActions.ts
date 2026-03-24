@@ -5,6 +5,33 @@ import { createAdminClient } from "../lib/supabase/admin";
 
 type Result = { success: true } | { error: string };
 
+// ─── Signed Upload URL (browser uploads directly to Supabase, bypasses Vercel body limit) ───
+
+export async function createSignedUploadUrl(
+  bucket: string,
+  filePath: string
+): Promise<{ signedUrl: string | null; token: string | null; fullPath: string | null; error: string | null }> {
+  try {
+    if (!bucket || !filePath) {
+      return { signedUrl: null, token: null, fullPath: null, error: "Missing bucket or path" };
+    }
+    const supabase = createAdminClient();
+    const { data, error } = await supabase.storage.from(bucket).createSignedUploadUrl(filePath);
+    if (error) {
+      console.error(`[SignedUpload] Failed bucket="${bucket}" path="${filePath}":`, error.message);
+      return { signedUrl: null, token: null, fullPath: null, error: error.message };
+    }
+    console.log(`[SignedUpload] OK bucket="${bucket}" path="${filePath}"`);
+    // Build the public URL for after upload completes
+    const { data: publicData } = supabase.storage.from(bucket).getPublicUrl(data.path);
+    return { signedUrl: data.signedUrl, token: data.token, fullPath: publicData.publicUrl, error: null };
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : "Failed to create signed URL";
+    console.error("[SignedUpload] Uncaught error:", msg);
+    return { signedUrl: null, token: null, fullPath: null, error: msg };
+  }
+}
+
 // ─── Admin File Upload (bypasses RLS via service role key) ───
 
 export async function uploadAdminFile(

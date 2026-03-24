@@ -3,7 +3,8 @@
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { type Strategy } from "../../lib/mockData";
-import { saveAdminStrategy, deleteAdminStrategy, fetchAdminStrategies, uploadAdminFile } from "../../actions/adminActions";
+import { saveAdminStrategy, deleteAdminStrategy, fetchAdminStrategies } from "../../actions/adminActions";
+import { uploadViaSignedUrl } from "../../lib/uploadViaSignedUrl";
 
 const emptyForm = {
   brand: "", brandInitial: "", brandColor: "#8957f6",
@@ -72,11 +73,7 @@ export default function AdminStrategiesPage() {
     if (!file) return;
     setUploading(true);
     setErrorMsg(null);
-    const fd = new FormData();
-    fd.append("file", file);
-    fd.append("bucket", "strategy-covers");
-    fd.append("path", `strategy-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`);
-    const result = await uploadAdminFile(fd);
+    const result = await uploadViaSignedUrl("strategy-covers", file, `strategy-${Date.now()}`);
     if (result.error) {
       console.error("[AdminStrategies] Thumbnail upload failed:", result.error);
       setErrorMsg(`فشل رفع الصورة: ${result.error}`);

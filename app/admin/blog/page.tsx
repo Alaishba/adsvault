@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useRef, useEffect, type ChangeEvent } from "react";
-import { saveAdminBlogPost, deleteAdminBlogPost, fetchAdminBlogPosts, uploadAdminFile } from "../../actions/adminActions";
+import { saveAdminBlogPost, deleteAdminBlogPost, fetchAdminBlogPosts } from "../../actions/adminActions";
+import { uploadViaSignedUrl } from "../../lib/uploadViaSignedUrl";
 
 interface AdminArticle {
   id: number;
@@ -184,11 +185,7 @@ export default function AdminBlogPage() {
     const file = e.target.files?.[0];
     if (!file) return;
     setUploading(true);
-    const fd = new FormData();
-    fd.append("file", file);
-    fd.append("bucket", "Blog-images");
-    fd.append("path", `blog-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`);
-    const result = await uploadAdminFile(fd);
+    const result = await uploadViaSignedUrl("Blog-images", file, `blog-${Date.now()}`);
     if (result.error) {
       console.error("[AdminBlog] Image upload failed:", result.error);
     } else if (result.url) {

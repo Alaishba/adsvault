@@ -7,7 +7,7 @@ import AppLayout from "../components/AppLayout";
 import { createClient } from "../lib/supabase/client";
 import { getImageUrl } from "../lib/imageUrl";
 import { revalidate } from "../actions";
-import { uploadAdminFile } from "../actions/adminActions";
+import { uploadViaSignedUrl } from "../lib/uploadViaSignedUrl";
 
 const tabs = [
   { id: "info", label: "معلوماتي" },
@@ -84,11 +84,7 @@ export default function ProfilePage() {
     try {
       if (!userId) throw new Error("يجب تسجيل الدخول أولاً");
       console.log(`[Profile] Uploading avatar for user=${userId} size=${file.size}`);
-      const fd = new FormData();
-      fd.append("file", file);
-      fd.append("bucket", "user-avatars");
-      fd.append("path", `${userId}-avatar`);
-      const result = await uploadAdminFile(fd);
+      const result = await uploadViaSignedUrl("user-avatars", file, `${userId}-avatar`);
       if (result.error) {
         console.error(`[Profile] Avatar upload failed:`, result.error);
         throw new Error(result.error);
