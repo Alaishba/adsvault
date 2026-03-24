@@ -137,7 +137,15 @@ export default function AdminAdsPage() {
       fd.append("path", `analysis-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`);
       const result = await uploadAdminFile(fd);
       if (result.error) { console.error("[AdminAds] Analysis image upload failed:", result.error); continue; }
-      if (result.url) setPro({ analysis_images: [...pro.analysis_images, result.url] });
+      if (result.url) {
+        setForm((f) => ({
+          ...f,
+          pro_analysis: {
+            ...(f.pro_analysis ?? emptyProAnalysis),
+            analysis_images: [...(f.pro_analysis?.analysis_images ?? []), result.url!],
+          },
+        }));
+      }
     }
   };
 
@@ -150,7 +158,15 @@ export default function AdminAdsPage() {
       fd.append("path", `attach-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`);
       const result = await uploadAdminFile(fd);
       if (result.error) { console.error("[AdminAds] Attachment upload failed:", result.error); continue; }
-      if (result.url) setPro({ attachments: [...pro.attachments, result.url] });
+      if (result.url) {
+        setForm((f) => ({
+          ...f,
+          pro_analysis: {
+            ...(f.pro_analysis ?? emptyProAnalysis),
+            attachments: [...(f.pro_analysis?.attachments ?? []), result.url!],
+          },
+        }));
+      }
     }
   };
 
@@ -199,6 +215,7 @@ export default function AdminAdsPage() {
         apply_idea: form.apply_idea ?? [],
         recommended_action: form.recommended_action || "",
         is_pro_only: form.is_pro_only ?? false,
+        pro_analysis: form.pro_analysis ?? emptyProAnalysis,
       };
 
       console.log(`[AdminAds] Saving ad with ${images.length} image(s)...`);
