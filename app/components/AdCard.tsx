@@ -53,11 +53,12 @@ export default function AdCard({ ad, onClick }: { ad: Ad; onClick: (ad: Ad) => v
   return (
     <article
       onClick={() => onClick(ad)}
-      className="card-base card-hover cursor-pointer group p-0 overflow-hidden"
+      className="rounded-xl cursor-pointer group p-0 overflow-hidden transition-all duration-200 hover:shadow-md hover:scale-[1.02] bg-[#ced3de] border border-[#ced3de]"
+      style={{ height: 360 }}
     >
       {/* Thumbnail */}
       <div
-        className="w-full h-36 flex items-center justify-center relative overflow-hidden"
+        className="w-full h-52 flex items-center justify-center relative overflow-hidden"
         style={{ background: `${ad.brandColor ?? "#2563eb"}18` }}
       >
         {(ad.images ?? []).length > 0 ? (
@@ -77,20 +78,19 @@ export default function AdCard({ ad, onClick }: { ad: Ad; onClick: (ad: Ad) => v
 
       {/* Content */}
       <div className="p-4 overflow-hidden">
-        <p className="text-xs font-extrabold mb-1 truncate text-slate-300">
+        <p className="text-xs font-extrabold mb-1 truncate text-slate-700">
           {ad.brand}
         </p>
-        <h3 className="text-sm font-bold leading-snug mb-2 line-clamp-2 group-hover:text-blue-400 transition-colors"
-          style={{ color: "var(--text-primary)" }}>
+        <h3 className="text-sm font-bold leading-snug mb-2 line-clamp-2 group-hover:text-blue-400 transition-colors text-slate-900">
           {ad.title}
         </h3>
-        <p className="text-xs leading-relaxed line-clamp-2 mb-3" style={{ color: "var(--text-secondary)" }}>
+        <p className="text-xs leading-relaxed line-clamp-2 mb-3 text-slate-700">
           {ad.description}
         </p>
 
         {/* Footer */}
-        <div className="flex items-center justify-between pt-2 border-t border-[--border] min-w-0">
-          <div className="flex items-center gap-3 text-xs min-w-0 overflow-hidden" style={{ color: "var(--text-secondary)" }}>
+        <div className="flex items-center justify-between pt-2 border-t border-[#ced3de]/50 min-w-0">
+          <div className="flex items-center gap-3 text-xs min-w-0 overflow-hidden text-slate-700">
             <span className="flex items-center gap-1 shrink-0">
               <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
@@ -105,7 +105,7 @@ export default function AdCard({ ad, onClick }: { ad: Ad; onClick: (ad: Ad) => v
               {ad.saved}
             </span>
           </div>
-          <span className="text-xs shrink-0 mr-2 truncate" style={{ color: "var(--text-secondary)" }}>
+          <span className="text-xs shrink-0 mr-2 truncate text-slate-700">
             {ad.country}
           </span>
         </div>

@@ -6,9 +6,9 @@ import { fetchAdminUsers } from "../../actions/adminActions";
 type User = { id: string; email: string; full_name: string; plan: string; created_at: string; status: string };
 
 const planStyle: Record<string, { bg: string; color: string }> = {
-  pro:        { bg: "#f3eeff", color: "#8957f6" },
+  pro:        { bg: "#f3eeff", color: "#3b82f6" },
   enterprise: { bg: "#eff6ff", color: "#2563eb" },
-  free:       { bg: "#f3f5f9", color: "#6b7280" },
+  free:       { bg: "#eff6ff", color: "#6b7280" },
   admin:      { bg: "#fef2f2", color: "#ef4444" },
 };
 
@@ -51,7 +51,7 @@ export default function AdminUsersPage() {
       </div>
 
       <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl border mb-5"
-        style={{ background: "#ffffff", borderColor: "#e5e7eb" }}>
+        style={{ background: "#ffffff", borderColor: "#dbeafe" }}>
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="2">
           <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
         </svg>
@@ -60,24 +60,24 @@ export default function AdminUsersPage() {
           className="bg-transparent outline-none w-full text-sm text-[#1c1c1e] placeholder:text-[#9ca3af]" dir="rtl" />
       </div>
 
-      <div className="rounded-2xl border overflow-hidden" style={{ background: "#ffffff", borderColor: "#e5e7eb" }}>
+      <div className="rounded-2xl border overflow-hidden" style={{ background: "#ffffff", borderColor: "#dbeafe" }}>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr style={{ background: "#f3f5f9" }}>
+              <tr style={{ background: "#eff6ff" }}>
                 {["الاسم", "البريد", "الخطة", "تاريخ التسجيل", "الحالة", "الإجراءات"].map((h) => (
                   <th key={h} className="text-right px-5 py-3 text-xs font-bold uppercase tracking-wider"
                     style={{ color: "#6b7280" }}>{h}</th>
                 ))}
               </tr>
             </thead>
-            <tbody className="divide-y" style={{ borderColor: "#e5e7eb" }}>
+            <tbody className="divide-y" style={{ borderColor: "#dbeafe" }}>
               {filtered.length === 0 ? (
                 <tr><td colSpan={6} className="text-center py-10" style={{ color: "#9ca3af" }}>لا يوجد مستخدمون</td></tr>
               ) : filtered.map((u) => {
                 const ps = planStyle[u.plan] ?? planStyle.free;
                 return (
-                  <tr key={u.id} className="hover:bg-[#f3f5f9] transition-colors">
+                  <tr key={u.id} className="hover:bg-[#eff6ff] transition-colors">
                     <td className="px-5 py-3 font-semibold text-[#1c1c1e]">{u.full_name}</td>
                     <td className="px-5 py-3" style={{ color: "#6b7280" }} dir="ltr">{u.email}</td>
                     <td className="px-5 py-3">
@@ -92,14 +92,14 @@ export default function AdminUsersPage() {
                       <span className="px-2 py-0.5 rounded-full text-xs font-bold"
                         style={{
                           background: u.status === "active" ? "#f7fee7" : "#fef2f2",
-                          color: u.status === "active" ? "#84cc18" : "#ef4444",
+                          color: u.status === "active" ? "#3b82f6" : "#ef4444",
                         }}>
                         {u.status === "active" ? "نشط" : "موقوف"}
                       </span>
                     </td>
                     <td className="px-5 py-3">
                       <button onClick={() => toggleStatus(u.id)}
-                        className="text-xs px-2.5 py-1 rounded-lg font-medium border border-[#e5e7eb] hover:border-[#8957f6]/40 transition-all"
+                        className="text-xs px-2.5 py-1 rounded-lg font-medium border border-[#dbeafe] hover:border-[#3b82f6]/40 transition-all"
                         style={{ color: "#6b7280" }}>
                         {u.status === "active" ? "تعليق" : "تفعيل"}
                       </button>

@@ -163,7 +163,7 @@ export default function AdminRequestsPage() {
         onChange={(e) => onChange(e.target.value as RequestStatus)}
         style={{
           padding: "6px 10px",
-          border: "1px solid #e5e7eb",
+          border: "1px solid #dbeafe",
           borderRadius: "6px",
           fontSize: "12px",
           color: "#1c1c1e",
@@ -204,7 +204,7 @@ export default function AdminRequestsPage() {
     fontWeight: 600,
     color: "#6b7280",
     textAlign: "right",
-    borderBottom: "1px solid #e5e7eb",
+    borderBottom: "1px solid #dbeafe",
     whiteSpace: "nowrap",
   };
 
@@ -233,7 +233,7 @@ export default function AdminRequestsPage() {
         style={{
           display: "flex",
           gap: "0",
-          borderBottom: "2px solid #e5e7eb",
+          borderBottom: "2px solid #dbeafe",
           marginBottom: "24px",
         }}
       >
@@ -245,10 +245,10 @@ export default function AdminRequestsPage() {
               padding: "12px 24px",
               fontSize: "14px",
               fontWeight: activeTab === tab.key ? 600 : 400,
-              color: activeTab === tab.key ? "#84cc18" : "#6b7280",
+              color: activeTab === tab.key ? "#3b82f6" : "#6b7280",
               backgroundColor: "transparent",
               border: "none",
-              borderBottom: activeTab === tab.key ? "2px solid #84cc18" : "2px solid transparent",
+              borderBottom: activeTab === tab.key ? "2px solid #3b82f6" : "2px solid transparent",
               marginBottom: "-2px",
               cursor: "pointer",
               display: "flex",
@@ -285,7 +285,7 @@ export default function AdminRequestsPage() {
         <div
           style={{
             backgroundColor: "#ffffff",
-            border: "1px solid #e5e7eb",
+            border: "1px solid #dbeafe",
             borderRadius: "12px",
             overflow: "hidden",
           }}
@@ -338,7 +338,7 @@ export default function AdminRequestsPage() {
         <div
           style={{
             backgroundColor: "#ffffff",
-            border: "1px solid #e5e7eb",
+            border: "1px solid #dbeafe",
             borderRadius: "12px",
             overflow: "hidden",
           }}
@@ -366,7 +366,7 @@ export default function AdminRequestsPage() {
                         href={req.content_url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        style={{ color: "#8957f6", textDecoration: "none", fontSize: "13px" }}
+                        style={{ color: "#3b82f6", textDecoration: "none", fontSize: "13px" }}
                       >
                         عرض المحتوى
                       </a>
@@ -400,7 +400,7 @@ export default function AdminRequestsPage() {
         <div
           style={{
             backgroundColor: "#ffffff",
-            border: "1px solid #e5e7eb",
+            border: "1px solid #dbeafe",
             borderRadius: "12px",
             overflow: "hidden",
           }}
@@ -451,10 +451,10 @@ export default function AdminRequestsPage() {
                           }}
                           style={{
                             padding: "6px 12px",
-                            border: "1px solid #e5e7eb",
+                            border: "1px solid #dbeafe",
                             borderRadius: "6px",
                             backgroundColor: "#ffffff",
-                            color: "#8957f6",
+                            color: "#3b82f6",
                             fontSize: "12px",
                             fontWeight: 600,
                             cursor: "pointer",
@@ -520,7 +520,7 @@ export default function AdminRequestsPage() {
               style={{
                 width: "100%",
                 padding: "12px 14px",
-                border: "1px solid #e5e7eb",
+                border: "1px solid #dbeafe",
                 borderRadius: "8px",
                 fontSize: "14px",
                 color: "#1c1c1e",
@@ -536,7 +536,7 @@ export default function AdminRequestsPage() {
               <button
                 onClick={handleReply}
                 style={{
-                  backgroundColor: "#84cc18",
+                  backgroundColor: "#3b82f6",
                   color: "#ffffff",
                   border: "none",
                   borderRadius: "8px",
@@ -553,7 +553,7 @@ export default function AdminRequestsPage() {
                 style={{
                   backgroundColor: "#ffffff",
                   color: "#6b7280",
-                  border: "1px solid #e5e7eb",
+                  border: "1px solid #dbeafe",
                   borderRadius: "8px",
                   padding: "10px 24px",
                   fontSize: "14px",

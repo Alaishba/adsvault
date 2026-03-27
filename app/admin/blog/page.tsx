@@ -121,6 +121,7 @@ const emptyForm = {
   content: "",
   tags: "",
   status: "published" as "published" | "draft",
+  featured: false,
 };
 
 export default function AdminBlogPage() {
@@ -130,7 +131,7 @@ export default function AdminBlogPage() {
     data.map((d) => ({
       id: d.id as number, slug: (d.slug as string) ?? "", title: (d.title as string) ?? "",
       excerpt: ((d.content as string) ?? "").slice(0, 120),
-      category: (d.category as string) ?? "", coverImage: (d.banner_image as string) ?? "#8957f6",
+      category: (d.category as string) ?? "", coverImage: (d.banner_image as string) ?? "#3b82f6",
       author: (d.author as string) ?? "مدير المحتوى",
       date: ((d.created_at as string) ?? "").slice(0, 10),
       readTime: "5 دقائق", tags: (d.tags as string[]) ?? [],
@@ -170,6 +171,7 @@ export default function AdminBlogPage() {
       content: a.content,
       tags: a.tags.join(", "),
       status: a.status,
+      featured: (a as unknown as Record<string, boolean>).featured ?? false,
     });
     setImagePreview(a.coverImage.startsWith("#") ? null : a.coverImage);
     setShowModal(true);
@@ -209,6 +211,7 @@ export default function AdminBlogPage() {
       tags: tagsArr,
       status: form.status,
       author: "مدير المحتوى",
+      featured: form.featured ?? false,
     };
 
     try {
@@ -220,10 +223,10 @@ export default function AdminBlogPage() {
   };
 
   /* ── Inline styles (admin light mode) ── */
-  const bg = "#f3f5f9";
+  const bg = "#eff6ff";
   const card = "#ffffff";
-  const surface = "#f3f5f9";
-  const border = "#e5e7eb";
+  const surface = "#eff6ff";
+  const border = "#dbeafe";
   const textPrimary = "#1c1c1e";
   const textSecondary = "#6b7280";
 
@@ -247,7 +250,7 @@ export default function AdminBlogPage() {
           <button
             onClick={openAdd}
             className="px-4 py-2 rounded-lg text-sm font-bold text-white"
-            style={{ background: "#84cc18" }}
+            style={{ background: "#3b82f6" }}
           >
             + إضافة مقال
           </button>
@@ -292,7 +295,7 @@ export default function AdminBlogPage() {
                         className="px-2 py-0.5 rounded-full text-xs font-bold"
                         style={
                           a.status === "published"
-                            ? { background: "#f7fee7", color: "#84cc18" }
+                            ? { background: "#f7fee7", color: "#3b82f6" }
                             : { background: "#fef3c7", color: "#f59e0b" }
                         }
                       >
@@ -312,7 +315,7 @@ export default function AdminBlogPage() {
                           className="px-3 py-1 rounded text-xs font-semibold"
                           style={{
                             background: "#ffffff",
-                            color: "#8957f6",
+                            color: "#3b82f6",
                             border: `1px solid ${border}`,
                           }}
                         >
@@ -509,7 +512,7 @@ export default function AdminBlogPage() {
                       className="px-4 py-1.5 rounded-lg text-sm font-semibold transition-colors"
                       style={
                         form.status === s
-                          ? { background: "#84cc18", color: "#fff" }
+                          ? { background: "#3b82f6", color: "#fff" }
                           : {
                               background: "#ffffff",
                               color: textSecondary,
@@ -524,12 +527,18 @@ export default function AdminBlogPage() {
               </div>
             </div>
 
+            <div className="flex items-center gap-2 mt-4">
+              <input type="checkbox" checked={form.featured} onChange={(e) => setForm({...form, featured: e.target.checked})}
+                className="w-4 h-4 accent-blue-500 rounded" />
+              <label className="text-sm font-semibold text-gray-700">تمييز في الصفحة الرئيسية</label>
+            </div>
+
             {/* Actions */}
             <div className="flex items-center gap-3 mt-6">
               <button
                 onClick={handleSave}
                 className="px-5 py-2 rounded-lg text-sm font-bold text-white"
-                style={{ background: "#84cc18" }}
+                style={{ background: "#3b82f6" }}
               >
                 حفظ
               </button>

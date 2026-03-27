@@ -11,6 +11,8 @@ export default function AdminGuidePage() {
         "اختر المنصة والقطاع والبلد والموسم وهدف الإعلان",
         "أضف التاغات مفصولة بفاصلة (مثال: رمضان, موسمي, عاطفي)",
         "أدخل التحليل الأساسي وأفكار التطبيق والإجراء الموصى به",
+        "أضف التحليل المتقدم (Pro Analysis): أفكار التطبيق والإجراء الموصى به",
+        "ارفع صور الإعلان عبر نظام Signed URL (لا حدود لحجم الملف)",
         'اضغط \"إضافة الإعلان\" لحفظ البيانات',
       ],
     },
@@ -25,6 +27,9 @@ export default function AdminGuidePage() {
         "أدخل عدد المتابعين ونسبة التفاعل والتصنيف والبلد",
         "اكتب نبذة مختصرة عن المؤثر وتخصصه",
         "أضف نقاط القوة والضعف مفصولة بفاصلة",
+        "أدخل مجال المؤثر (niche) والجمهور المستهدف (target_audience)",
+        "أضف الاهتمامات (interests) كهاشتاقات مفصولة بفاصلة",
+        "أضف الأداء التاريخي والتركيبة السكانية بصيغة JSON",
         'اضغط \"إضافة المؤثر\" لحفظ البيانات',
       ],
     },
@@ -57,12 +62,33 @@ export default function AdminGuidePage() {
       icon: "🎨",
       title: "الألوان المستخدمة في المنصة",
       colors: [
-        { name: "اللون الأساسي", hex: "#22c55e", bg: "#22c55e" },
-        { name: "اللون الأساسي الداكن", hex: "#16a34a", bg: "#16a34a" },
-        { name: "أزرق Enterprise", hex: "#1d4ed8", bg: "#1d4ed8" },
-        { name: "بنفسجي TikTok", hex: "#9d174d", bg: "#9d174d" },
+        { name: "الأزرق الأساسي", hex: "#1C4ED8", bg: "#1C4ED8" },
+        { name: "أزرق الأزرار", hex: "#3b82f6", bg: "#3b82f6" },
+        { name: "لون البطاقات", hex: "#ced3de", bg: "#ced3de" },
+        { name: "الخلفية الداكنة", hex: "#0a0a2e", bg: "#0a0a2e" },
+        { name: "نص أساسي", hex: "#0f172a", bg: "#0f172a" },
         { name: "أحمر تحذير", hex: "#b91c1c", bg: "#b91c1c" },
-        { name: "رمادي نص ثانوي", hex: "#6b7280", bg: "#6b7280" },
+      ],
+    },
+    {
+      icon: "📸",
+      title: "إدارة الوسائط والبانرات",
+      steps: [
+        "اذهب إلى صفحة إدارة الوسائط من الشريط الجانبي",
+        "ارفع صور البانر الإعلاني لكل قسم (إعلانات، استراتيجيات، مؤثرين، مدونة)",
+        "ارفع صورة اللابتوب للهيرو الرئيسي",
+        "ارفع صورة البانر الرئيسي للصفحة الرئيسية",
+        "الصور المرفوعة تظهر تلقائياً في الأقسام المقابلة على الموقع",
+      ],
+    },
+    {
+      icon: "📋",
+      title: "إدارة الشروط وسياسة الخصوصية",
+      steps: [
+        "اذهب إلى صفحة الشروط والأحكام من الشريط الجانبي",
+        "الأقسام مقسمة إلى مجموعتين: الشروط والأحكام وسياسة الخصوصية",
+        "يمكنك إضافة وتعديل وحذف وإعادة ترتيب الأقسام في كل مجموعة",
+        "التغييرات تظهر فوراً على الموقع في صفحة /terms",
       ],
     },
     {
@@ -111,8 +137,8 @@ export default function AdminGuidePage() {
 
       <div className="space-y-6">
         {sections.map((section, i) => (
-          <div key={i} className="bg-white rounded-2xl border border-[#e5e7eb] overflow-hidden">
-            <div className="px-6 py-4 border-b border-[#e5e7eb]" style={{ background: "#f3f5f9" }}>
+          <div key={i} className="bg-white rounded-2xl border border-[#dbeafe] overflow-hidden">
+            <div className="px-6 py-4 border-b border-[#dbeafe]" style={{ background: "#eff6ff" }}>
               <h2 className="font-extrabold text-base flex items-center gap-2 text-[#1c1c1e]">
                 <span>{section.icon}</span>
                 <span>{section.title}</span>
@@ -124,7 +150,7 @@ export default function AdminGuidePage() {
                   {section.steps.map((step, j) => (
                     <li key={j} className="flex items-start gap-3">
                       <span className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-black flex-shrink-0 mt-0.5"
-                        style={{ background: "#f0faf0", color: "#15803d" }}>
+                        style={{ background: "#dbeafe", color: "#1d4ed8" }}>
                         {j + 1}
                       </span>
                       <span className="text-sm leading-relaxed text-[#1c1c1e]">{step}</span>
@@ -135,7 +161,7 @@ export default function AdminGuidePage() {
               {"items" in section && section.items && (
                 <div className="space-y-2.5">
                   {section.items.map((item, j) => (
-                    <div key={j} className="flex items-center justify-between py-2 border-b border-[#e5e7eb] last:border-0">
+                    <div key={j} className="flex items-center justify-between py-2 border-b border-[#dbeafe] last:border-0">
                       <span className="text-sm font-semibold text-[#1c1c1e]">{item.label}</span>
                       <span className="text-sm text-[#6b7280]">{item.value}</span>
                     </div>
@@ -145,7 +171,7 @@ export default function AdminGuidePage() {
               {"colors" in section && section.colors && (
                 <div className="grid grid-cols-2 gap-3">
                   {section.colors.map((c, j) => (
-                    <div key={j} className="flex items-center gap-3 p-3 rounded-xl border border-[#e5e7eb]">
+                    <div key={j} className="flex items-center gap-3 p-3 rounded-xl border border-[#dbeafe]">
                       <div className="w-8 h-8 rounded-lg flex-shrink-0" style={{ background: c.bg }} />
                       <div>
                         <p className="text-xs font-bold text-[#1c1c1e]">{c.name}</p>
@@ -161,7 +187,7 @@ export default function AdminGuidePage() {
       </div>
 
       {/* Version note */}
-      <div className="mt-8 p-4 rounded-xl border border-[#e5e7eb] text-center">
+      <div className="mt-8 p-4 rounded-xl border border-[#dbeafe] text-center">
         <p className="text-xs text-[#6b7280]">
           AdVault Admin Guide · v1.0 · آخر تحديث: مارس 2025
         </p>

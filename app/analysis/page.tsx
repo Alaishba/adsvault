@@ -35,10 +35,10 @@ function StrategyModal({ s, onClose, isPro }: { s: Strategy; onClose: () => void
   const isLocked = !isPro && s.is_pro_only;
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4"
-      style={{ background: "rgba(0,0,0,0.6)", backdropFilter: "blur(4px)" }}
+      style={{ background: "rgba(0,0,0,0.6)", backdropFilter: "blur(6px)" }}
       onClick={(e) => e.target === e.currentTarget && onClose()}>
-      <div className="w-full max-w-xl rounded-2xl shadow-2xl overflow-hidden"
-        style={{ background: "#ced3de", animation: "modalIn 0.2s cubic-bezier(0.34,1.56,0.64,1)" }}>
+      <div className="w-full max-w-xl rounded-2xl shadow-2xl overflow-hidden overflow-y-auto"
+        style={{ background: "#ced3de", animation: "modalIn 0.2s cubic-bezier(0.34,1.56,0.64,1)", maxHeight: "85vh", WebkitOverflowScrolling: "touch", touchAction: "pan-y", border: "1px solid rgba(206,211,222,0.8)" }}>
         <style>{`@keyframes modalIn{from{opacity:0;transform:scale(0.95) translateY(8px)}to{opacity:1;transform:scale(1) translateY(0)}}`}</style>
         <div className="w-full h-40 flex items-center justify-center relative overflow-hidden" style={{ background: "#0f0f0f" }}>
           {s.thumbnail && !s.thumbnail.startsWith("#") ? (
@@ -54,24 +54,22 @@ function StrategyModal({ s, onClose, isPro }: { s: Strategy; onClose: () => void
         <div className="p-6">
           <div className="flex items-start justify-between mb-4">
             <div>
-              <p className="text-xs font-bold mb-1" style={{ color: "#94a3b8" }}>{s.brand}</p>
-              <h2 className="text-xl font-extrabold" style={{ color: "var(--text-primary)" }}>{s.title}</h2>
+              <p className="text-xs font-bold mb-1 text-slate-700">{s.brand}</p>
+              <h2 className="text-xl font-extrabold text-slate-900">{s.title}</h2>
             </div>
-            <button onClick={onClose} className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-[--surface2]"
-              style={{ color: "var(--text-secondary)" }}>
+            <button onClick={onClose} className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-slate-200 text-slate-500 hover:text-slate-900">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M18 6 6 18M6 6l12 12"/></svg>
             </button>
           </div>
-          <p className="text-sm leading-relaxed mb-5" style={{ color: "var(--text-secondary)" }}>{s.preview}</p>
+          <p className="text-sm leading-relaxed mb-5 text-slate-600">{s.preview}</p>
           <div className="mb-5 relative">
             {isLocked && <ProBlurOverlay />}
             <div style={isLocked ? { filter: "blur(5px)", userSelect: "none", pointerEvents: "none" } : {}}>
-              <p className="text-xs font-extrabold mb-3" style={{ color: "var(--text-primary)" }}>الرؤى الرئيسية</p>
+              <p className="text-xs font-extrabold mb-3 text-slate-900">الرؤى الرئيسية</p>
               <ul className="space-y-2">
                 {(s.insights ?? []).map((insight, i) => (
-                  <li key={i} className="flex items-start gap-2.5 text-sm" style={{ color: "var(--text-secondary)" }}>
-                    <span className="mt-0.5 w-4 h-4 rounded-full flex items-center justify-center shrink-0 text-xs font-bold"
-                      style={{ background: "var(--accent-light)", color: "var(--accent-text)" }}>✓</span>
+                  <li key={i} className="flex items-start gap-2.5 text-sm text-slate-700">
+                    <span className="mt-0.5 w-4 h-4 rounded-full flex items-center justify-center shrink-0 text-xs font-bold bg-blue-100 text-blue-700">✓</span>
                     {insight}
                   </li>
                 ))}
@@ -80,8 +78,7 @@ function StrategyModal({ s, onClose, isPro }: { s: Strategy; onClose: () => void
           </div>
           <div className="flex flex-wrap gap-1.5 mb-5">
             {(s.tags ?? []).map((tag) => (
-              <span key={tag} className="px-2.5 py-1 text-xs rounded-full font-medium"
-                style={{ background: "var(--accent-light)", color: "var(--accent-text)" }}>#{tag}</span>
+              <span key={tag} className="px-2.5 py-1 text-xs rounded-full font-medium bg-blue-100 text-blue-700">#{tag}</span>
             ))}
           </div>
           <button className="w-full py-3 rounded-xl font-bold text-sm text-white" style={{ background: "#2563eb" }}>
@@ -100,16 +97,24 @@ export default function AnalysisPage() {
   const [allStrategies, setAllStrategies] = useState<Strategy[]>([]);
 
   useEffect(() => {
+    let mounted = true;
     fetchStrategies().then(setAllStrategies);
     (async () => {
-      const supabase = createClient();
-      const { data: { user: u } } = await supabase.auth.getUser();
-      if (u) {
-        const { data: profile } = await supabase.from("users").select("plan").eq("id", u.id).single();
-        const p = profile?.plan ?? "free";
-        setIsPro(p === "pro" || p === "enterprise" || p === "admin");
+      try {
+        const supabase = createClient();
+        const { data: { user: u } } = await supabase.auth.getUser();
+        if (!mounted) return;
+        if (u) {
+          const { data: profile } = await supabase.from("users").select("plan").eq("id", u.id).single();
+          if (!mounted) return;
+          const p = profile?.plan ?? "free";
+          setIsPro(p === "pro" || p === "enterprise" || p === "admin");
+        }
+      } catch {
+        // silently ignore lock errors on unmount
       }
     })();
+    return () => { mounted = false; };
   }, []);
 
   const handleFilterChange = (key: string, value: string | null) => {

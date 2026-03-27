@@ -57,7 +57,6 @@ const quickActions = [
   { href: "/admin/influencers", label: "إضافة مؤثر", icon: "🌟" },
   { href: "/admin/strategies", label: "إضافة استراتيجية", icon: "📊" },
   { href: "/admin/blog", label: "إضافة مقال", icon: "📝" },
-  { href: "/admin/planner-settings", label: "إعدادات مخطط الحملة", icon: "⚙️" },
   { href: "/admin/appsflyer", label: "إعدادات AppsFlyer", icon: "🔗" },
 ];
 

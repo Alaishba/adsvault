@@ -7,7 +7,7 @@ import { saveAdminStrategy, deleteAdminStrategy, fetchAdminStrategies } from "..
 import { uploadViaSignedUrl } from "../../lib/uploadViaSignedUrl";
 
 const emptyForm = {
-  brand: "", brandInitial: "", brandColor: "#8957f6",
+  brand: "", brandInitial: "", brandColor: "#3b82f6",
   title: "", preview: "",
   insights: [] as string[],
   sector: "",
@@ -15,6 +15,7 @@ const emptyForm = {
   date: "",
   thumbnail: "",
   is_pro_only: false,
+  featured: false,
 };
 
 export default function AdminStrategiesPage() {
@@ -54,6 +55,7 @@ export default function AdminStrategiesPage() {
       date: s.date,
       thumbnail: s.thumbnail ?? "",
       is_pro_only: (s as unknown as Record<string, boolean>).is_pro_only ?? false,
+      featured: (s as unknown as Record<string, boolean>).featured ?? false,
     });
     setThumbPreview(s.thumbnail ?? null);
     setEditId(s.id);
@@ -94,6 +96,7 @@ export default function AdminStrategiesPage() {
       insights: form.insights, tags: form.tags,
       thumbnail: form.thumbnail || null,
       is_pro_only: form.is_pro_only,
+      featured: form.featured ?? false,
     };
     console.log("[AdminStrategies] Saving strategy:", { ...stratData, thumbnail: stratData.thumbnail ? "(set)" : "(null)" });
     const result = await saveAdminStrategy(stratData, editId);
@@ -118,14 +121,14 @@ export default function AdminStrategiesPage() {
         </div>
         <button onClick={openAdd}
           className="px-4 py-2 rounded-xl text-sm font-bold transition-all hover:opacity-90"
-          style={{ background: "#84cc18", color: "#fff" }}>
+          style={{ background: "#3b82f6", color: "#fff" }}>
           + إضافة استراتيجية
         </button>
       </div>
 
       {/* Search */}
       <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl border mb-5"
-        style={{ background: "#ffffff", borderColor: "#e5e7eb" }}>
+        style={{ background: "#ffffff", borderColor: "#dbeafe" }}>
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="2">
           <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
         </svg>
@@ -135,20 +138,20 @@ export default function AdminStrategiesPage() {
       </div>
 
       {/* Table */}
-      <div className="rounded-2xl border overflow-hidden" style={{ background: "#ffffff", borderColor: "#e5e7eb" }}>
+      <div className="rounded-2xl border overflow-hidden" style={{ background: "#ffffff", borderColor: "#dbeafe" }}>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr style={{ background: "#f3f5f9" }}>
+              <tr style={{ background: "#eff6ff" }}>
                 {["العلامة", "العنوان", "القطاع", "Pro فقط", "التاريخ", "الإجراءات"].map((h) => (
                   <th key={h} className="text-right px-5 py-3 text-xs font-bold uppercase tracking-wider"
                     style={{ color: "#6b7280" }}>{h}</th>
                 ))}
               </tr>
             </thead>
-            <tbody className="divide-y" style={{ borderColor: "#e5e7eb" }}>
+            <tbody className="divide-y" style={{ borderColor: "#dbeafe" }}>
               {filtered.map((s) => (
-                <tr key={s.id} className="hover:bg-[#f3f5f9] transition-colors">
+                <tr key={s.id} className="hover:bg-[#eff6ff] transition-colors">
                   <td className="px-5 py-3">
                     <div className="flex items-center gap-2">
                       {s.thumbnail ? (
@@ -165,16 +168,16 @@ export default function AdminStrategiesPage() {
                   <td className="px-5 py-3" style={{ color: "#6b7280" }}>{s.sector}</td>
                   <td className="px-5 py-3">
                     {(s as unknown as Record<string, boolean>).is_pro_only ? (
-                      <span className="px-2 py-0.5 rounded-full text-xs font-bold" style={{ background: "#f3eeff", color: "#8957f6" }}>Pro</span>
+                      <span className="px-2 py-0.5 rounded-full text-xs font-bold" style={{ background: "#f3eeff", color: "#3b82f6" }}>Pro</span>
                     ) : (
-                      <span className="px-2 py-0.5 rounded-full text-xs font-bold" style={{ background: "#f3f5f9", color: "#6b7280" }}>مجاني</span>
+                      <span className="px-2 py-0.5 rounded-full text-xs font-bold" style={{ background: "#eff6ff", color: "#6b7280" }}>مجاني</span>
                     )}
                   </td>
                   <td className="px-5 py-3" style={{ color: "#6b7280" }} dir="ltr">{s.date}</td>
                   <td className="px-5 py-3">
                     <div className="flex gap-2">
                       <button onClick={() => openEdit(s)}
-                        className="text-xs px-2.5 py-1 rounded-lg font-medium border border-[#e5e7eb] hover:border-[#8957f6]/40 transition-all"
+                        className="text-xs px-2.5 py-1 rounded-lg font-medium border border-[#dbeafe] hover:border-[#3b82f6]/40 transition-all"
                         style={{ color: "#6b7280" }}>تعديل</button>
                       <button onClick={() => handleDelete(s.id)}
                         className="text-xs px-2.5 py-1 rounded-lg font-medium border transition-all"
@@ -195,12 +198,12 @@ export default function AdminStrategiesPage() {
           onClick={(e) => e.target === e.currentTarget && setShowForm(false)}>
           <div className="w-full max-w-2xl rounded-2xl shadow-2xl overflow-y-auto"
             style={{ background: "#ffffff", maxHeight: "90vh" }}>
-            <div className="flex items-center justify-between px-6 py-4 border-b" style={{ borderColor: "#e5e7eb" }}>
+            <div className="flex items-center justify-between px-6 py-4 border-b" style={{ borderColor: "#dbeafe" }}>
               <h2 className="font-extrabold text-lg text-[#1c1c1e]">
                 {editId ? "تعديل الاستراتيجية" : "إضافة استراتيجية جديدة"}
               </h2>
               <button onClick={() => setShowForm(false)}
-                className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-[#f3f5f9] transition-colors"
+                className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-[#eff6ff] transition-colors"
                 style={{ color: "#6b7280" }}>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                   <path d="M18 6 6 18M6 6l12 12"/>
@@ -214,7 +217,7 @@ export default function AdminStrategiesPage() {
                 <label className="block text-xs font-bold mb-2" style={{ color: "#6b7280" }}>صورة الغلاف</label>
                 <div className="flex items-center gap-4">
                   <div className="w-20 h-14 rounded-xl flex items-center justify-center overflow-hidden flex-shrink-0"
-                    style={{ background: "#f3f5f9", border: "2px dashed #e5e7eb" }}>
+                    style={{ background: "#eff6ff", border: "2px dashed #dbeafe" }}>
                     {thumbPreview ? (
                       <img src={thumbPreview} alt="thumb" className="w-full h-full object-cover" />
                     ) : (
@@ -227,8 +230,8 @@ export default function AdminStrategiesPage() {
                   <div>
                     <button type="button" onClick={() => fileRef.current?.click()}
                       disabled={uploading}
-                      className="px-3 py-1.5 rounded-lg text-xs font-bold border border-[#e5e7eb] hover:border-[#8957f6]/40 transition-all"
-                      style={{ color: "#8957f6" }}>
+                      className="px-3 py-1.5 rounded-lg text-xs font-bold border border-[#dbeafe] hover:border-[#3b82f6]/40 transition-all"
+                      style={{ color: "#3b82f6" }}>
                       {uploading ? "جارٍ الرفع..." : "رفع صورة"}
                     </button>
                     <p className="text-xs mt-1" style={{ color: "#9ca3af" }}>JPG, PNG, WEBP — حتى 5MB</p>
@@ -250,7 +253,7 @@ export default function AdminStrategiesPage() {
                     value={(form as Record<string, unknown>)[key] as string ?? ""}
                     onChange={(e) => setForm((f) => ({ ...f, [key]: e.target.value }))}
                     className="w-full px-3 py-2 rounded-xl border outline-none text-sm text-[#1c1c1e]"
-                    style={{ background: "#ffffff", borderColor: "#e5e7eb" }} />
+                    style={{ background: "#ffffff", borderColor: "#dbeafe" }} />
                 </div>
               ))}
 
@@ -260,7 +263,7 @@ export default function AdminStrategiesPage() {
                 <input type="text" value={form.title}
                   onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))}
                   className="w-full px-3 py-2 rounded-xl border outline-none text-sm text-[#1c1c1e]"
-                  style={{ background: "#ffffff", borderColor: "#e5e7eb" }} />
+                  style={{ background: "#ffffff", borderColor: "#dbeafe" }} />
               </div>
 
               {/* Preview */}
@@ -269,7 +272,7 @@ export default function AdminStrategiesPage() {
                 <textarea rows={3} value={form.preview}
                   onChange={(e) => setForm((f) => ({ ...f, preview: e.target.value }))}
                   className="w-full px-3 py-2 rounded-xl border outline-none text-sm resize-none text-[#1c1c1e]"
-                  style={{ background: "#ffffff", borderColor: "#e5e7eb" }} />
+                  style={{ background: "#ffffff", borderColor: "#dbeafe" }} />
               </div>
 
               {/* Insights */}
@@ -281,7 +284,7 @@ export default function AdminStrategiesPage() {
                   value={form.insights.join("\n")}
                   onChange={(e) => setForm((f) => ({ ...f, insights: e.target.value.split("\n").filter(Boolean) }))}
                   className="w-full px-3 py-2 rounded-xl border outline-none text-sm resize-none text-[#1c1c1e] placeholder:text-[#9ca3af]"
-                  style={{ background: "#ffffff", borderColor: "#e5e7eb" }}
+                  style={{ background: "#ffffff", borderColor: "#dbeafe" }}
                   placeholder="مثال: استخدام العد التنازلي رفع التحويل 340%" />
               </div>
 
@@ -294,23 +297,29 @@ export default function AdminStrategiesPage() {
                   value={form.tags.join(", ")}
                   onChange={(e) => setForm((f) => ({ ...f, tags: e.target.value.split(",").map((t) => t.trim()).filter(Boolean) }))}
                   className="w-full px-3 py-2 rounded-xl border outline-none text-sm text-[#1c1c1e] placeholder:text-[#9ca3af]"
-                  style={{ background: "#ffffff", borderColor: "#e5e7eb" }}
+                  style={{ background: "#ffffff", borderColor: "#dbeafe" }}
                   placeholder="رمضان, موسمي, عاطفي" />
               </div>
 
               {/* is_pro_only toggle */}
               <div className="col-span-2 flex items-center justify-between py-2 rounded-xl px-4 border"
-                style={{ background: "#f3f5f9", borderColor: "#e5e7eb" }}>
+                style={{ background: "#eff6ff", borderColor: "#dbeafe" }}>
                 <div>
                   <p className="text-sm font-semibold text-[#1c1c1e]">Pro فقط</p>
                   <p className="text-xs" style={{ color: "#9ca3af" }}>إخفاء هذه الاستراتيجية عن المستخدمين المجانيين</p>
                 </div>
                 <button type="button" onClick={() => setForm((f) => ({ ...f, is_pro_only: !f.is_pro_only }))}
                   className="w-12 h-6 rounded-full transition-all relative flex-shrink-0"
-                  style={{ background: form.is_pro_only ? "#8957f6" : "#d1d5db" }}>
+                  style={{ background: form.is_pro_only ? "#3b82f6" : "#d1d5db" }}>
                   <span className="absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-all"
                     style={{ right: form.is_pro_only ? "2px" : "auto", left: form.is_pro_only ? "auto" : "2px" }} />
                 </button>
+              </div>
+
+              <div className="col-span-2 flex items-center gap-2">
+                <input type="checkbox" checked={form.featured} onChange={(e) => setForm({...form, featured: e.target.checked})}
+                  className="w-4 h-4 accent-blue-500 rounded" />
+                <label className="text-sm font-semibold text-gray-700">تمييز في الصفحة الرئيسية</label>
               </div>
 
               {errorMsg && (
@@ -322,12 +331,12 @@ export default function AdminStrategiesPage() {
               <div className="col-span-2 flex gap-3 pt-2">
                 <button onClick={handleSave}
                   className="flex-1 py-2.5 rounded-xl font-bold text-sm transition-all hover:opacity-90"
-                  style={{ background: "#84cc18", color: "#fff" }}>
+                  style={{ background: "#3b82f6", color: "#fff" }}>
                   {editId ? "حفظ التعديلات" : "إضافة الاستراتيجية"}
                 </button>
                 <button onClick={() => setShowForm(false)}
                   className="flex-1 py-2.5 rounded-xl font-bold text-sm border"
-                  style={{ borderColor: "#e5e7eb", color: "#6b7280" }}>
+                  style={{ borderColor: "#dbeafe", color: "#6b7280" }}>
                   إلغاء
                 </button>
               </div>

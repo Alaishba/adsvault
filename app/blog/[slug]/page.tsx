@@ -75,6 +75,13 @@ export default function BlogArticlePage() {
 
   return (
     <AppLayout>
+      {/* Back button */}
+      <div className="px-4 sm:px-6 lg:px-10 py-3">
+        <Link href="/blog" className="flex items-center gap-2 text-slate-700 hover:text-slate-900 text-sm font-semibold transition-colors">
+          → العودة للمدونة
+        </Link>
+      </div>
+
       {/* Hero banner */}
       <div
         className="w-full relative overflow-hidden"

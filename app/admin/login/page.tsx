@@ -75,12 +75,12 @@ export default function AdminLoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4" style={{ background: "#f3f5f9" }}>
+    <div className="min-h-screen flex items-center justify-center px-4" style={{ background: "#eff6ff" }}>
       <div className="w-full max-w-sm">
         {/* Header */}
         <div className="text-center mb-8">
           <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-lg font-black text-white mx-auto mb-4"
-            style={{ background: "#8957f6" }}>AV</div>
+            style={{ background: "#3b82f6" }}>AV</div>
           <h1 className="text-2xl font-extrabold" style={{ color: "#1c1c1e" }}>لوحة الإدارة</h1>
           <p className="text-sm mt-1" style={{ color: "#6b7280" }}>
             {step === 1 ? "أدخل رقم الهاتف المسجّل" : "أدخل رمز التحقق"}
@@ -89,11 +89,11 @@ export default function AdminLoginPage() {
 
         {/* Step indicator */}
         <div className="flex items-center justify-center gap-2 mb-6">
-          <div className="w-8 h-1 rounded-full" style={{ background: "#8957f6" }} />
-          <div className="w-8 h-1 rounded-full" style={{ background: step === 2 ? "#8957f6" : "#e5e7eb" }} />
+          <div className="w-8 h-1 rounded-full" style={{ background: "#3b82f6" }} />
+          <div className="w-8 h-1 rounded-full" style={{ background: step === 2 ? "#3b82f6" : "#dbeafe" }} />
         </div>
 
-        <div className="rounded-2xl border p-6" style={{ background: "#ffffff", borderColor: "#e5e7eb" }}>
+        <div className="rounded-2xl border p-6" style={{ background: "#ffffff", borderColor: "#dbeafe" }}>
 
           {/* Step 1: Phone */}
           {step === 1 && (
@@ -102,7 +102,7 @@ export default function AdminLoginPage() {
                 <label className="block text-sm font-semibold mb-2" style={{ color: "#1c1c1e" }}>رقم الهاتف</label>
                 <div className="flex items-center gap-2" dir="ltr">
                   <div className="px-3 py-2.5 rounded-xl border text-sm font-bold shrink-0"
-                    style={{ background: "#f3f5f9", borderColor: "#e5e7eb", color: "#1c1c1e" }}>
+                    style={{ background: "#eff6ff", borderColor: "#dbeafe", color: "#1c1c1e" }}>
                     +966
                   </div>
                   <input
@@ -113,7 +113,7 @@ export default function AdminLoginPage() {
                     onChange={(e) => { setPhone(e.target.value.replace(/\D/g, "")); setError(null); }}
                     placeholder="5XXXXXXXX"
                     className="flex-1 px-4 py-2.5 rounded-xl border outline-none text-sm font-mono tracking-wider"
-                    style={{ background: "#ffffff", borderColor: "#e5e7eb", color: "#1c1c1e" }}
+                    style={{ background: "#ffffff", borderColor: "#dbeafe", color: "#1c1c1e" }}
                     autoFocus
                   />
                 </div>
@@ -127,7 +127,7 @@ export default function AdminLoginPage() {
 
               <button type="submit"
                 className="w-full py-3 rounded-xl font-bold text-sm text-white transition-all hover:opacity-90"
-                style={{ background: "#8957f6" }}>
+                style={{ background: "#3b82f6" }}>
                 التالي
               </button>
             </form>
@@ -152,8 +152,8 @@ export default function AdminLoginPage() {
                       value={digit}
                       onChange={(e) => handleOtpChange(i, e.target.value)}
                       onKeyDown={(e) => handleOtpKeyDown(i, e)}
-                      className="w-14 h-14 rounded-xl border text-center text-xl font-bold outline-none transition-all focus:border-[#8957f6] focus:ring-2 focus:ring-[#8957f6]/20"
-                      style={{ background: "#ffffff", borderColor: digit ? "#8957f6" : "#e5e7eb", color: "#1c1c1e" }}
+                      className="w-14 h-14 rounded-xl border text-center text-xl font-bold outline-none transition-all focus:border-[#3b82f6] focus:ring-2 focus:ring-[#3b82f6]/20"
+                      style={{ background: "#ffffff", borderColor: digit ? "#3b82f6" : "#dbeafe", color: "#1c1c1e" }}
                     />
                   ))}
                 </div>
@@ -167,12 +167,12 @@ export default function AdminLoginPage() {
 
               <button type="submit" disabled={loading}
                 className="w-full py-3 rounded-xl font-bold text-sm text-white transition-all hover:opacity-90 disabled:opacity-60"
-                style={{ background: "#8957f6" }}>
+                style={{ background: "#3b82f6" }}>
                 {loading ? "جارٍ التحقق..." : "تحقق"}
               </button>
 
               <button type="button" onClick={() => { setStep(1); setOtp(["", "", "", ""]); setError(null); }}
-                className="w-full text-center text-xs font-semibold" style={{ color: "#8957f6" }}>
+                className="w-full text-center text-xs font-semibold" style={{ color: "#3b82f6" }}>
                 تغيير رقم الهاتف
               </button>
             </form>

@@ -4,7 +4,7 @@ import { useState, useMemo, useEffect } from "react";
 import AppLayout from "../components/AppLayout";
 import AdCard from "../components/AdCard";
 import AdModal from "../components/AdModal";
-import FilterBar from "../components/FilterBar";
+import ChipFilter from "../components/ChipFilter";
 import { SkeletonList } from "../components/Skeleton";
 import { type Ad } from "../lib/mockData";
 import { fetchAds } from "../lib/db";
@@ -54,7 +54,7 @@ export default function LibraryPage() {
 
   return (
     <AppLayout>
-      <FilterBar
+      <ChipFilter
         filters={filterConfigs}
         activeFilters={activeFilters}
         onFilterChange={handleFilterChange}

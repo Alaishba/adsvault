@@ -85,7 +85,7 @@ const devices = [
   {
     name: "سطح المكتب",
     pct: 62,
-    color: "#8957f6",
+    color: "#3b82f6",
     icon: (
       <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
         <rect x="2" y="3" width="20" height="14" rx="2" />
@@ -96,7 +96,7 @@ const devices = [
   {
     name: "الجوال",
     pct: 31,
-    color: "#84cc18",
+    color: "#3b82f6",
     icon: (
       <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
         <rect x="5" y="2" width="14" height="20" rx="2" />
@@ -107,7 +107,7 @@ const devices = [
   {
     name: "التابلت",
     pct: 7,
-    color: "#8957f6",
+    color: "#3b82f6",
     icon: (
       <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
         <rect x="4" y="2" width="16" height="20" rx="2" />
@@ -128,7 +128,7 @@ export default function AdminAnalyticsPage() {
   }, []);
 
   return (
-    <div dir="rtl" className="min-h-screen p-6 space-y-8" style={{ background: "#f3f5f9", color: "#1c1c1e" }}>
+    <div dir="rtl" className="min-h-screen p-6 space-y-8" style={{ background: "#eff6ff", color: "#1c1c1e" }}>
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold">تحليلات متقدمة</h1>
@@ -143,7 +143,7 @@ export default function AdminAnalyticsPage() {
           <div
             key={kpi.label}
             className="rounded-xl p-4"
-            style={{ background: "#ffffff", border: "1px solid #e5e7eb" }}
+            style={{ background: "#ffffff", border: "1px solid #dbeafe" }}
           >
             <p className="text-2xl font-bold">{kpi.value}</p>
             <p className="text-sm mt-1" style={{ color: "#6b7280" }}>
@@ -151,7 +151,7 @@ export default function AdminAnalyticsPage() {
             </p>
             <span
               className="text-xs font-medium mt-2 inline-block"
-              style={{ color: kpi.up ? "#84cc18" : "#ef4444" }}
+              style={{ color: kpi.up ? "#3b82f6" : "#ef4444" }}
             >
               {kpi.trend}
             </span>
@@ -162,12 +162,12 @@ export default function AdminAnalyticsPage() {
       {/* Section 2 — Most Viewed Content */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Top Ads */}
-        <div className="rounded-xl p-5" style={{ background: "#ffffff", border: "1px solid #e5e7eb" }}>
+        <div className="rounded-xl p-5" style={{ background: "#ffffff", border: "1px solid #dbeafe" }}>
           <h2 className="text-lg font-bold mb-4">أكثر الإعلانات مشاهدة</h2>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr style={{ color: "#6b7280", borderBottom: "1px solid #e5e7eb" }}>
+                <tr style={{ color: "#6b7280", borderBottom: "1px solid #dbeafe" }}>
                   <th className="pb-2 text-right font-medium">#</th>
                   <th className="pb-2 text-right font-medium">العنوان</th>
                   <th className="pb-2 text-right font-medium">البراند</th>
@@ -177,12 +177,12 @@ export default function AdminAnalyticsPage() {
               </thead>
               <tbody>
                 {topAds.map((ad, i) => (
-                  <tr key={i} style={{ borderBottom: "1px solid #e5e7eb" }}>
+                  <tr key={i} style={{ borderBottom: "1px solid #dbeafe" }}>
                     <td className="py-2" style={{ color: "#6b7280" }}>{i + 1}</td>
                     <td className="py-2">{ad.title}</td>
-                    <td className="py-2" style={{ color: "#8957f6" }}>{ad.brand}</td>
+                    <td className="py-2" style={{ color: "#3b82f6" }}>{ad.brand}</td>
                     <td className="py-2">{ad.views.toLocaleString()}</td>
-                    <td className="py-2" style={{ color: "#84cc18" }}>{ad.saves}</td>
+                    <td className="py-2" style={{ color: "#3b82f6" }}>{ad.saves}</td>
                   </tr>
                 ))}
               </tbody>
@@ -192,11 +192,11 @@ export default function AdminAnalyticsPage() {
 
         {/* Top Strategies + Top Influencers */}
         <div className="space-y-6">
-          <div className="rounded-xl p-5" style={{ background: "#ffffff", border: "1px solid #e5e7eb" }}>
+          <div className="rounded-xl p-5" style={{ background: "#ffffff", border: "1px solid #dbeafe" }}>
             <h2 className="text-lg font-bold mb-4">أكثر الاستراتيجيات مشاهدة</h2>
             <table className="w-full text-sm">
               <thead>
-                <tr style={{ color: "#6b7280", borderBottom: "1px solid #e5e7eb" }}>
+                <tr style={{ color: "#6b7280", borderBottom: "1px solid #dbeafe" }}>
                   <th className="pb-2 text-right font-medium">#</th>
                   <th className="pb-2 text-right font-medium">العنوان</th>
                   <th className="pb-2 text-right font-medium">المشاهدات</th>
@@ -205,22 +205,22 @@ export default function AdminAnalyticsPage() {
               </thead>
               <tbody>
                 {topStrategies.map((s, i) => (
-                  <tr key={i} style={{ borderBottom: "1px solid #e5e7eb" }}>
+                  <tr key={i} style={{ borderBottom: "1px solid #dbeafe" }}>
                     <td className="py-2" style={{ color: "#6b7280" }}>{i + 1}</td>
                     <td className="py-2">{s.title}</td>
                     <td className="py-2">{s.views.toLocaleString()}</td>
-                    <td className="py-2" style={{ color: "#84cc18" }}>{s.saves}</td>
+                    <td className="py-2" style={{ color: "#3b82f6" }}>{s.saves}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
 
-          <div className="rounded-xl p-5" style={{ background: "#ffffff", border: "1px solid #e5e7eb" }}>
+          <div className="rounded-xl p-5" style={{ background: "#ffffff", border: "1px solid #dbeafe" }}>
             <h2 className="text-lg font-bold mb-4">أكثر المؤثرين مشاهدة</h2>
             <table className="w-full text-sm">
               <thead>
-                <tr style={{ color: "#6b7280", borderBottom: "1px solid #e5e7eb" }}>
+                <tr style={{ color: "#6b7280", borderBottom: "1px solid #dbeafe" }}>
                   <th className="pb-2 text-right font-medium">#</th>
                   <th className="pb-2 text-right font-medium">الاسم</th>
                   <th className="pb-2 text-right font-medium">المنصة</th>
@@ -229,10 +229,10 @@ export default function AdminAnalyticsPage() {
               </thead>
               <tbody>
                 {topInfluencers.map((inf, i) => (
-                  <tr key={i} style={{ borderBottom: "1px solid #e5e7eb" }}>
+                  <tr key={i} style={{ borderBottom: "1px solid #dbeafe" }}>
                     <td className="py-2" style={{ color: "#6b7280" }}>{i + 1}</td>
                     <td className="py-2">{inf.name}</td>
-                    <td className="py-2" style={{ color: "#8957f6" }}>{inf.platform}</td>
+                    <td className="py-2" style={{ color: "#3b82f6" }}>{inf.platform}</td>
                     <td className="py-2">{inf.views.toLocaleString()}</td>
                   </tr>
                 ))}
@@ -245,7 +245,7 @@ export default function AdminAnalyticsPage() {
       {/* Section 3 — User Behavior */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Filter Usage Bar Chart */}
-        <div className="rounded-xl p-5" style={{ background: "#ffffff", border: "1px solid #e5e7eb" }}>
+        <div className="rounded-xl p-5" style={{ background: "#ffffff", border: "1px solid #dbeafe" }}>
           <h2 className="text-lg font-bold mb-4">الفلاتر الأكثر استخداماً</h2>
           <div className="space-y-4">
             {filterUsage.map((f) => (
@@ -254,11 +254,11 @@ export default function AdminAnalyticsPage() {
                   <span>{f.label}</span>
                   <span style={{ color: "#6b7280" }}>{f.pct}%</span>
                 </div>
-                <div className="h-3 rounded-full overflow-hidden" style={{ background: "#e5e7eb" }}>
+                <div className="h-3 rounded-full overflow-hidden" style={{ background: "#dbeafe" }}>
                   <div
                     className="h-full rounded-full"
                     style={{
-                      background: "#84cc18",
+                      background: "#3b82f6",
                       width: mounted ? `${f.pct}%` : "0%",
                       transition: "width 0.8s ease-out",
                     }}
@@ -270,14 +270,14 @@ export default function AdminAnalyticsPage() {
         </div>
 
         {/* Search Tags */}
-        <div className="rounded-xl p-5" style={{ background: "#ffffff", border: "1px solid #e5e7eb" }}>
+        <div className="rounded-xl p-5" style={{ background: "#ffffff", border: "1px solid #dbeafe" }}>
           <h2 className="text-lg font-bold mb-4">أكثر الكلمات بحثاً</h2>
           <div className="flex flex-wrap gap-2">
             {searchTags.map((tag) => (
               <span
                 key={tag.text}
                 className={`rounded-full px-3 py-1 cursor-default transition-colors ${tag.size}`}
-                style={{ background: "#f3f5f9", color: "#6b7280" }}
+                style={{ background: "#eff6ff", color: "#6b7280" }}
                 onMouseEnter={(e) => (e.currentTarget.style.color = "#1c1c1e")}
                 onMouseLeave={(e) => (e.currentTarget.style.color = "#6b7280")}
               >
@@ -289,18 +289,18 @@ export default function AdminAnalyticsPage() {
       </div>
 
       {/* Conversion Funnel */}
-      <div className="rounded-xl p-5" style={{ background: "#ffffff", border: "1px solid #e5e7eb" }}>
+      <div className="rounded-xl p-5" style={{ background: "#ffffff", border: "1px solid #dbeafe" }}>
         <h2 className="text-lg font-bold mb-6">قمع التحويل</h2>
         <div className="space-y-4">
           {funnelSteps.map((step, i) => {
-            const colors = ["#8957f6", "#8957f6", "#84cc18"];
+            const colors = ["#3b82f6", "#3b82f6", "#3b82f6"];
             return (
               <div key={step.label}>
                 <div className="flex justify-between text-sm mb-1">
                   <span>{step.label}</span>
                   <span style={{ color: "#6b7280" }}>{step.value}</span>
                 </div>
-                <div className="h-8 rounded-lg overflow-hidden" style={{ background: "#e5e7eb" }}>
+                <div className="h-8 rounded-lg overflow-hidden" style={{ background: "#dbeafe" }}>
                   <div
                     className="h-full rounded-lg flex items-center justify-center text-xs font-bold text-white"
                     style={{
@@ -320,12 +320,12 @@ export default function AdminAnalyticsPage() {
       </div>
 
       {/* Section 4 — Geographic Distribution */}
-      <div className="rounded-xl p-5" style={{ background: "#ffffff", border: "1px solid #e5e7eb" }}>
+      <div className="rounded-xl p-5" style={{ background: "#ffffff", border: "1px solid #dbeafe" }}>
         <h2 className="text-lg font-bold mb-4">التوزيع الجغرافي</h2>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr style={{ color: "#6b7280", borderBottom: "1px solid #e5e7eb" }}>
+              <tr style={{ color: "#6b7280", borderBottom: "1px solid #dbeafe" }}>
                 <th className="pb-2 text-right font-medium">#</th>
                 <th className="pb-2 text-right font-medium">البلد</th>
                 <th className="pb-2 text-right font-medium">الزوار</th>
@@ -334,7 +334,7 @@ export default function AdminAnalyticsPage() {
             </thead>
             <tbody>
               {geoData.map((row, i) => (
-                <tr key={i} style={{ borderBottom: "1px solid #e5e7eb" }}>
+                <tr key={i} style={{ borderBottom: "1px solid #dbeafe" }}>
                   <td className="py-2" style={{ color: "#6b7280" }}>{i + 1}</td>
                   <td className="py-2">{row.country}</td>
                   <td className="py-2">{row.visitors}</td>
@@ -343,7 +343,7 @@ export default function AdminAnalyticsPage() {
                       className="inline-block rounded-full px-2 py-0.5 text-xs font-medium"
                       style={{
                         background: parseFloat(row.conversion) >= 3 ? "#f7fee7" : "#f3eeff",
-                        color: parseFloat(row.conversion) >= 3 ? "#84cc18" : "#8957f6",
+                        color: parseFloat(row.conversion) >= 3 ? "#3b82f6" : "#3b82f6",
                       }}
                     >
                       {row.conversion}
@@ -357,7 +357,7 @@ export default function AdminAnalyticsPage() {
       </div>
 
       {/* Section 5 — Device Breakdown */}
-      <div className="rounded-xl p-5" style={{ background: "#ffffff", border: "1px solid #e5e7eb" }}>
+      <div className="rounded-xl p-5" style={{ background: "#ffffff", border: "1px solid #dbeafe" }}>
         <h2 className="text-lg font-bold mb-6">توزيع الأجهزة</h2>
         <div className="grid grid-cols-3 gap-6">
           {devices.map((d) => (
@@ -365,7 +365,7 @@ export default function AdminAnalyticsPage() {
               <div style={{ color: d.color }}>{d.icon}</div>
               <p className="text-3xl font-bold">{d.pct}%</p>
               <p className="text-sm" style={{ color: "#6b7280" }}>{d.name}</p>
-              <div className="w-full h-2 rounded-full overflow-hidden" style={{ background: "#e5e7eb" }}>
+              <div className="w-full h-2 rounded-full overflow-hidden" style={{ background: "#dbeafe" }}>
                 <div
                   className="h-full rounded-full"
                   style={{

@@ -80,6 +80,51 @@ export async function uploadAdminFile(
   }
 }
 
+// ─── Promo Banners ───
+
+export async function savePromoBanner(section: string, image_url: string): Promise<Result> {
+  try {
+    const supabase = createAdminClient();
+
+    const { data: existing } = await supabase
+      .from("promo_banners")
+      .select("id")
+      .eq("section", section)
+      .single();
+
+    if (existing?.id) {
+      const { error } = await supabase
+        .from("promo_banners")
+        .update({ image_url })
+        .eq("id", existing.id);
+      if (error) return { error: error.message };
+    } else {
+      const { error } = await supabase
+        .from("promo_banners")
+        .insert({ section, image_url });
+      if (error) return { error: error.message };
+    }
+
+    revalidatePath("/");
+    revalidatePath("/admin/media");
+    return { success: true };
+  } catch (err) {
+    return { error: err instanceof Error ? err.message : "Failed to save banner" };
+  }
+}
+
+export async function fetchPromoBanners(): Promise<Record<string, string>> {
+  try {
+    const supabase = createAdminClient();
+    const { data } = await supabase.from("promo_banners").select("section,image_url");
+    const map: Record<string, string> = {};
+    if (data) data.forEach((r: { section: string; image_url: string }) => { map[r.section] = r.image_url; });
+    return map;
+  } catch {
+    return {};
+  }
+}
+
 // ─── Strategies ───
 
 export async function saveAdminStrategy(

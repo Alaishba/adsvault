@@ -14,10 +14,8 @@ const navLinks = [
   { href: "/library", label: "مكتبة" },
   { href: "/analysis", label: "الاستراتيجيات" },
   { href: "/influencers", label: "المؤثرون" },
-  { href: "/planner", label: "مخطط الحملة" },
   { href: "/saved", label: "المحفوظات" },
   { href: "/blog", label: "المدونة" },
-  { href: "/profile", label: "حسابي" },
 ];
 
 export default function TopNavbar() {
@@ -31,31 +29,53 @@ export default function TopNavbar() {
   const [showSearch, setShowSearch] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // Load user on mount
+  // Navbar fade on scroll
   useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 50);
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  // Load user on mount with mounted guard to prevent lock errors
+  useEffect(() => {
+    let mounted = true;
+
     (async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        const { data: profile } = await supabase
-          .from("users").select("full_name,plan,avatar_url").eq("id", user.id).single();
-        setUserInfo({ name: profile?.full_name ?? user.email ?? "", plan: profile?.plan ?? "free", avatar: profile?.avatar_url ?? undefined });
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!mounted) return;
+        if (user) {
+          const { data: profile } = await supabase
+            .from("users").select("full_name,plan,avatar_url").eq("id", user.id).single();
+          if (!mounted) return;
+          setUserInfo({ name: profile?.full_name ?? user.email ?? "", plan: profile?.plan ?? "free", avatar: profile?.avatar_url ?? undefined });
+        }
+      } catch {
+        // silently ignore lock errors on unmount
       }
-      setAuthLoading(false);
+      if (mounted) setAuthLoading(false);
     })();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event: string, session: { user: { id: string; email?: string } } | null) => {
+      if (!mounted) return;
       if (session?.user) {
-        const { data: profile } = await supabase
-          .from("users").select("full_name,plan,avatar_url").eq("id", session.user.id).single();
-        setUserInfo({ name: profile?.full_name ?? session.user.email ?? "", plan: profile?.plan ?? "free", avatar: profile?.avatar_url ?? undefined });
+        try {
+          const { data: profile } = await supabase
+            .from("users").select("full_name,plan,avatar_url").eq("id", session.user.id).single();
+          if (!mounted) return;
+          setUserInfo({ name: profile?.full_name ?? session.user.email ?? "", plan: profile?.plan ?? "free", avatar: profile?.avatar_url ?? undefined });
+        } catch {
+          // ignore
+        }
       } else {
         setUserInfo(null);
       }
     });
 
-    return () => subscription.unsubscribe();
+    return () => { mounted = false; subscription.unsubscribe(); };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -100,8 +120,8 @@ export default function TopNavbar() {
     : "؟";
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 backdrop-blur-md bg-white/10 border-b border-white/20">
-      <div className="flex items-center gap-3 px-4 lg:px-8 h-[72px]">
+    <header className={`fixed top-0 left-0 right-0 z-50 bg-transparent transition-opacity duration-300 ${scrolled ? "opacity-25" : "opacity-100"}`}>
+      <div className="flex items-center gap-3 px-4 lg:px-8 py-4">
         {/* Mobile hamburger */}
         <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="lg:hidden p-2 rounded-lg text-white/70 hover:text-white transition-colors">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -118,24 +138,26 @@ export default function TopNavbar() {
           </div>
         </Link>
 
-        {/* CENTER: Navigation links (desktop) */}
-        <nav className="hidden lg:flex items-center gap-1.5 flex-1 justify-center">
-          {navLinks.map((link) => {
-            const active = pathname === link.href;
-            return (
-              <Link key={link.href} href={link.href}
-                className={`px-5 py-2 rounded-full backdrop-blur-sm border text-sm font-semibold transition-all ${
-                  active
-                    ? "bg-blue-600/20 border-blue-400/40 text-blue-300"
-                    : "bg-white/20 border-white/30 text-slate-900 hover:bg-white/30"
-                }`}>
-                {link.label}
-              </Link>
-            );
-          })}
+        {/* CENTER: Single pill nav container (desktop) */}
+        <nav className="hidden lg:flex flex-1 justify-center">
+          <div className="flex items-center gap-1 rounded-full backdrop-blur-md bg-white/10 border border-white/20 px-2 py-1.5">
+            {navLinks.map((link) => {
+              const active = pathname === link.href;
+              return (
+                <Link key={link.href} href={link.href}
+                  className={`px-4 py-1.5 rounded-full text-sm font-semibold transition-all ${
+                    active
+                      ? "bg-white/30 text-white"
+                      : "text-slate-800 hover:bg-white/15 hover:text-white"
+                  }`}>
+                  {link.label}
+                </Link>
+              );
+            })}
+          </div>
         </nav>
 
-        {/* Search (compact) */}
+        {/* Search (compact, mobile only) */}
         <div className="relative lg:hidden flex-1 mx-2">
           <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-white/10 border border-white/15">
             <svg className="shrink-0" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ color: "#94a3b8" }}>
@@ -167,12 +189,20 @@ export default function TopNavbar() {
           )}
         </div>
 
-        {/* LEFT side: Auth buttons */}
+        {/* LEFT side: Auth */}
         <div className="flex items-center gap-2 shrink-0">
+          {/* Loading skeleton */}
+          {authLoading && (
+            <div className="flex items-center gap-2">
+              <div className="w-16 h-8 rounded-full bg-white/10 animate-pulse" />
+              <div className="w-9 h-9 rounded-full bg-white/10 animate-pulse" />
+            </div>
+          )}
+
           {!authLoading && !userInfo && (
             <div className="flex items-center gap-2">
               <Link href="/login"
-                className="px-5 py-2 rounded-full backdrop-blur-sm bg-white/20 border border-white/30 text-sm font-semibold text-slate-900 hover:bg-white/30 transition-all">
+                className="px-5 py-2 rounded-full backdrop-blur-sm bg-white/10 border border-white/20 text-sm font-semibold text-white hover:bg-white/20 transition-all">
                 دخول
               </Link>
               <Link href="/register"
@@ -183,38 +213,38 @@ export default function TopNavbar() {
           )}
 
           {!authLoading && userInfo && (
-            <>
-              <span className="hidden sm:inline text-sm text-slate-300 font-medium">مرحباً {userInfo.name}</span>
-              <div className="relative" ref={dropdownRef}>
-                <button onClick={() => setDropdownOpen(!dropdownOpen)}
-                  className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold text-white cursor-pointer shrink-0 hover:opacity-90 transition-all overflow-hidden bg-blue-600">
+            <div className="relative" ref={dropdownRef}>
+              <button onClick={() => setDropdownOpen(!dropdownOpen)}
+                className="flex items-center gap-2 cursor-pointer hover:opacity-90 transition-all">
+                <span className="hidden sm:inline text-sm text-slate-200 font-medium">مرحباً {userInfo.name}</span>
+                <div className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold text-white shrink-0 overflow-hidden bg-blue-600">
                   {userInfo.avatar ? (
                     <img src={getImageUrl("user-avatars", userInfo.avatar)} alt="" className="w-full h-full object-cover"
                       onError={(e) => { e.currentTarget.src = "/fallback.png"; e.currentTarget.style.display = "block"; }} />
                   ) : initials}
-                </button>
-                {dropdownOpen && (
-                  <div className="absolute top-full mt-2 left-0 w-48 rounded-xl border shadow-lg overflow-hidden z-50"
-                    style={{ background: "rgba(15,23,42,0.95)", borderColor: "rgba(255,255,255,0.1)", backdropFilter: "blur(12px)" }}>
-                    <Link href="/profile" onClick={() => setDropdownOpen(false)}
-                      className="flex items-center gap-2.5 px-4 py-3 text-sm hover:bg-white/10 transition-colors text-white">
-                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
-                      </svg>
-                      حسابي
-                    </Link>
-                    <button onClick={handleLogout}
-                      className="w-full flex items-center gap-2.5 px-4 py-3 text-sm hover:bg-white/10 transition-colors text-right"
-                      style={{ color: "#ef4444" }}>
-                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
-                      </svg>
-                      تسجيل الخروج
-                    </button>
-                  </div>
-                )}
-              </div>
-            </>
+                </div>
+              </button>
+              {dropdownOpen && (
+                <div className="absolute top-full mt-2 left-0 w-48 rounded-xl border shadow-lg overflow-hidden z-50"
+                  style={{ background: "rgba(15,23,42,0.95)", borderColor: "rgba(255,255,255,0.1)", backdropFilter: "blur(12px)" }}>
+                  <Link href="/profile" onClick={() => setDropdownOpen(false)}
+                    className="flex items-center gap-2.5 px-4 py-3 text-sm hover:bg-white/10 transition-colors text-white">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+                    </svg>
+                    حسابي
+                  </Link>
+                  <button onClick={handleLogout}
+                    className="w-full flex items-center gap-2.5 px-4 py-3 text-sm hover:bg-white/10 transition-colors text-right"
+                    style={{ color: "#ef4444" }}>
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
+                    </svg>
+                    تسجيل الخروج
+                  </button>
+                </div>
+              )}
+            </div>
           )}
         </div>
       </div>
@@ -223,25 +253,26 @@ export default function TopNavbar() {
       {mobileMenuOpen && (
         <>
           <div className="fixed inset-0 bg-black/40 z-40 lg:hidden" onClick={() => setMobileMenuOpen(false)} />
-          <div className="absolute top-full left-0 right-0 z-50 lg:hidden border-b border-white/10"
-            style={{ background: "rgba(10,10,46,0.98)", backdropFilter: "blur(16px)" }}>
-            <nav className="flex flex-col px-4 py-3 gap-1">
+          <div className="absolute top-full left-4 right-4 z-50 lg:hidden rounded-xl shadow-xl mt-2 bg-[#ced3de] border border-[#ced3de]">
+            <nav className="flex flex-col px-3 py-3 gap-0.5">
               {navLinks.map((link) => {
                 const active = pathname === link.href;
                 return (
                   <Link key={link.href} href={link.href} onClick={() => setMobileMenuOpen(false)}
                     className={`px-4 py-2.5 rounded-xl text-sm font-semibold transition-all ${
-                      active ? "bg-blue-600/20 text-blue-300" : "text-slate-300 hover:bg-white/10"
+                      active ? "bg-blue-600 text-white" : "text-slate-900 hover:bg-slate-200"
                     }`}>
                     {link.label}
                   </Link>
                 );
               })}
-              <div className="border-t border-white/10 mt-2 pt-2">
+              <div className="border-t border-slate-300 mt-2 pt-2">
+                <Link href="/profile" onClick={() => setMobileMenuOpen(false)}
+                  className="px-4 py-2 text-sm text-slate-700 block font-medium">حسابي</Link>
                 <Link href="/terms" onClick={() => setMobileMenuOpen(false)}
-                  className="px-4 py-2 text-xs text-slate-400 block">الشروط والأحكام</Link>
+                  className="px-4 py-2 text-xs text-slate-500 block">الشروط والأحكام</Link>
                 <Link href="/removal" onClick={() => setMobileMenuOpen(false)}
-                  className="px-4 py-2 text-xs text-slate-400 block">طلب إزالة محتوى</Link>
+                  className="px-4 py-2 text-xs text-slate-500 block">طلب إزالة محتوى</Link>
               </div>
             </nav>
           </div>

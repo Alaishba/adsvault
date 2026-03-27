@@ -24,7 +24,7 @@ function MediaSwiper({ colors, brandColor }: { colors: string[]; brandColor: str
   const current = items[idx] ?? "";
   const isUrl = current.startsWith("http") || current.startsWith("blob:") || current.startsWith("data:");
   return (
-    <div className="relative w-full h-full min-h-[220px] flex items-center justify-center overflow-hidden rounded-xl"
+    <div className="relative w-full h-full min-h-[320px] flex items-center justify-center overflow-hidden rounded-xl"
       style={{ background: isUrl ? "#f3f5f9" : (current + "22") }}>
       {isUrl ? (
         <img src={current} alt="" className="w-full h-full object-cover" onError={(e) => { e.currentTarget.src = "/fallback.png"; e.currentTarget.style.display = "block"; }} />
@@ -82,15 +82,23 @@ export default function AdModal({ ad, onClose }: { ad: Ad | null; onClose: () =>
   const [showPaywall, setShowPaywall] = useState(false);
 
   useEffect(() => {
+    let mounted = true;
     (async () => {
-      const supabase = createClient();
-      const { data: { user: u } } = await supabase.auth.getUser();
-      if (u) {
-        const { data: profile } = await supabase.from("users").select("plan").eq("id", u.id).single();
-        const p = profile?.plan ?? "free";
-        setIsPro(p === "pro" || p === "enterprise" || p === "admin");
+      try {
+        const supabase = createClient();
+        const { data: { user: u } } = await supabase.auth.getUser();
+        if (!mounted) return;
+        if (u) {
+          const { data: profile } = await supabase.from("users").select("plan").eq("id", u.id).single();
+          if (!mounted) return;
+          const p = profile?.plan ?? "free";
+          setIsPro(p === "pro" || p === "enterprise" || p === "admin");
+        }
+      } catch {
+        // silently ignore lock errors on unmount
       }
     })();
+    return () => { mounted = false; };
   }, []);
 
   useEffect(() => {
@@ -117,15 +125,15 @@ export default function AdModal({ ad, onClose }: { ad: Ad | null; onClose: () =>
   ];
 
   const proContent = (
-    <div className="divide-y divide-[--border]">
+    <div className="divide-y divide-slate-300">
       {ad.apply_idea && ad.apply_idea.length > 0 && (
         <div className="px-5 py-4">
-          <p className="text-sm font-extrabold mb-3 flex items-center gap-2" style={{ color: "var(--text-primary)" }}>
+          <p className="text-sm font-extrabold mb-3 flex items-center gap-2 text-slate-900">
             <span>💡</span> كيف تطبق هذه الفكرة على مشروعك؟
           </p>
           <ol className="space-y-2">
             {(ad.apply_idea ?? []).map((step, i) => (
-              <li key={i} className="flex items-start gap-2 text-xs" style={{ color: "var(--text-secondary)" }}>
+              <li key={i} className="flex items-start gap-2 text-xs text-slate-700">
                 <span className="mt-0.5 w-4 h-4 rounded-full flex items-center justify-center shrink-0 text-[10px] font-bold text-white"
                   style={{ background: "#2563eb" }}>{i + 1}</span>
                 {step}
@@ -136,10 +144,10 @@ export default function AdModal({ ad, onClose }: { ad: Ad | null; onClose: () =>
       )}
       {ad.recommended_action && (
         <div className="px-5 py-4">
-          <p className="text-sm font-extrabold mb-2 flex items-center gap-2" style={{ color: "var(--text-primary)" }}>
+          <p className="text-sm font-extrabold mb-2 flex items-center gap-2 text-slate-900">
             <span>🎯</span> الإجراء الموصى به
           </p>
-          <p className="text-sm font-bold" style={{ color: "#94a3b8" }}>{ad.recommended_action}</p>
+          <p className="text-sm font-bold text-blue-700">{ad.recommended_action}</p>
         </div>
       )}
     </div>
@@ -150,33 +158,32 @@ export default function AdModal({ ad, onClose }: { ad: Ad | null; onClose: () =>
       style={{ background: "rgba(0,0,0,0.65)", backdropFilter: "blur(6px)" }}
       onClick={(e) => e.target === e.currentTarget && onClose()}>
       <div className="w-full max-w-3xl rounded-2xl shadow-2xl overflow-hidden overflow-y-auto"
-        style={{ maxHeight: "92vh", background: "var(--card)", animation: "modalIn 0.2s cubic-bezier(0.34,1.56,0.64,1)" }}>
+        style={{ maxHeight: "85vh", background: "#ced3de", border: "1px solid rgba(206,211,222,0.8)", animation: "modalIn 0.2s cubic-bezier(0.34,1.56,0.64,1)", WebkitOverflowScrolling: "touch", touchAction: "pan-y" }}>
         <style>{`@keyframes modalIn{from{opacity:0;transform:scale(0.95) translateY(8px)}to{opacity:1;transform:scale(1) translateY(0)}}`}</style>
 
         {/* TOP: two columns */}
         <div className="flex flex-col md:flex-row">
-          {/* RIGHT (40%) — media */}
-          <div className="md:w-[40%] shrink-0 p-4 border-b md:border-b-0 md:border-l border-[--border]">
+          {/* RIGHT (60%) — media */}
+          <div className="md:w-[60%] shrink-0 p-4 border-b md:border-b-0 md:border-l border-slate-300">
             <MediaSwiper colors={ad.images ?? []} brandColor={ad.brandColor} />
           </div>
 
-          {/* LEFT (60%) — content */}
+          {/* LEFT (40%) — content */}
           <div className="flex-1 min-w-0 p-5 flex flex-col gap-3">
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
                 <div className="flex items-center gap-2 flex-wrap mb-1">
-                  <span className="text-sm font-extrabold truncate" style={{ color: "#94a3b8" }}>{ad.brand}</span>
+                  <span className="text-sm font-extrabold truncate text-slate-700">{ad.brand}</span>
                   <PlatformBadge platform={ad.platform} />
                   {funnel && (
                     <span className="px-2 py-0.5 rounded-full text-xs font-bold"
                       style={{ background: funnel.bg, color: funnel.color }}>{funnel.label}</span>
                   )}
                 </div>
-                <h2 className="text-lg font-extrabold leading-snug" style={{ color: "var(--text-primary)" }}>{ad.title}</h2>
+                <h2 className="text-lg font-extrabold leading-snug text-slate-900">{ad.title}</h2>
               </div>
               <button onClick={onClose}
-                className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 hover:bg-[--surface2] transition-colors"
-                style={{ color: "var(--text-secondary)" }}>
+                className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 hover:bg-slate-200 transition-colors text-slate-500">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M18 6 6 18M6 6l12 12"/></svg>
               </button>
             </div>
@@ -192,8 +199,7 @@ export default function AdModal({ ad, onClose }: { ad: Ad | null; onClose: () =>
 
             {ad.source_url && (
               <a href={ad.source_url} target="_blank" rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg border border-[--border] w-fit hover:border-[#94a3b8]/40 transition-all"
-                style={{ color: "var(--text-secondary)" }}>
+                className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg border border-slate-300 w-fit hover:border-blue-400 transition-all text-slate-600">
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
                   <polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/>
@@ -202,43 +208,42 @@ export default function AdModal({ ad, onClose }: { ad: Ad | null; onClose: () =>
               </a>
             )}
 
-            <p className="text-xs leading-relaxed line-clamp-3" style={{ color: "var(--text-secondary)" }}>{ad.description}</p>
+            <p className="text-xs leading-relaxed line-clamp-3 text-slate-600">{ad.description}</p>
 
             <div className="grid grid-cols-2 gap-x-4 gap-y-2">
               {dataGrid.map((d) => (
                 <div key={d.label} className="flex flex-col">
-                  <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color: "var(--text-secondary)" }}>{d.label}</span>
-                  <span className="text-xs font-semibold truncate" style={{ color: "var(--text-primary)" }}>{d.value}</span>
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">{d.label}</span>
+                  <span className="text-xs font-semibold truncate text-slate-900">{d.value}</span>
                 </div>
               ))}
             </div>
 
-            <div className="flex gap-4 pt-2 border-t border-[--border]">
+            <div className="flex gap-4 pt-2 border-t border-slate-300">
               <div>
-                <p className="text-base font-extrabold" style={{ color: "#94a3b8" }}>{ad.views}</p>
-                <p className="text-[10px]" style={{ color: "var(--text-secondary)" }}>مشاهدة</p>
+                <p className="text-base font-extrabold text-slate-900">{ad.views}</p>
+                <p className="text-[10px] text-slate-500">مشاهدة</p>
               </div>
               <div>
-                <p className="text-base font-extrabold" style={{ color: "#94a3b8" }}>{ad.saved}</p>
-                <p className="text-[10px]" style={{ color: "var(--text-secondary)" }}>محفوظ</p>
+                <p className="text-base font-extrabold text-slate-900">{ad.saved}</p>
+                <p className="text-[10px] text-slate-500">محفوظ</p>
               </div>
             </div>
           </div>
         </div>
 
         {/* BOTTOM: analysis */}
-        <div className="border-t border-[--border]">
+        <div className="border-t border-slate-300">
           {/* Basic analysis — always visible */}
           {ad.basic_analysis && ad.basic_analysis.length > 0 && (
-            <div className="px-5 py-4" style={{ background: "var(--surface2)" }}>
-              <p className="text-sm font-extrabold mb-3 flex items-center gap-2" style={{ color: "var(--text-primary)" }}>
+            <div className="px-5 py-4 bg-blue-100/60 border-t border-blue-300/50 backdrop-blur-sm">
+              <p className="text-sm font-extrabold mb-3 flex items-center gap-2 text-slate-900">
                 <span>⚡</span> التحليل الأساسي
               </p>
               <ul className="space-y-2">
                 {(ad.basic_analysis ?? []).map((item, i) => (
-                  <li key={i} className="flex items-start gap-2 text-xs" style={{ color: "var(--text-secondary)" }}>
-                    <span className="mt-0.5 w-4 h-4 rounded-full flex items-center justify-center shrink-0 text-[10px] font-bold"
-                      style={{ background: "var(--primary-light)", color: "var(--primary-text)" }}>{i + 1}</span>
+                  <li key={i} className="flex items-start gap-2 text-xs text-slate-700">
+                    <span className="mt-0.5 w-4 h-4 rounded-full flex items-center justify-center shrink-0 text-[10px] font-bold text-white bg-blue-600">{i + 1}</span>
                     {item}
                   </li>
                 ))}

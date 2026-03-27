@@ -42,7 +42,7 @@ export default function FilterBar({
 
   return (
     <div className="border-b border-[--border] px-4 lg:px-10 py-3 overflow-visible"
-      style={{ background: "var(--card)", boxShadow: "0 1px 4px rgba(0,0,0,0.06)", position: "relative", zIndex: 20 }}>
+      style={{ background: "rgba(206,211,222,0.3)", boxShadow: "0 1px 4px rgba(0,0,0,0.06)", position: "relative", zIndex: 20 }}>
       <div className="flex items-center gap-2 min-w-max lg:min-w-0 lg:flex-wrap overflow-x-auto overflow-y-visible">
         {filters.map((filter) => {
           const active = activeFilters[filter.key];

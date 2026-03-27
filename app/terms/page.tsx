@@ -37,37 +37,42 @@ export default function TermsPage() {
 
   return (
     <AppLayout>
-      <div className="px-6 lg:px-10 py-8 max-w-3xl">
+      <div className="px-6 lg:px-10 py-8 max-w-5xl mx-auto">
         <div className="mb-8">
-          <h1 className="text-2xl font-extrabold" style={{ color: "#ffffff" }}>الشروط والأحكام</h1>
-          <p className="text-sm mt-1" style={{ color: "#94a3b8" }}>
+          <h1 className="text-2xl font-extrabold text-slate-900">الشروط والأحكام</h1>
+          <p className="text-sm mt-1 text-slate-700">
             آخر تحديث: مارس 2025 — يرجى قراءة هذه الشروط بعناية قبل استخدام المنصة
           </p>
         </div>
 
-        <div className="space-y-6">
-          {defaultSections.map((section, i) => (
-            <div key={i} className="rounded-2xl border overflow-hidden" style={{ background: "rgba(255,255,255,0.05)", borderColor: "rgba(255,255,255,0.1)" }}>
-              <div className="px-6 py-4 border-b" style={{ background: "rgba(255,255,255,0.03)", borderColor: "rgba(255,255,255,0.1)" }}>
-                <h2 className="font-extrabold text-base flex items-center gap-2" style={{ color: "#ffffff" }}>
-                  <span className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-black text-white"
-                    style={{ background: "#2563eb" }}>{i + 1}</span>
-                  {section.title}
-                </h2>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+          {/* RIGHT column — الشروط والأحكام */}
+          <div className="bg-[#ced3de] rounded-2xl p-6">
+            <h2 className="text-lg font-extrabold text-slate-900 mb-4">الشروط والأحكام</h2>
+            {[0, 1, 3, 4].map((idx) => (
+              <div key={idx}>
+                <h3 className="text-sm font-bold text-slate-900 mb-2">{defaultSections[idx].title}</h3>
+                <p className="text-sm text-slate-700 leading-relaxed whitespace-pre-line mb-4">{defaultSections[idx].content}</p>
               </div>
-              <div className="px-6 py-5">
-                <p className="text-sm leading-relaxed whitespace-pre-line" style={{ color: "#94a3b8" }}>{section.content}</p>
-              </div>
-            </div>
-          ))}
+            ))}
+          </div>
+
+          {/* LEFT column — سياسة الخصوصية */}
+          <div className="bg-[#ced3de] rounded-2xl p-6">
+            <h2 className="text-lg font-extrabold text-slate-900 mb-4">سياسة الخصوصية</h2>
+            <h3 className="text-sm font-bold text-slate-900 mb-2">{defaultSections[2].title}</h3>
+            <p className="text-sm text-slate-700 leading-relaxed whitespace-pre-line mb-4">{defaultSections[2].content}</p>
+          </div>
         </div>
 
-        {/* Customer Support Section */}
-        <div className="mt-8 rounded-2xl border p-6" style={{ background: "rgba(255,255,255,0.05)", borderColor: "rgba(255,255,255,0.1)" }}>
-          <h3 className="font-extrabold text-base mb-2" style={{ color: "#ffffff" }}>خدمة العملاء</h3>
-          <p className="text-sm mb-4" style={{ color: "#94a3b8" }}>
-            هل تحتاج مساعدة؟ فريق الدعم الفني جاهز لمساعدتك في أي استفسار أو مشكلة تواجهها.
-          </p>
+        {/* الدعم والتواصل */}
+        <div className="bg-[#ced3de] rounded-2xl p-6 mb-6">
+          <h2 className="text-lg font-extrabold text-slate-900 mb-3">الدعم والتواصل</h2>
+          <p className="text-sm text-slate-700 leading-relaxed whitespace-pre-line mb-4">{defaultSections[5].content}</p>
+          <div className="flex flex-wrap items-center gap-4 mb-4 text-sm text-slate-700">
+            <span>legal@advaultmena.com</span>
+            <span>دبي، الإمارات العربية المتحدة</span>
+          </div>
           <button onClick={() => setShowSupport(true)}
             className="px-5 py-2.5 rounded-xl font-bold text-sm text-white transition-all hover:opacity-90"
             style={{ background: "#2563eb" }}>
@@ -75,9 +80,6 @@ export default function TermsPage() {
           </button>
         </div>
 
-        <div className="mt-6 p-4 rounded-xl border text-center" style={{ borderColor: "rgba(255,255,255,0.1)" }}>
-          <p className="text-xs" style={{ color: "#64748b" }}>AdVault MENA © 2025 — جميع الحقوق محفوظة</p>
-        </div>
       </div>
 
       {/* Support Modal */}

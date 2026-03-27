@@ -5,8 +5,13 @@ import Link from "next/link";
 import AppLayout from "./components/AppLayout";
 import AdCard from "./components/AdCard";
 import AdModal from "./components/AdModal";
-import { type Ad, type Strategy } from "./lib/mockData";
-import { fetchAds, fetchStrategies } from "./lib/db";
+import { type Ad, type Strategy, type Influencer } from "./lib/mockData";
+import { type BlogArticle } from "./lib/blogData";
+import { fetchAds, fetchStrategies, fetchInfluencers } from "./lib/db";
+import { supabase, isSupabaseConfigured } from "./lib/supabase";
+import { getImageUrl } from "./lib/imageUrl";
+import PlatformBadge from "./components/PlatformBadge";
+import type { Platform } from "./lib/mockData";
 
 /* ─── Animated counter hook ─── */
 function useCountUp(target: number, duration = 1500) {
@@ -66,7 +71,7 @@ function StatCard({ stat }: { stat: StatItem }) {
   const { count, ref } = useCountUp(stat.target);
   const display = `${stat.prefix}${count.toLocaleString()}${stat.suffix}`;
   return (
-    <div ref={ref} className="rounded-xl p-3 flex flex-col items-center justify-center text-center w-40 h-28" style={{
+    <div ref={ref} className="rounded-xl p-3 flex flex-col items-center justify-center text-center w-48 h-28" style={{
       background: "rgba(206,211,222,0.2)",
       backdropFilter: "blur(10px)",
       WebkitBackdropFilter: "blur(10px)",
@@ -85,27 +90,79 @@ export default function HomePage() {
   const [selectedAd, setSelectedAd] = useState<Ad | null>(null);
   const [ads, setAds] = useState<Ad[]>([]);
   const [strategies, setStrategies] = useState<Strategy[]>([]);
+  const [influencers, setInfluencers] = useState<(Influencer & { profile_image?: string })[]>([]);
+  const [blogPosts, setBlogPosts] = useState<BlogArticle[]>([]);
+  const [promoBanners, setPromoBanners] = useState<Record<string, string>>({});
 
   useEffect(() => {
-    fetchAds().then(setAds);
-    fetchStrategies().then(setStrategies);
+    // Fetch featured ads (2), fallback to latest
+    fetchAds().then((all) => {
+      const featured = all.filter((a) => (a as unknown as Record<string, unknown>).featured);
+      const result = featured.length >= 2 ? featured.slice(0, 2) : [...featured, ...all.filter((a) => !(a as unknown as Record<string, unknown>).featured)].slice(0, 2);
+      setAds(result);
+    });
+    // Fetch featured strategies (2), fallback to latest
+    fetchStrategies().then((all) => {
+      const featured = all.filter((s) => (s as unknown as Record<string, unknown>).featured);
+      const result = featured.length >= 2 ? featured.slice(0, 2) : [...featured, ...all.filter((s) => !(s as unknown as Record<string, unknown>).featured)].slice(0, 2);
+      setStrategies(result);
+    });
+    // Fetch featured influencers (3), fallback to latest
+    fetchInfluencers().then((all) => {
+      const featured = all.filter((i) => (i as unknown as Record<string, unknown>).featured);
+      const result = featured.length >= 3 ? featured.slice(0, 3) : [...featured, ...all.filter((i) => !(i as unknown as Record<string, unknown>).featured)].slice(0, 3);
+      setInfluencers(result);
+    });
+    // Fetch promo banners + blog posts
+    if (isSupabaseConfigured()) {
+      supabase.from("promo_banners").select("section,image_url")
+        .then(({ data }: { data: { section: string; image_url: string }[] | null }) => {
+          if (data) {
+            const map: Record<string, string> = {};
+            data.forEach((r) => { map[r.section] = r.image_url; });
+            setPromoBanners(map);
+          }
+        });
+      supabase.from("blog_posts").select("*").eq("status", "published").order("created_at", { ascending: false }).limit(10)
+        .then(({ data }: { data: Record<string, unknown>[] | null }) => {
+          if (data && data.length > 0) {
+            const all = data.map((d: Record<string, unknown>) => ({
+              id: d.id as number, slug: (d.slug as string) ?? "",
+              title: (d.title as string) ?? "", excerpt: ((d.content as string) ?? "").slice(0, 120),
+              category: (d.category as string) ?? "تسويق",
+              coverImage: (d.banner_image as string) ?? "#2563eb",
+              author: (d.author as string) ?? "فريق AdVault",
+              date: ((d.created_at as string) ?? "").slice(0, 10),
+              readTime: "5 دقائق", tags: (d.tags as string[]) ?? [],
+              featured: d.featured as boolean,
+            }));
+            const feat = all.filter((a) => a.featured);
+            const result = feat.length >= 2 ? feat.slice(0, 2) : [...feat, ...all.filter((a) => !a.featured)].slice(0, 2);
+            setBlogPosts(result);
+          }
+        });
+    }
   }, []);
 
   return (
     <AppLayout>
       {/* ── HERO ── */}
-      <section className="relative min-h-[90vh] flex items-center bg-gradient-to-br from-[#1C4ED8] via-[#0d1b4b] to-black -mt-20 pt-20 overflow-hidden" style={{ animation: "fadeInUp 0.5s ease both" }}>
+      <section className="relative min-h-[80vh] flex items-center bg-gradient-to-br from-[#1C4ED8] via-[#0d1b4b] to-black -mt-20 pt-8 overflow-hidden" style={{ animation: "fadeInUp 0.5s ease both" }}>
         <div className="flex flex-col lg:flex-row gap-12 items-center w-full px-6 lg:px-10">
           {/* LEFT column (40%) — laptop placeholder, bleeds off left edge */}
           <div className="w-full lg:w-[40%] order-2 lg:order-2 lg:-ml-[5%]">
-            <div className="rounded-2xl bg-white/5 border border-white/10 w-full h-80 flex items-center justify-center lg:-translate-x-8">
-              <span className="text-4xl">📸 صورة اللابتوب</span>
+            <div className="rounded-2xl bg-white/5 border border-white/10 w-full h-80 flex items-center justify-center lg:-translate-x-8 overflow-hidden">
+              {promoBanners["hero_laptop"] ? (
+                <img src={promoBanners["hero_laptop"]} alt="AdVault" className="w-full h-full object-cover" />
+              ) : (
+                <span className="text-4xl">📸 صورة اللابتوب</span>
+              )}
             </div>
           </div>
 
           {/* RIGHT column (60%) — glassmorphism card */}
           <div className="w-full lg:w-[60%] order-1 lg:order-1">
-            <div className="backdrop-blur-lg bg-[#ced3de]/20 border border-[#ced3de]/40 rounded-3xl p-10">
+            <div className="backdrop-blur-lg bg-white/10 border border-white/20 rounded-3xl p-10">
               <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold mb-6 bg-white/10 border border-white/20 text-white">
                 أول منصة ذكاء تسويقي متكامل في السعودية 🇸🇦
               </div>
@@ -132,7 +189,7 @@ export default function HomePage() {
       </section>
 
       {/* ── STATS (glassmorphism, smaller) ── */}
-      <section className="px-6 lg:px-10 pb-10 bg-[#0a0a2e]">
+      <section className="px-6 lg:px-10 pt-2 pb-10 bg-[#0a0a2e]">
         <div className="flex justify-center gap-6 flex-wrap">
           {buildStatsData(ads, strategies).map((s, i) => <StatCard key={i} stat={s} />)}
         </div>
@@ -150,8 +207,18 @@ export default function HomePage() {
           </Link>
         </div>
         {ads.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
-            {ads.map((ad) => <AdCard key={ad.id} ad={ad} onClick={setSelectedAd} />)}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {ads.slice(0, 2).map((ad) => (
+              <div key={ad.id} className="rounded-2xl" style={{ height: 360, overflow: "hidden" }}>
+                <AdCard ad={ad} onClick={setSelectedAd} />
+              </div>
+            ))}
+            {/* Promo banner */}
+            <div className="rounded-2xl overflow-hidden" style={{ height: 360 }}>
+              {promoBanners["ads"] ? (
+                <img src={promoBanners["ads"]} alt="" className="w-full h-full object-cover" />
+              ) : <div className="w-full h-full bg-[#ced3de]/20" />}
+            </div>
           </div>
         ) : (
           <div className="text-center py-12 rounded-2xl" style={{ background: "rgba(206,211,222,0.3)", border: "1px solid rgba(206,211,222,0.5)" }}>
@@ -173,33 +240,136 @@ export default function HomePage() {
             عرض الكل ←
           </Link>
         </div>
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-          {strategies.map((s) => (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {strategies.slice(0, 2).map((s) => (
             <Link key={s.id} href="/analysis"
-              className="rounded-xl overflow-hidden group p-0 bg-[#ced3de] border border-[#ced3de] transition-all duration-200 hover:shadow-md hover:scale-[1.02]">
-              <div className="w-full h-48 flex items-center justify-center" style={{ background: "#0f0f0f" }}>
-                <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl font-black"
+              className="rounded-xl overflow-hidden group p-0 bg-[#ced3de] border border-[#ced3de] transition-all duration-200 hover:shadow-md hover:scale-[1.02]"
+              style={{ height: 280 }}>
+              <div className="w-full h-40 flex items-center justify-center relative overflow-hidden" style={{ background: "#0f0f0f" }}>
+                {s.thumbnail && !s.thumbnail.startsWith("#") ? (
+                  <img src={getImageUrl("strategy-covers", s.thumbnail)} alt={s.title}
+                    className="absolute inset-0 w-full h-full object-cover"
+                    onError={(e) => { e.currentTarget.style.display = "none"; }} />
+                ) : null}
+                <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-xl font-black relative"
                   style={{ background: s.brandColor === "#000000" ? "#1a1a1a" : `${s.brandColor}22`, color: s.brandColor === "#000000" ? "#fff" : s.brandColor, border: `2px solid ${s.brandColor === "#000000" ? "#333" : s.brandColor + "44"}` }}>
                   {s.brandInitial}
                 </div>
               </div>
-              <div className="p-5">
-                <p className="text-xs font-bold mb-1 text-slate-300">{s.brand}</p>
-                <h3 className="text-sm font-extrabold leading-snug mb-2 group-hover:text-blue-400 transition-colors" style={{ color: "var(--text-primary)" }}>
+              <div className="p-3">
+                <p className="text-xs font-bold mb-1 text-slate-700">{s.brand}</p>
+                <h3 className="text-sm font-extrabold leading-snug mb-1 group-hover:text-blue-400 transition-colors text-slate-900 line-clamp-1">
                   {s.title}
                 </h3>
-                <p className="text-xs leading-relaxed mb-3 line-clamp-2" style={{ color: "var(--text-secondary)" }}>{s.preview}</p>
+                <p className="text-xs leading-relaxed mb-2 line-clamp-1 text-slate-700">{s.preview}</p>
                 <div className="flex flex-wrap gap-1">
-                  {(s.tags ?? []).slice(0, 3).map((tag) => (
-                    <span key={tag} className="px-2 py-0.5 text-xs rounded-full font-medium"
-                      style={{ background: "var(--accent-light)", color: "var(--accent-text)" }}>{tag}</span>
+                  {(s.tags ?? []).slice(0, 2).map((tag) => (
+                    <span key={tag} className="px-2 py-0.5 text-xs rounded-full font-medium bg-blue-100 text-blue-700">{tag}</span>
                   ))}
                 </div>
               </div>
             </Link>
           ))}
+          {/* Promo banner */}
+          <div className="rounded-2xl bg-[#ced3de]/20 overflow-hidden" style={{ height: 280 }}>
+            {promoBanners["strategies"] ? (
+              <img src={promoBanners["strategies"]} alt="" className="w-full h-full object-cover" />
+            ) : <div className="w-full h-full bg-[#ced3de]/20" />}
+          </div>
         </div>
       </section>
+
+      {/* ── TOP INFLUENCERS ── */}
+      {influencers.length > 0 && (
+        <section className="px-6 lg:px-10 pb-12 bg-[#0a0a2e]">
+          <div className="flex items-end justify-between mb-5">
+            <div>
+              <h2 className="text-xl font-extrabold text-white">أبرز المؤثرين</h2>
+              <p className="text-sm mt-0.5 text-slate-400">أبرز المؤثرين في المنطقة العربية</p>
+            </div>
+            <Link href="/influencers" className="text-sm font-semibold transition-colors text-blue-400">
+              عرض الكل ←
+            </Link>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+            {influencers.slice(0, 3).map((inf) => (
+              <Link key={inf.id} href="/influencers"
+                className="rounded-xl p-3 bg-[#ced3de] border border-[#ced3de] transition-all duration-200 hover:shadow-md hover:scale-[1.02] overflow-hidden"
+                style={{ height: 220 }}>
+                <div className="flex items-center gap-3 mb-2">
+                  {inf.profile_image ? (
+                    <img src={getImageUrl("influencer-photos", inf.profile_image)} alt={inf.name}
+                      className="w-10 h-10 rounded-xl object-cover shrink-0"
+                      onError={(e) => { e.currentTarget.style.display = "none"; }} />
+                  ) : (
+                    <div className="w-10 h-10 rounded-xl flex items-center justify-center text-sm font-black text-white shrink-0"
+                      style={{ background: inf.color }}>{inf.initial}</div>
+                  )}
+                  <div>
+                    <p className="font-bold text-sm text-slate-900">{inf.name}</p>
+                    <p className="text-xs text-slate-600">{inf.category} · {inf.country}</p>
+                  </div>
+                </div>
+                <div className="flex gap-3 text-xs">
+                  <span className="text-slate-900 font-bold">{inf.followers} <span className="text-slate-500 font-normal">متابع</span></span>
+                  <span className="text-slate-900 font-bold">{inf.engagement} <span className="text-slate-500 font-normal">تفاعل</span></span>
+                </div>
+              </Link>
+            ))}
+            {/* Promo banner */}
+            <div className="rounded-2xl bg-[#ced3de]/20 overflow-hidden" style={{ height: 220 }}>
+              {promoBanners["influencers"] ? (
+                <img src={promoBanners["influencers"]} alt="" className="w-full h-full object-cover" />
+              ) : <div className="w-full h-full bg-[#ced3de]/20" />}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* ── LATEST BLOG POSTS ── */}
+      {blogPosts.length > 0 && (
+        <section className="px-6 lg:px-10 pb-12 bg-[#0a0a2e]">
+          <div className="flex items-end justify-between mb-5">
+            <div>
+              <h2 className="text-xl font-extrabold text-white">آخر المقالات</h2>
+              <p className="text-sm mt-0.5 text-slate-400">أحدث المقالات والنصائح التسويقية</p>
+            </div>
+            <Link href="/blog" className="text-sm font-semibold transition-colors text-blue-400">
+              عرض الكل ←
+            </Link>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {blogPosts.slice(0, 2).map((post) => (
+              <Link key={post.id} href={`/blog/${post.slug}`}
+                className="rounded-xl overflow-hidden bg-[#ced3de] border border-[#ced3de] transition-all duration-200 hover:shadow-md hover:scale-[1.02]"
+                style={{ height: 280 }}>
+                <div className="h-40 flex items-center justify-center relative overflow-hidden"
+                  style={{ background: post.coverImage.startsWith("#") ? post.coverImage : "#2563eb" }}>
+                  {!post.coverImage.startsWith("#") && (
+                    <img src={getImageUrl("Blog-images", post.coverImage)} alt={post.title}
+                      className="absolute inset-0 w-full h-full object-cover"
+                      onError={(e) => { e.currentTarget.style.display = "none"; }} />
+                  )}
+                  <span className="absolute top-3 right-3 px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-600 text-white">
+                    {post.category}
+                  </span>
+                </div>
+                <div className="p-3">
+                  <h3 className="font-bold text-sm leading-snug mb-1 line-clamp-1 text-slate-900">{post.title}</h3>
+                  <p className="text-xs text-slate-600 line-clamp-1 mb-1">{post.excerpt}</p>
+                  <span className="text-xs text-slate-500">{post.date}</span>
+                </div>
+              </Link>
+            ))}
+            {/* Promo banner */}
+            <div className="rounded-2xl bg-[#ced3de]/20 overflow-hidden" style={{ height: 280 }}>
+              {promoBanners["blog"] ? (
+                <img src={promoBanners["blog"]} alt="" className="w-full h-full object-cover" />
+              ) : <div className="w-full h-full bg-[#ced3de]/20" />}
+            </div>
+          </div>
+        </section>
+      )}
 
       <AdModal ad={selectedAd} onClose={() => setSelectedAd(null)} />
     </AppLayout>

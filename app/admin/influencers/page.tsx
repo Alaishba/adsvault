@@ -14,7 +14,13 @@ const emptyForm = {
   weaknesses: [] as string[],
   contactEmail: "",
   profileImage: "",
-  initial: "", color: "#8957f6",
+  initial: "", color: "#3b82f6",
+  target_audience: "",
+  interests: [] as string[],
+  niche: "",
+  historical_performance: "",
+  demographics: "",
+  featured: false,
 };
 
 const allPlatforms: Platform[] = ["Meta", "TikTok", "Snap", "YouTube", "Instagram"];
@@ -50,7 +56,13 @@ export default function AdminInfluencersPage() {
       weaknesses: inf.weaknesses ?? [],
       contactEmail: (inf as unknown as Record<string, string>).contactEmail ?? "",
       profileImage: (inf as unknown as Record<string, string>).profileImage ?? "",
-      initial: inf.initial ?? (inf.name ?? "?")[0], color: inf.color ?? "#8957f6",
+      initial: inf.initial ?? (inf.name ?? "?")[0], color: inf.color ?? "#3b82f6",
+      target_audience: (inf as unknown as Record<string, string>).target_audience ?? "",
+      interests: Array.isArray((inf as unknown as Record<string, unknown>).interests) ? (inf as unknown as Record<string, string[]>).interests : [],
+      niche: (inf as unknown as Record<string, string>).niche ?? "",
+      historical_performance: (inf as unknown as Record<string, unknown>).historical_performance ? JSON.stringify((inf as unknown as Record<string, unknown>).historical_performance, null, 2) : "",
+      demographics: (inf as unknown as Record<string, unknown>).demographics ? JSON.stringify((inf as unknown as Record<string, unknown>).demographics, null, 2) : "",
+      featured: (inf as unknown as Record<string, boolean>).featured ?? false,
     });
     setImagePreview((inf as unknown as Record<string, string>).profileImage ?? null);
     setEditId(inf.id);
@@ -100,6 +112,17 @@ export default function AdminInfluencersPage() {
   const handleSave = async () => {
     if (!form.name) return;
     setSaveError(null);
+    let parsedHistoricalPerformance = null;
+    if (form.historical_performance) {
+      try { parsedHistoricalPerformance = JSON.parse(form.historical_performance); }
+      catch { setSaveError("صيغة JSON غير صحيحة في الأداء التاريخي"); return; }
+    }
+    let parsedDemographics = null;
+    if (form.demographics) {
+      try { parsedDemographics = JSON.parse(form.demographics); }
+      catch { setSaveError("صيغة JSON غير صحيحة في التركيبة السكانية"); return; }
+    }
+
     const infData = {
       name: form.name, bio: form.bio,
       platform: form.platforms.join(","),
@@ -109,6 +132,12 @@ export default function AdminInfluencersPage() {
       weaknesses: form.weaknesses,
       profile_image: form.profileImage || null,
       contact_email: form.contactEmail || null,
+      target_audience: form.target_audience || null,
+      interests: form.interests,
+      niche: form.niche || null,
+      historical_performance: parsedHistoricalPerformance,
+      demographics: parsedDemographics,
+      featured: form.featured ?? false,
     };
 
     console.log("[AdminInfluencers] Saving influencer:", { ...infData, profile_image: infData.profile_image ? "(set)" : "(null)" });
@@ -138,14 +167,14 @@ export default function AdminInfluencersPage() {
         </div>
         <button onClick={openAdd}
           className="px-4 py-2 rounded-xl text-sm font-bold transition-all hover:opacity-90"
-          style={{ background: "#84cc18", color: "#fff" }}>
+          style={{ background: "#3b82f6", color: "#fff" }}>
           + إضافة مؤثر
         </button>
       </div>
 
       {/* Search */}
       <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl border mb-5"
-        style={{ background: "#ffffff", borderColor: "#e5e7eb" }}>
+        style={{ background: "#ffffff", borderColor: "#dbeafe" }}>
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="2">
           <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
         </svg>
@@ -155,20 +184,20 @@ export default function AdminInfluencersPage() {
       </div>
 
       {/* Table */}
-      <div className="rounded-2xl border overflow-hidden" style={{ background: "#ffffff", borderColor: "#e5e7eb" }}>
+      <div className="rounded-2xl border overflow-hidden" style={{ background: "#ffffff", borderColor: "#dbeafe" }}>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr style={{ background: "#f3f5f9" }}>
+              <tr style={{ background: "#eff6ff" }}>
                 {["المؤثر", "التصنيف", "المنصات", "المتابعون", "التفاعل", "البلد", "الإجراءات"].map((h) => (
                   <th key={h} className="text-right px-5 py-3 text-xs font-bold uppercase tracking-wider"
                     style={{ color: "#6b7280" }}>{h}</th>
                 ))}
               </tr>
             </thead>
-            <tbody className="divide-y" style={{ borderColor: "#e5e7eb" }}>
+            <tbody className="divide-y" style={{ borderColor: "#dbeafe" }}>
               {filtered.map((inf) => (
-                <tr key={inf.id} className="hover:bg-[#f3f5f9] transition-colors">
+                <tr key={inf.id} className="hover:bg-[#eff6ff] transition-colors">
                   <td className="px-5 py-3">
                     <div className="flex items-center gap-2">
                       {((inf as unknown as Record<string, string>).profile_image || (inf as unknown as Record<string, string>).profileImage) ? (
@@ -177,7 +206,7 @@ export default function AdminInfluencersPage() {
                           className="w-8 h-8 rounded-full object-cover flex-shrink-0" />
                       ) : (
                         <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-black text-white flex-shrink-0"
-                          style={{ background: inf.color ?? "#8957f6" }}>{inf.initial ?? (inf.name ?? "?")[0]}</div>
+                          style={{ background: inf.color ?? "#3b82f6" }}>{inf.initial ?? (inf.name ?? "?")[0]}</div>
                       )}
                       <span className="font-semibold text-[#1c1c1e]">{inf.name}</span>
                     </div>
@@ -187,17 +216,17 @@ export default function AdminInfluencersPage() {
                     <div className="flex gap-1 flex-wrap">
                       {(inf.platforms ?? []).map((p) => (
                         <span key={p} className="px-1.5 py-0.5 rounded text-xs font-medium"
-                          style={{ background: "#f3f5f9", color: "#6b7280" }}>{p}</span>
+                          style={{ background: "#eff6ff", color: "#6b7280" }}>{p}</span>
                       ))}
                     </div>
                   </td>
                   <td className="px-5 py-3 font-bold text-[#1c1c1e]">{inf.followers}</td>
-                  <td className="px-5 py-3" style={{ color: "#84cc18" }}>{inf.engagement}</td>
+                  <td className="px-5 py-3" style={{ color: "#3b82f6" }}>{inf.engagement}</td>
                   <td className="px-5 py-3" style={{ color: "#6b7280" }}>{inf.country ?? "—"}</td>
                   <td className="px-5 py-3">
                     <div className="flex gap-2">
                       <button onClick={() => openEdit(inf)}
-                        className="text-xs px-2.5 py-1 rounded-lg font-medium border border-[#e5e7eb] hover:border-[#8957f6]/40 transition-all"
+                        className="text-xs px-2.5 py-1 rounded-lg font-medium border border-[#dbeafe] hover:border-[#3b82f6]/40 transition-all"
                         style={{ color: "#6b7280" }}>تعديل</button>
                       <button onClick={() => handleDelete(inf.id)}
                         className="text-xs px-2.5 py-1 rounded-lg font-medium border transition-all"
@@ -218,12 +247,12 @@ export default function AdminInfluencersPage() {
           onClick={(e) => e.target === e.currentTarget && setShowForm(false)}>
           <div className="w-full max-w-2xl rounded-2xl shadow-2xl overflow-y-auto"
             style={{ background: "#ffffff", maxHeight: "90vh" }}>
-            <div className="flex items-center justify-between px-6 py-4 border-b" style={{ borderColor: "#e5e7eb" }}>
+            <div className="flex items-center justify-between px-6 py-4 border-b" style={{ borderColor: "#dbeafe" }}>
               <h2 className="font-extrabold text-lg text-[#1c1c1e]">
                 {editId ? "تعديل المؤثر" : "إضافة مؤثر جديد"}
               </h2>
               <button onClick={() => setShowForm(false)}
-                className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-[#f3f5f9] transition-colors"
+                className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-[#eff6ff] transition-colors"
                 style={{ color: "#6b7280" }}>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                   <path d="M18 6 6 18M6 6l12 12"/>
@@ -237,7 +266,7 @@ export default function AdminInfluencersPage() {
                 <label className="block text-xs font-bold mb-2" style={{ color: "#6b7280" }}>صورة الملف الشخصي</label>
                 <div className="flex items-center gap-4">
                   <div className="w-16 h-16 rounded-full flex items-center justify-center overflow-hidden flex-shrink-0"
-                    style={{ background: "#f3f5f9", border: "2px dashed #e5e7eb" }}>
+                    style={{ background: "#eff6ff", border: "2px dashed #dbeafe" }}>
                     {imagePreview ? (
                       <img src={imagePreview} alt="preview" className="w-full h-full object-cover" />
                     ) : (
@@ -250,8 +279,8 @@ export default function AdminInfluencersPage() {
                   <div>
                     <button type="button" onClick={() => fileRef.current?.click()}
                       disabled={uploading}
-                      className="px-3 py-1.5 rounded-lg text-xs font-bold border border-[#e5e7eb] hover:border-[#8957f6]/40 transition-all"
-                      style={{ color: "#8957f6" }}>
+                      className="px-3 py-1.5 rounded-lg text-xs font-bold border border-[#dbeafe] hover:border-[#3b82f6]/40 transition-all"
+                      style={{ color: "#3b82f6" }}>
                       {uploading ? "جارٍ الرفع..." : "رفع صورة"}
                     </button>
                     <p className="text-xs mt-1" style={{ color: "#9ca3af" }}>JPG, PNG, WEBP — حتى 5MB</p>
@@ -275,7 +304,7 @@ export default function AdminInfluencersPage() {
                     value={(form as Record<string, unknown>)[key] as string ?? ""}
                     onChange={(e) => setForm((f) => ({ ...f, [key]: e.target.value }))}
                     className="w-full px-3 py-2 rounded-xl border outline-none text-sm text-[#1c1c1e] placeholder:text-[#9ca3af]"
-                    style={{ background: "#ffffff", borderColor: "#e5e7eb" }} />
+                    style={{ background: "#ffffff", borderColor: "#dbeafe" }} />
                 </div>
               ))}
 
@@ -286,7 +315,7 @@ export default function AdminInfluencersPage() {
                   onChange={(e) => setForm((f) => ({ ...f, contactEmail: e.target.value }))}
                   placeholder="influencer@example.com"
                   className="w-full px-3 py-2 rounded-xl border outline-none text-sm text-[#1c1c1e] placeholder:text-[#9ca3af]"
-                  style={{ background: "#ffffff", borderColor: "#e5e7eb" }} dir="ltr" />
+                  style={{ background: "#ffffff", borderColor: "#dbeafe" }} dir="ltr" />
               </div>
 
               {/* Platforms */}
@@ -297,9 +326,9 @@ export default function AdminInfluencersPage() {
                     <button key={p} type="button" onClick={() => togglePlatform(p)}
                       className="px-3 py-1 rounded-lg text-xs font-medium border transition-all"
                       style={{
-                        background: form.platforms.includes(p) ? "#8957f6" : "#ffffff",
+                        background: form.platforms.includes(p) ? "#3b82f6" : "#ffffff",
                         color: form.platforms.includes(p) ? "#fff" : "#6b7280",
-                        borderColor: form.platforms.includes(p) ? "#8957f6" : "#e5e7eb",
+                        borderColor: form.platforms.includes(p) ? "#3b82f6" : "#dbeafe",
                       }}>{p}</button>
                   ))}
                 </div>
@@ -311,7 +340,7 @@ export default function AdminInfluencersPage() {
                 <textarea rows={3} value={form.bio}
                   onChange={(e) => setForm((f) => ({ ...f, bio: e.target.value }))}
                   className="w-full px-3 py-2 rounded-xl border outline-none text-sm resize-none text-[#1c1c1e]"
-                  style={{ background: "#ffffff", borderColor: "#e5e7eb" }} />
+                  style={{ background: "#ffffff", borderColor: "#dbeafe" }} />
               </div>
 
               {/* Strengths */}
@@ -321,7 +350,7 @@ export default function AdminInfluencersPage() {
                   value={form.strengths.join(", ")}
                   onChange={(e) => setForm((f) => ({ ...f, strengths: e.target.value.split(",").map((t) => t.trim()).filter(Boolean) }))}
                   className="w-full px-3 py-2 rounded-xl border outline-none text-sm text-[#1c1c1e] placeholder:text-[#9ca3af]"
-                  style={{ background: "#ffffff", borderColor: "#e5e7eb" }} />
+                  style={{ background: "#ffffff", borderColor: "#dbeafe" }} />
               </div>
 
               {/* Weaknesses */}
@@ -331,7 +360,55 @@ export default function AdminInfluencersPage() {
                   value={form.weaknesses.join(", ")}
                   onChange={(e) => setForm((f) => ({ ...f, weaknesses: e.target.value.split(",").map((t) => t.trim()).filter(Boolean) }))}
                   className="w-full px-3 py-2 rounded-xl border outline-none text-sm text-[#1c1c1e] placeholder:text-[#9ca3af]"
-                  style={{ background: "#ffffff", borderColor: "#e5e7eb" }} />
+                  style={{ background: "#ffffff", borderColor: "#dbeafe" }} />
+              </div>
+
+              {/* Niche */}
+              <div>
+                <label className="block text-sm font-semibold mb-1.5 text-gray-700">مجال المؤثر</label>
+                <input type="text" value={form.niche} onChange={(e) => setForm({...form, niche: e.target.value})}
+                  placeholder="مثال: تقنية، أزياء، طعام..."
+                  className="w-full px-4 py-2.5 rounded-xl border border-blue-200 bg-white outline-none text-sm text-gray-900" />
+              </div>
+
+              {/* Target Audience */}
+              <div>
+                <label className="block text-sm font-semibold mb-1.5 text-gray-700">الجمهور المستهدف</label>
+                <input type="text" value={form.target_audience} onChange={(e) => setForm({...form, target_audience: e.target.value})}
+                  placeholder="مثال: شباب 18-25، أمهات..."
+                  className="w-full px-4 py-2.5 rounded-xl border border-blue-200 bg-white outline-none text-sm text-gray-900" />
+              </div>
+
+              {/* Interests */}
+              <div className="col-span-2">
+                <label className="block text-sm font-semibold mb-1.5 text-gray-700">الاهتمامات (فاصلة)</label>
+                <input type="text"
+                  value={form.interests.join(", ")}
+                  onChange={(e) => setForm({...form, interests: e.target.value.split(",").map((t) => t.trim()).filter(Boolean)})}
+                  placeholder="مثال: سفر، تصوير، رياضة..."
+                  className="w-full px-4 py-2.5 rounded-xl border border-blue-200 bg-white outline-none text-sm text-gray-900" />
+              </div>
+
+              {/* Historical Performance */}
+              <div className="col-span-2">
+                <label className="block text-sm font-semibold mb-1.5 text-gray-700">الأداء التاريخي (JSON)</label>
+                <textarea rows={3} value={form.historical_performance} onChange={(e) => setForm({...form, historical_performance: e.target.value})}
+                  placeholder='{"متوسط_المشاهدات": "50K", "متوسط_التفاعل": "5%"}'
+                  className="w-full px-4 py-2.5 rounded-xl border border-blue-200 bg-white outline-none text-sm text-gray-900 resize-none" />
+              </div>
+
+              {/* Demographics */}
+              <div className="col-span-2">
+                <label className="block text-sm font-semibold mb-1.5 text-gray-700">التركيبة السكانية (JSON)</label>
+                <textarea rows={3} value={form.demographics} onChange={(e) => setForm({...form, demographics: e.target.value})}
+                  placeholder='{"ذكور": "60%", "إناث": "40%"}'
+                  className="w-full px-4 py-2.5 rounded-xl border border-blue-200 bg-white outline-none text-sm text-gray-900 resize-none" />
+              </div>
+
+              <div className="col-span-2 flex items-center gap-2">
+                <input type="checkbox" checked={form.featured} onChange={(e) => setForm({...form, featured: e.target.checked})}
+                  className="w-4 h-4 accent-blue-500 rounded" />
+                <label className="text-sm font-semibold text-gray-700">تمييز في الصفحة الرئيسية</label>
               </div>
 
               {(uploadError || saveError) && (
@@ -343,12 +420,12 @@ export default function AdminInfluencersPage() {
               <div className="col-span-2 flex gap-3 pt-2">
                 <button onClick={handleSave}
                   className="flex-1 py-2.5 rounded-xl font-bold text-sm transition-all hover:opacity-90"
-                  style={{ background: "#84cc18", color: "#fff" }}>
+                  style={{ background: "#3b82f6", color: "#fff" }}>
                   {editId ? "حفظ التعديلات" : "إضافة المؤثر"}
                 </button>
                 <button onClick={() => setShowForm(false)}
                   className="flex-1 py-2.5 rounded-xl font-bold text-sm border"
-                  style={{ borderColor: "#e5e7eb", color: "#6b7280" }}>
+                  style={{ borderColor: "#dbeafe", color: "#6b7280" }}>
                   إلغاء
                 </button>
               </div>

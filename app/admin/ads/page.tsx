@@ -36,13 +36,14 @@ const emptyProAnalysis: ProAnalysis = {
   rating: 0, metrics: { ctr: "", conversion: "", reach: "" },
 };
 
-type FormAd = Partial<Ad> & { is_pro_only?: boolean; pro_analysis?: ProAnalysis };
+type FormAd = Partial<Ad> & { is_pro_only?: boolean; pro_analysis?: ProAnalysis; featured?: boolean };
 
 const emptyForm: FormAd = {
-  brand: "", brandInitial: "", brandColor: "#84cc18", title: "", description: "",
+  brand: "", brandInitial: "", brandColor: "#3b82f6", title: "", description: "",
   platform: "Meta", sector: "", country: "", season: "", ad_goal: "", funnel_stage: "awareness",
   tags: [], source_url: "", basic_analysis: [], apply_idea: [], recommended_action: "",
   is_pro_only: false, pro_analysis: { ...emptyProAnalysis },
+  featured: false,
 };
 
 /* ─── Star Rating ─── */
@@ -70,15 +71,15 @@ function DynamicList({ items, onChange, placeholder }: { items: string[]; onChan
         <input value={input} onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), add())}
           placeholder={placeholder}
-          className="flex-1 px-3 py-2 rounded-xl border border-[#e5e7eb] bg-white outline-none text-sm text-[#1c1c1e]" />
+          className="flex-1 px-3 py-2 rounded-xl border border-[#dbeafe] bg-white outline-none text-sm text-[#1c1c1e]" />
         <button type="button" onClick={add}
-          className="px-3 py-2 rounded-xl text-xs font-bold border border-[#e5e7eb] text-[#84cc18] hover:border-[#84cc18]/40 transition-all">+</button>
+          className="px-3 py-2 rounded-xl text-xs font-bold border border-[#dbeafe] text-[#3b82f6] hover:border-[#3b82f6]/40 transition-all">+</button>
       </div>
       <div className="flex flex-wrap gap-1.5">
         {items.map((item, i) => (
           <span key={i} className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium"
-            style={{ background: "#f3f5f9", color: "#6b7280" }}>
-            <span className="text-[10px] font-bold" style={{ color: "#84cc18" }}>{i + 1}.</span>
+            style={{ background: "#eff6ff", color: "#6b7280" }}>
+            <span className="text-[10px] font-bold" style={{ color: "#3b82f6" }}>{i + 1}.</span>
             {item}
             <button type="button" onClick={() => onChange(items.filter((_, j) => j !== i))}
               className="text-red-400 hover:text-red-500 ml-1">×</button>
@@ -115,7 +116,7 @@ export default function AdminAdsPage() {
   );
 
   const openAdd = () => { setForm(emptyForm); setEditId(null); setImageFiles([]); setImagePreviews([]); setShowForm(true); };
-  const openEdit = (ad: Ad) => { setForm({ ...ad, is_pro_only: false, pro_analysis: { ...emptyProAnalysis } }); setEditId(ad.id); setImageFiles([]); setImagePreviews(ad.images ?? []); setShowForm(true); };
+  const openEdit = (ad: Ad) => { setForm({ ...ad, is_pro_only: false, pro_analysis: { ...emptyProAnalysis }, featured: (ad as unknown as Record<string, boolean>).featured ?? false }); setEditId(ad.id); setImageFiles([]); setImagePreviews(ad.images ?? []); setShowForm(true); };
   const handleDelete = async (id: string) => {
     const result = await deleteAdminAd(id);
     if ("error" in result) { window.alert("خطأ في الحذف: " + result.error); return; }
@@ -193,7 +194,7 @@ export default function AdminAdsPage() {
       const adData = {
         title: form.title, brand: form.brand,
         brand_initial: form.brandInitial || form.brand?.[0] || "?",
-        brand_color: form.brandColor || "#84cc18",
+        brand_color: form.brandColor || "#3b82f6",
         description: form.description || "", platform: form.platform || "Meta",
         sector: form.sector || "", country: form.country || "",
         season: form.season || "", ad_goal: form.ad_goal || "",
@@ -205,6 +206,7 @@ export default function AdminAdsPage() {
         recommended_action: form.recommended_action || "",
         is_pro_only: form.is_pro_only ?? false,
         pro_analysis: form.pro_analysis ?? emptyProAnalysis,
+        featured: form.featured ?? false,
       };
 
       console.log(`[AdminAds] Saving ad with ${images.length} image(s)...`);
@@ -226,7 +228,7 @@ export default function AdminAdsPage() {
     setUploading(false);
   };
 
-  const inputCls = "w-full px-3 py-2 rounded-xl border border-[#e5e7eb] bg-white outline-none text-sm text-[#1c1c1e] focus:border-[#84cc18]/60 transition-colors";
+  const inputCls = "w-full px-3 py-2 rounded-xl border border-[#dbeafe] bg-white outline-none text-sm text-[#1c1c1e] focus:border-[#3b82f6]/60 transition-colors";
   const labelCls = "block text-xs font-bold mb-1 text-[#6b7280]";
 
   return (
@@ -238,41 +240,41 @@ export default function AdminAdsPage() {
         </div>
         <button onClick={openAdd}
           className="px-4 py-2 rounded-xl text-sm font-bold text-white transition-all hover:opacity-90"
-          style={{ background: "#84cc18" }}>+ إضافة إعلان</button>
+          style={{ background: "#3b82f6" }}>+ إضافة إعلان</button>
       </div>
 
       {/* Search */}
-      <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-[#e5e7eb] mb-5" style={{ background: "#ffffff" }}>
+      <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-[#dbeafe] mb-5" style={{ background: "#ffffff" }}>
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
         <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="ابحث عن إعلان..."
           className="bg-transparent outline-none w-full text-sm text-[#1c1c1e]" dir="rtl" />
       </div>
 
       {/* Table */}
-      <div className="rounded-2xl border overflow-hidden" style={{ background: "#ffffff", borderColor: "#e5e7eb" }}>
+      <div className="rounded-2xl border overflow-hidden" style={{ background: "#ffffff", borderColor: "#dbeafe" }}>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr style={{ background: "#f3f5f9" }}>
+              <tr style={{ background: "#eff6ff" }}>
                 {["العلامة", "العنوان", "القطاع", "المنصة", "البلد", "Pro فقط", "الإجراءات"].map((h) => (
                   <th key={h} className="text-right px-5 py-3 text-xs font-bold uppercase tracking-wider" style={{ color: "#6b7280" }}>{h}</th>
                 ))}
               </tr>
             </thead>
-            <tbody className="divide-y" style={{ borderColor: "#e5e7eb" }}>
+            <tbody className="divide-y" style={{ borderColor: "#dbeafe" }}>
               {filtered.map((ad) => (
-                <tr key={ad.id} className="hover:bg-[#f3f5f9] transition-colors">
-                  <td className="px-5 py-3 font-bold" style={{ color: "#8957f6" }}>{ad.brand}</td>
+                <tr key={ad.id} className="hover:bg-[#eff6ff] transition-colors">
+                  <td className="px-5 py-3 font-bold" style={{ color: "#3b82f6" }}>{ad.brand}</td>
                   <td className="px-5 py-3 max-w-[200px] truncate text-[#1c1c1e]">{ad.title}</td>
                   <td className="px-5 py-3" style={{ color: "#6b7280" }}>{ad.sector}</td>
                   <td className="px-5 py-3" style={{ color: "#6b7280" }}>{ad.platform}</td>
                   <td className="px-5 py-3" style={{ color: "#6b7280" }}>{ad.country}</td>
                   <td className="px-5 py-3">
-                    <span className="text-xs px-2 py-0.5 rounded-full font-bold" style={{ background: "#f3eeff", color: "#8957f6" }}>Pro</span>
+                    <span className="text-xs px-2 py-0.5 rounded-full font-bold" style={{ background: "#f3eeff", color: "#3b82f6" }}>Pro</span>
                   </td>
                   <td className="px-5 py-3">
                     <div className="flex gap-2">
-                      <button onClick={() => openEdit(ad)} className="text-xs px-2.5 py-1 rounded-lg font-medium border border-[#e5e7eb] hover:border-[#8957f6]/40 transition-all" style={{ color: "#6b7280" }}>تعديل</button>
+                      <button onClick={() => openEdit(ad)} className="text-xs px-2.5 py-1 rounded-lg font-medium border border-[#dbeafe] hover:border-[#3b82f6]/40 transition-all" style={{ color: "#6b7280" }}>تعديل</button>
                       <button onClick={() => handleDelete(ad.id)} className="text-xs px-2.5 py-1 rounded-lg font-medium border transition-all" style={{ borderColor: "#fecaca", color: "#ef4444" }}>حذف</button>
                     </div>
                   </td>
@@ -289,11 +291,11 @@ export default function AdminAdsPage() {
           style={{ background: "rgba(0,0,0,0.3)", backdropFilter: "blur(4px)" }}
           onClick={(e) => e.target === e.currentTarget && setShowForm(false)}>
           <div className="w-full max-w-3xl rounded-2xl shadow-2xl overflow-y-auto"
-            style={{ maxHeight: "92vh", background: "#ffffff", border: "1px solid #e5e7eb" }}>
-            <div className="flex items-center justify-between px-6 py-4 border-b border-[#e5e7eb]">
+            style={{ maxHeight: "92vh", background: "#ffffff", border: "1px solid #dbeafe" }}>
+            <div className="flex items-center justify-between px-6 py-4 border-b border-[#dbeafe]">
               <h2 className="font-extrabold text-lg text-[#1c1c1e]">{editId ? "تعديل الإعلان" : "إضافة إعلان جديد"}</h2>
               <button onClick={() => setShowForm(false)}
-                className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-[#f3f5f9]" style={{ color: "#6b7280" }}>
+                className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-[#eff6ff]" style={{ color: "#6b7280" }}>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M18 6 6 18M6 6l12 12"/></svg>
               </button>
             </div>
@@ -343,7 +345,7 @@ export default function AdminAdsPage() {
                       <input type="radio" name="funnel" value={f.value}
                         checked={form.funnel_stage === f.value}
                         onChange={() => setForm((prev) => ({ ...prev, funnel_stage: f.value as Ad["funnel_stage"] }))}
-                        className="accent-[#84cc18]" />
+                        className="accent-[#3b82f6]" />
                       <span className="text-sm text-[#1c1c1e]">{f.label}</span>
                     </label>
                   ))}
@@ -370,14 +372,14 @@ export default function AdminAdsPage() {
               {/* Image upload */}
               <div>
                 <label className={labelCls}>رفع الصور (حتى 5 صور)</label>
-                <div className="border border-dashed border-[#e5e7eb] rounded-xl p-4">
+                <div className="border border-dashed border-[#dbeafe] rounded-xl p-4">
                   <button type="button" onClick={() => fileRef.current?.click()}
-                    className="text-xs px-3 py-1.5 rounded-lg border border-[#e5e7eb] text-[#6b7280] hover:border-[#84cc18]/40 transition-all mb-3">اختر الصور</button>
+                    className="text-xs px-3 py-1.5 rounded-lg border border-[#dbeafe] text-[#6b7280] hover:border-[#3b82f6]/40 transition-all mb-3">اختر الصور</button>
                   <input ref={fileRef} type="file" multiple accept="image/*" className="hidden" onChange={handleImages} />
                   {imagePreviews.length > 0 && (
                     <div className="flex gap-2 flex-wrap mt-2">
                       {imagePreviews.map((src, i) => (
-                        <div key={i} className="relative w-16 h-16 rounded-lg overflow-hidden border border-[#e5e7eb]">
+                        <div key={i} className="relative w-16 h-16 rounded-lg overflow-hidden border border-[#dbeafe]">
                           {src.startsWith("data:") || src.startsWith("http") || src.startsWith("blob:") ? (
                             <img src={src} alt="" className="w-full h-full object-cover" />
                           ) : (
@@ -411,10 +413,10 @@ export default function AdminAdsPage() {
               </div>
 
               {/* ─── PRO ANALYSIS SECTION ─── */}
-              <div className="rounded-xl border border-[#8957f6]/30 p-4 space-y-4" style={{ background: "#f3eeff" }}>
+              <div className="rounded-xl border border-[#3b82f6]/30 p-4 space-y-4" style={{ background: "#f3eeff" }}>
                 <div className="flex items-center gap-2 mb-2">
-                  <span className="text-sm font-black" style={{ color: "#8957f6" }}>🔒 التحليل المتقدم — Pro</span>
-                  <span className="text-[10px] px-1.5 py-0.5 rounded-full font-bold" style={{ background: "#8957f6", color: "#fff" }}>Pro</span>
+                  <span className="text-sm font-black" style={{ color: "#3b82f6" }}>🔒 التحليل المتقدم — Pro</span>
+                  <span className="text-[10px] px-1.5 py-0.5 rounded-full font-bold" style={{ background: "#3b82f6", color: "#fff" }}>Pro</span>
                 </div>
 
                 {/* 1. الخطاف الرئيسي */}
@@ -462,11 +464,11 @@ export default function AdminAdsPage() {
                   <label className={labelCls}>صور التحليل (حتى 3)</label>
                   <div className="flex items-center gap-3">
                     <button type="button" onClick={() => analysisImgRef.current?.click()}
-                      className="text-xs px-3 py-1.5 rounded-lg border border-[#e5e7eb] text-[#8957f6] hover:border-[#8957f6]/40 transition-all">رفع صورة</button>
+                      className="text-xs px-3 py-1.5 rounded-lg border border-[#dbeafe] text-[#3b82f6] hover:border-[#3b82f6]/40 transition-all">رفع صورة</button>
                     <input ref={analysisImgRef} type="file" accept="image/*" multiple className="hidden" onChange={handleAnalysisImages} />
                     <div className="flex gap-2">
                       {pro.analysis_images.map((src, i) => (
-                        <div key={i} className="relative w-12 h-12 rounded-lg overflow-hidden border border-[#e5e7eb]">
+                        <div key={i} className="relative w-12 h-12 rounded-lg overflow-hidden border border-[#dbeafe]">
                           <img src={src} alt="" className="w-full h-full object-cover" />
                           <button type="button" onClick={() => setPro({ analysis_images: pro.analysis_images.filter((_, j) => j !== i) })}
                             className="absolute top-0 right-0 w-4 h-4 rounded-full bg-black/60 flex items-center justify-center text-white text-[10px]">×</button>
@@ -489,11 +491,11 @@ export default function AdminAdsPage() {
                   <label className={labelCls}>ملفات مرفقة (PDF/DOC — حتى 2)</label>
                   <div className="flex items-center gap-3">
                     <button type="button" onClick={() => attachRef.current?.click()}
-                      className="text-xs px-3 py-1.5 rounded-lg border border-[#e5e7eb] text-[#8957f6] hover:border-[#8957f6]/40 transition-all">رفع ملف</button>
+                      className="text-xs px-3 py-1.5 rounded-lg border border-[#dbeafe] text-[#3b82f6] hover:border-[#3b82f6]/40 transition-all">رفع ملف</button>
                     <input ref={attachRef} type="file" accept=".pdf,.doc,.docx" multiple className="hidden" onChange={handleAttachments} />
                     <div className="flex gap-2">
                       {pro.attachments.map((url, i) => (
-                        <span key={i} className="text-xs px-2 py-1 rounded-lg" style={{ background: "#f3f5f9", color: "#6b7280" }}>
+                        <span key={i} className="text-xs px-2 py-1 rounded-lg" style={{ background: "#eff6ff", color: "#6b7280" }}>
                           📄 ملف {i + 1}
                           <button type="button" onClick={() => setPro({ attachments: pro.attachments.filter((_, j) => j !== i) })}
                             className="text-red-400 mr-1">×</button>
@@ -555,9 +557,15 @@ export default function AdminAdsPage() {
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input type="checkbox" checked={!!form.is_pro_only}
                     onChange={(e) => setForm((f) => ({ ...f, is_pro_only: e.target.checked }))}
-                    className="w-4 h-4 rounded accent-[#8957f6]" />
+                    className="w-4 h-4 rounded accent-[#3b82f6]" />
                   <span className="text-sm text-[#1c1c1e]">إعلان Pro فقط</span>
                 </label>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <input type="checkbox" checked={form.featured} onChange={(e) => setForm({...form, featured: e.target.checked})}
+                  className="w-4 h-4 accent-blue-500 rounded" />
+                <label className="text-sm font-semibold text-gray-700">تمييز في الصفحة الرئيسية</label>
               </div>
 
               {saveError && (
@@ -569,11 +577,11 @@ export default function AdminAdsPage() {
               <div className="flex gap-3 pt-2">
                 <button onClick={handleSave} disabled={uploading}
                   className="flex-1 py-2.5 rounded-xl font-bold text-sm text-white transition-all hover:opacity-90 disabled:opacity-60"
-                  style={{ background: "#84cc18" }}>
+                  style={{ background: "#3b82f6" }}>
                   {uploading ? "جارٍ الرفع..." : editId ? "حفظ التعديلات" : "إضافة الإعلان"}
                 </button>
                 <button onClick={() => setShowForm(false)}
-                  className="flex-1 py-2.5 rounded-xl font-bold text-sm border border-[#e5e7eb]" style={{ color: "#6b7280" }}>
+                  className="flex-1 py-2.5 rounded-xl font-bold text-sm border border-[#dbeafe]" style={{ color: "#6b7280" }}>
                   إلغاء
                 </button>
               </div>

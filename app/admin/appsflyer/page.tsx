@@ -78,10 +78,10 @@ export default function AppsFlyerPage() {
   };
 
   const inputClass =
-    "w-full px-4 py-2.5 rounded-lg bg-white border border-[#e5e7eb] text-[#1c1c1e] placeholder-[#9ca3af] focus:outline-none focus:border-[#84cc18] transition-colors";
+    "w-full px-4 py-2.5 rounded-lg bg-white border border-[#dbeafe] text-[#1c1c1e] placeholder-[#9ca3af] focus:outline-none focus:border-[#3b82f6] transition-colors";
 
   return (
-    <div className="min-h-screen bg-[#f3f5f9] p-6 md:p-8" dir="rtl">
+    <div className="min-h-screen bg-[#eff6ff] p-6 md:p-8" dir="rtl">
       {/* Page Header */}
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-[#1c1c1e] mb-2">ربط AppsFlyer</h1>
@@ -92,7 +92,7 @@ export default function AppsFlyerPage() {
 
       <div className="space-y-6 max-w-4xl">
         {/* Section 1 — API Configuration */}
-        <div className="bg-white rounded-xl border border-[#e5e7eb] p-6">
+        <div className="bg-white rounded-xl border border-[#dbeafe] p-6">
           <h2 className="text-lg font-semibold text-[#1c1c1e] mb-6">
             إعدادات API
           </h2>
@@ -163,12 +163,12 @@ export default function AppsFlyerPage() {
               <button
                 onClick={handleSaveCredentials}
                 disabled={savingCreds}
-                className="px-6 py-2.5 bg-[#84cc18] text-white font-medium rounded-lg hover:bg-[#76b814] transition-colors disabled:opacity-60"
+                className="px-6 py-2.5 bg-[#3b82f6] text-white font-medium rounded-lg hover:bg-[#76b814] transition-colors disabled:opacity-60"
               >
                 {savingCreds ? "جاري الحفظ..." : "حفظ بيانات الاعتماد"}
               </button>
               {credsSaved && (
-                <span className="text-sm text-[#84cc18]">
+                <span className="text-sm text-[#3b82f6]">
                   تم الحفظ بنجاح
                 </span>
               )}
@@ -177,7 +177,7 @@ export default function AppsFlyerPage() {
         </div>
 
         {/* Section 2 — Event Mapping */}
-        <div className="bg-white rounded-xl border border-[#e5e7eb] p-6">
+        <div className="bg-white rounded-xl border border-[#dbeafe] p-6">
           <h2 className="text-lg font-semibold text-[#1c1c1e] mb-6">
             ربط الأحداث
           </h2>
@@ -186,7 +186,7 @@ export default function AppsFlyerPage() {
             {events.map((event, index) => (
               <div
                 key={event.key}
-                className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 p-4 rounded-lg bg-[#f3f5f9] border border-[#e5e7eb]"
+                className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 p-4 rounded-lg bg-[#eff6ff] border border-[#dbeafe]"
               >
                 {/* Event label */}
                 <span className="text-[#1c1c1e] text-sm font-medium min-w-[160px] shrink-0">
@@ -198,7 +198,7 @@ export default function AppsFlyerPage() {
                   type="button"
                   onClick={() => toggleEvent(index)}
                   className={`relative w-12 h-6 rounded-full shrink-0 transition-colors ${
-                    event.enabled ? "bg-[#84cc18]" : "bg-[#d1d5db]"
+                    event.enabled ? "bg-[#3b82f6]" : "bg-[#d1d5db]"
                   }`}
                 >
                   <span
@@ -214,7 +214,7 @@ export default function AppsFlyerPage() {
                   value={event.eventName}
                   onChange={(e) => updateEventName(index, e.target.value)}
                   disabled={!event.enabled}
-                  className={`flex-1 px-3 py-2 rounded-lg bg-white border border-[#e5e7eb] text-[#1c1c1e] text-sm placeholder-[#9ca3af] focus:outline-none focus:border-[#84cc18] transition-colors ${
+                  className={`flex-1 px-3 py-2 rounded-lg bg-white border border-[#dbeafe] text-[#1c1c1e] text-sm placeholder-[#9ca3af] focus:outline-none focus:border-[#3b82f6] transition-colors ${
                     !event.enabled ? "opacity-40" : ""
                   }`}
                 />
@@ -224,7 +224,7 @@ export default function AppsFlyerPage() {
         </div>
 
         {/* Section 3 — Connection Status */}
-        <div className="bg-white rounded-xl border border-[#e5e7eb] p-6">
+        <div className="bg-white rounded-xl border border-[#dbeafe] p-6">
           <h2 className="text-lg font-semibold text-[#1c1c1e] mb-6">
             حالة الاتصال
           </h2>
@@ -251,7 +251,7 @@ export default function AppsFlyerPage() {
               <button
                 onClick={handleTestConnection}
                 disabled={testing}
-                className="px-6 py-2.5 bg-[#84cc18] text-white font-medium rounded-lg hover:bg-[#76b814] transition-colors disabled:opacity-60 inline-flex items-center gap-2"
+                className="px-6 py-2.5 bg-[#3b82f6] text-white font-medium rounded-lg hover:bg-[#76b814] transition-colors disabled:opacity-60 inline-flex items-center gap-2"
               >
                 {testing && (
                   <svg
@@ -288,7 +288,7 @@ export default function AppsFlyerPage() {
             </div>
 
             {/* Note */}
-            <div className="mt-4 p-4 rounded-lg bg-[#f3f5f9] border border-[#e5e7eb]">
+            <div className="mt-4 p-4 rounded-lg bg-[#eff6ff] border border-[#dbeafe]">
               <p className="text-sm text-[#6b7280]">
                 هذه صفحة إعداد — يتطلب حساب AppsFlyer فعّال للتفعيل الكامل
               </p>

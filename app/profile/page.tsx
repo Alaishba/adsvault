@@ -43,23 +43,31 @@ export default function ProfilePage() {
 
   // Load user session + profile (critical path — unblocks page)
   useEffect(() => {
+    let mounted = true;
     (async () => {
-      const { data: { user: authUser } } = await supabase.auth.getUser();
-      if (!authUser) { setPageLoading(false); return; }
-      setUserId(authUser.id);
-      setEmail(authUser.email ?? "");
-      const { data: profile } = await supabase
-        .from("users").select("full_name,plan,avatar_url,phone,company,job_title").eq("id", authUser.id).single();
-      if (profile) {
-        setName(profile.full_name ?? "");
-        setPlan(profile.plan ?? "free");
-        setAvatarUrl(profile.avatar_url ?? null);
-        setPhone(profile.phone ?? "");
-        setCompany(profile.company ?? "");
-        setJobTitle(profile.job_title ?? "");
+      try {
+        const { data: { user: authUser } } = await supabase.auth.getUser();
+        if (!mounted) return;
+        if (!authUser) { setPageLoading(false); return; }
+        setUserId(authUser.id);
+        setEmail(authUser.email ?? "");
+        const { data: profile } = await supabase
+          .from("users").select("full_name,plan,avatar_url,phone,company,job_title").eq("id", authUser.id).single();
+        if (!mounted) return;
+        if (profile) {
+          setName(profile.full_name ?? "");
+          setPlan(profile.plan ?? "free");
+          setAvatarUrl(profile.avatar_url ?? null);
+          setPhone(profile.phone ?? "");
+          setCompany(profile.company ?? "");
+          setJobTitle(profile.job_title ?? "");
+        }
+        setPageLoading(false);
+      } catch {
+        if (mounted) setPageLoading(false);
       }
-      setPageLoading(false);
     })();
+    return () => { mounted = false; };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

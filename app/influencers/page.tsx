@@ -47,7 +47,7 @@ function InfluencerModal({ inf, onClose }: { inf: Influencer; onClose: () => voi
     >
       <div
         className="w-full max-w-xl rounded-2xl shadow-2xl overflow-y-auto"
-        style={{ background: "#ced3de", border: "1px solid rgba(206,211,222,0.8)", animation: "modalIn 0.2s cubic-bezier(0.34,1.56,0.64,1)", maxHeight: "90vh", WebkitOverflowScrolling: "touch", touchAction: "pan-y" }}
+        style={{ background: "#ced3de", border: "1px solid rgba(206,211,222,0.8)", animation: "modalIn 0.2s cubic-bezier(0.34,1.56,0.64,1)", maxHeight: "85vh", WebkitOverflowScrolling: "touch", touchAction: "pan-y" }}
       >
         <style>{`@keyframes modalIn{from{opacity:0;transform:scale(0.95) translateY(8px)}to{opacity:1;transform:scale(1) translateY(0)}}`}</style>
 
@@ -56,10 +56,10 @@ function InfluencerModal({ inf, onClose }: { inf: Influencer; onClose: () => voi
           <div className="flex items-center gap-4">
             {(inf as unknown as Record<string, string>).profile_image ? (
               <img src={getImageUrl("influencer-photos", (inf as unknown as Record<string, string>).profile_image)}
-                alt={inf.name} className="w-16 h-16 rounded-2xl object-cover shrink-0"
+                alt={inf.name} className="w-20 h-20 rounded-full object-cover shrink-0"
                 onError={(e) => { e.currentTarget.src = "/fallback.png"; e.currentTarget.style.display = "block"; }} />
             ) : (
-              <div className="w-16 h-16 rounded-2xl flex items-center justify-center text-2xl font-black text-white shrink-0"
+              <div className="w-20 h-20 rounded-full flex items-center justify-center text-2xl font-black text-white shrink-0"
                 style={{ background: inf.color }}>
                 {inf.initial}
               </div>
@@ -110,6 +110,64 @@ function InfluencerModal({ inf, onClose }: { inf: Influencer; onClose: () => voi
               <p className="text-xs font-bold text-slate-900 mb-1">نبذة</p>
               <p className="text-sm text-slate-600 leading-relaxed">{inf.bio}</p>
             </div>
+
+            {/* Niche */}
+            {!!(inf as unknown as Record<string, unknown>).niche && (
+              <div className="bg-blue-50/60 border border-blue-200 rounded-xl p-3">
+                <p className="text-xs font-bold text-slate-900 mb-1">مجال المؤثر</p>
+                <p className="text-sm text-slate-700">{(inf as unknown as Record<string, string>).niche}</p>
+              </div>
+            )}
+
+            {/* Target Audience */}
+            {!!(inf as unknown as Record<string, unknown>).target_audience && (
+              <div className="bg-blue-50/60 border border-blue-200 rounded-xl p-3">
+                <p className="text-xs font-bold text-slate-900 mb-1">الجمهور المستهدف</p>
+                <p className="text-sm text-slate-700">{(inf as unknown as Record<string, string>).target_audience}</p>
+              </div>
+            )}
+
+            {/* Interests */}
+            {((inf as unknown as Record<string, unknown>).interests as string[] | undefined)?.length ? (
+              <div className="bg-blue-50/60 border border-blue-200 rounded-xl p-3">
+                <p className="text-xs font-bold text-slate-900 mb-2">الاهتمامات</p>
+                <div className="flex flex-wrap gap-1.5">
+                  {((inf as unknown as Record<string, string[]>).interests ?? []).map((interest: string) => (
+                    <span key={interest} className="px-3 py-1 rounded-full bg-blue-100 text-blue-800 text-xs">#{interest}</span>
+                  ))}
+                </div>
+              </div>
+            ) : null}
+
+            {/* Historical Performance */}
+            {!!(inf as unknown as Record<string, unknown>).historical_performance && typeof (inf as unknown as Record<string, unknown>).historical_performance === "object" && (
+              <div className="bg-blue-50/60 border border-blue-200 rounded-xl p-3">
+                <p className="text-xs font-bold text-slate-900 mb-2">الأداء التاريخي</p>
+                <div className="space-y-1">
+                  {Object.entries((inf as unknown as Record<string, Record<string, string>>).historical_performance ?? {}).map(([key, val]) => (
+                    <div key={key} className="flex justify-between text-xs">
+                      <span className="text-slate-600">{key}</span>
+                      <span className="text-slate-900 font-semibold">{String(val)}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Demographics */}
+            {!!(inf as unknown as Record<string, unknown>).demographics && typeof (inf as unknown as Record<string, unknown>).demographics === "object" && (
+              <div className="bg-blue-50/60 border border-blue-200 rounded-xl p-3">
+                <p className="text-xs font-bold text-slate-900 mb-2">التركيبة السكانية</p>
+                <div className="space-y-1">
+                  {Object.entries((inf as unknown as Record<string, Record<string, string>>).demographics ?? {}).map(([key, val]) => (
+                    <div key={key} className="flex justify-between text-xs">
+                      <span className="text-slate-600">{key}</span>
+                      <span className="text-slate-900 font-semibold">{String(val)}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* Audience age */}
             <div>
