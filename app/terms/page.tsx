@@ -39,44 +39,44 @@ export default function TermsPage() {
     <AppLayout>
       <div className="px-6 lg:px-10 py-8 max-w-3xl">
         <div className="mb-8">
-          <h1 className="text-2xl font-extrabold" style={{ color: "#1c1c1e" }}>الشروط والأحكام</h1>
-          <p className="text-sm mt-1" style={{ color: "#6b7280" }}>
+          <h1 className="text-2xl font-extrabold" style={{ color: "#ffffff" }}>الشروط والأحكام</h1>
+          <p className="text-sm mt-1" style={{ color: "#94a3b8" }}>
             آخر تحديث: مارس 2025 — يرجى قراءة هذه الشروط بعناية قبل استخدام المنصة
           </p>
         </div>
 
         <div className="space-y-6">
           {defaultSections.map((section, i) => (
-            <div key={i} className="rounded-2xl border overflow-hidden" style={{ background: "#ffffff", borderColor: "#e5e7eb" }}>
-              <div className="px-6 py-4 border-b" style={{ background: "#f3f5f9", borderColor: "#e5e7eb" }}>
-                <h2 className="font-extrabold text-base flex items-center gap-2" style={{ color: "#1c1c1e" }}>
+            <div key={i} className="rounded-2xl border overflow-hidden" style={{ background: "rgba(255,255,255,0.05)", borderColor: "rgba(255,255,255,0.1)" }}>
+              <div className="px-6 py-4 border-b" style={{ background: "rgba(255,255,255,0.03)", borderColor: "rgba(255,255,255,0.1)" }}>
+                <h2 className="font-extrabold text-base flex items-center gap-2" style={{ color: "#ffffff" }}>
                   <span className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-black text-white"
-                    style={{ background: "#8957f6" }}>{i + 1}</span>
+                    style={{ background: "#2563eb" }}>{i + 1}</span>
                   {section.title}
                 </h2>
               </div>
               <div className="px-6 py-5">
-                <p className="text-sm leading-relaxed whitespace-pre-line" style={{ color: "#6b7280" }}>{section.content}</p>
+                <p className="text-sm leading-relaxed whitespace-pre-line" style={{ color: "#94a3b8" }}>{section.content}</p>
               </div>
             </div>
           ))}
         </div>
 
         {/* Customer Support Section */}
-        <div className="mt-8 rounded-2xl border p-6" style={{ background: "#ffffff", borderColor: "#e5e7eb" }}>
-          <h3 className="font-extrabold text-base mb-2" style={{ color: "#1c1c1e" }}>خدمة العملاء</h3>
-          <p className="text-sm mb-4" style={{ color: "#6b7280" }}>
+        <div className="mt-8 rounded-2xl border p-6" style={{ background: "rgba(255,255,255,0.05)", borderColor: "rgba(255,255,255,0.1)" }}>
+          <h3 className="font-extrabold text-base mb-2" style={{ color: "#ffffff" }}>خدمة العملاء</h3>
+          <p className="text-sm mb-4" style={{ color: "#94a3b8" }}>
             هل تحتاج مساعدة؟ فريق الدعم الفني جاهز لمساعدتك في أي استفسار أو مشكلة تواجهها.
           </p>
           <button onClick={() => setShowSupport(true)}
             className="px-5 py-2.5 rounded-xl font-bold text-sm text-white transition-all hover:opacity-90"
-            style={{ background: "#84cc18" }}>
+            style={{ background: "#2563eb" }}>
             تواصل مع الدعم
           </button>
         </div>
 
-        <div className="mt-6 p-4 rounded-xl border text-center" style={{ borderColor: "#e5e7eb" }}>
-          <p className="text-xs" style={{ color: "#9ca3af" }}>AdVault MENA © 2025 — جميع الحقوق محفوظة</p>
+        <div className="mt-6 p-4 rounded-xl border text-center" style={{ borderColor: "rgba(255,255,255,0.1)" }}>
+          <p className="text-xs" style={{ color: "#64748b" }}>AdVault MENA © 2025 — جميع الحقوق محفوظة</p>
         </div>
       </div>
 
@@ -85,36 +85,36 @@ export default function TermsPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4"
           style={{ background: "rgba(0,0,0,0.5)", backdropFilter: "blur(4px)" }}
           onClick={(e) => e.target === e.currentTarget && setShowSupport(false)}>
-          <div className="w-full max-w-md rounded-2xl shadow-2xl p-6" style={{ background: "#ffffff" }}>
+          <div className="w-full max-w-md rounded-2xl shadow-2xl p-6" style={{ background: "rgba(15,23,42,0.95)", backdropFilter: "blur(12px)" }}>
             {supportSuccess ? (
               <div className="text-center py-6">
                 <div className="text-3xl mb-3">✅</div>
-                <h3 className="font-extrabold text-lg mb-1" style={{ color: "#1c1c1e" }}>تم إرسال طلبك</h3>
-                <p className="text-sm mb-4" style={{ color: "#6b7280" }}>سنتواصل معك قريباً</p>
+                <h3 className="font-extrabold text-lg mb-1" style={{ color: "#ffffff" }}>تم إرسال طلبك</h3>
+                <p className="text-sm mb-4" style={{ color: "#94a3b8" }}>سنتواصل معك قريباً</p>
                 <button onClick={() => { setShowSupport(false); setSupportSuccess(false); }}
-                  className="px-5 py-2 rounded-xl text-sm font-bold text-white" style={{ background: "#84cc18" }}>
+                  className="px-5 py-2 rounded-xl text-sm font-bold text-white" style={{ background: "#2563eb" }}>
                   إغلاق
                 </button>
               </div>
             ) : (
               <>
                 <div className="flex items-center justify-between mb-5">
-                  <h3 className="font-extrabold text-lg" style={{ color: "#1c1c1e" }}>تواصل مع الدعم</h3>
-                  <button onClick={() => setShowSupport(false)} style={{ color: "#9ca3af" }}>✕</button>
+                  <h3 className="font-extrabold text-lg" style={{ color: "#ffffff" }}>تواصل مع الدعم</h3>
+                  <button onClick={() => setShowSupport(false)} style={{ color: "#64748b" }}>✕</button>
                 </div>
                 <form onSubmit={handleSupportSubmit} className="space-y-3">
                   <input type="text" required placeholder="الاسم" value={supportForm.name}
                     onChange={(e) => setSupportForm((f) => ({ ...f, name: e.target.value }))}
                     className="w-full px-4 py-2.5 rounded-xl border outline-none text-sm"
-                    style={{ borderColor: "#e5e7eb", color: "#1c1c1e" }} />
+                    style={{ borderColor: "rgba(255,255,255,0.1)", color: "#ffffff" }} />
                   <input type="email" required placeholder="البريد الإلكتروني" value={supportForm.email}
                     onChange={(e) => setSupportForm((f) => ({ ...f, email: e.target.value }))}
                     className="w-full px-4 py-2.5 rounded-xl border outline-none text-sm" dir="ltr"
-                    style={{ borderColor: "#e5e7eb", color: "#1c1c1e" }} />
+                    style={{ borderColor: "rgba(255,255,255,0.1)", color: "#ffffff" }} />
                   <select required value={supportForm.type}
                     onChange={(e) => setSupportForm((f) => ({ ...f, type: e.target.value }))}
                     className="w-full px-4 py-2.5 rounded-xl border outline-none text-sm"
-                    style={{ borderColor: "#e5e7eb", color: "#1c1c1e" }}>
+                    style={{ borderColor: "rgba(255,255,255,0.1)", color: "#ffffff" }}>
                     <option value="">نوع الطلب</option>
                     <option>استفسار عام</option>
                     <option>مشكلة تقنية</option>
@@ -125,10 +125,10 @@ export default function TermsPage() {
                   <textarea required rows={4} placeholder="رسالتك..." value={supportForm.message}
                     onChange={(e) => setSupportForm((f) => ({ ...f, message: e.target.value }))}
                     className="w-full px-4 py-2.5 rounded-xl border outline-none text-sm resize-none"
-                    style={{ borderColor: "#e5e7eb", color: "#1c1c1e" }} />
+                    style={{ borderColor: "rgba(255,255,255,0.1)", color: "#ffffff" }} />
                   <button type="submit" disabled={supportLoading}
                     className="w-full py-3 rounded-xl font-bold text-sm text-white disabled:opacity-60"
-                    style={{ background: "#84cc18" }}>
+                    style={{ background: "#2563eb" }}>
                     {supportLoading ? "جارٍ الإرسال..." : "إرسال"}
                   </button>
                 </form>

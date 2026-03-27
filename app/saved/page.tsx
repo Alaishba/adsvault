@@ -47,26 +47,26 @@ export default function SavedAdsPage() {
     <AppLayout>
       <div className="px-6 lg:px-10 py-8">
         <div className="mb-7">
-          <h1 className="text-2xl font-extrabold" style={{ color: "#1c1c1e" }}>المحفوظات</h1>
-          <p className="text-sm mt-1" style={{ color: "#6b7280" }}>الإعلانات التي قمت بحفظها</p>
+          <h1 className="text-2xl font-extrabold" style={{ color: "#ffffff" }}>المحفوظات</h1>
+          <p className="text-sm mt-1" style={{ color: "#94a3b8" }}>الإعلانات التي قمت بحفظها</p>
         </div>
 
         {loading ? (
-          <div className="text-center py-20" style={{ color: "#6b7280" }}>جارٍ التحميل...</div>
+          <div className="text-center py-20" style={{ color: "#94a3b8" }}>جارٍ التحميل...</div>
         ) : !loggedIn ? (
-          <div className="text-center py-20 rounded-2xl" style={{ background: "#ffffff", border: "1px solid #e5e7eb" }}>
+          <div className="text-center py-20 rounded-2xl" style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)" }}>
             <div className="text-4xl mb-3">🔒</div>
-            <p className="font-bold mb-2" style={{ color: "#1c1c1e" }}>سجّل دخولك لعرض المحفوظات</p>
-            <Link href="/login" className="inline-block px-6 py-2.5 rounded-xl text-sm font-bold text-white" style={{ background: "#84cc18" }}>
+            <p className="font-bold mb-2" style={{ color: "#ffffff" }}>سجّل دخولك لعرض المحفوظات</p>
+            <Link href="/login" className="inline-block px-6 py-2.5 rounded-xl text-sm font-bold text-white" style={{ background: "#2563eb" }}>
               تسجيل الدخول
             </Link>
           </div>
         ) : ads.length === 0 ? (
-          <div className="text-center py-20 rounded-2xl" style={{ background: "#ffffff", border: "1px solid #e5e7eb" }}>
+          <div className="text-center py-20 rounded-2xl" style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)" }}>
             <div className="text-4xl mb-3">📌</div>
-            <p className="font-bold" style={{ color: "#1c1c1e" }}>لم تحفظ أي إعلان بعد</p>
-            <p className="text-sm mt-1 mb-4" style={{ color: "#6b7280" }}>احفظ الإعلانات من المكتبة لتعود إليها لاحقاً</p>
-            <Link href="/library" className="inline-block px-6 py-2.5 rounded-xl text-sm font-bold text-white" style={{ background: "#84cc18" }}>
+            <p className="font-bold" style={{ color: "#ffffff" }}>لم تحفظ أي إعلان بعد</p>
+            <p className="text-sm mt-1 mb-4" style={{ color: "#94a3b8" }}>احفظ الإعلانات من المكتبة لتعود إليها لاحقاً</p>
+            <Link href="/library" className="inline-block px-6 py-2.5 rounded-xl text-sm font-bold text-white" style={{ background: "#2563eb" }}>
               استعرض المكتبة
             </Link>
           </div>

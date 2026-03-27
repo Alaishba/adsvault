@@ -74,7 +74,7 @@ export default function RemovalPage() {
                 <input type="text" required value={form.name}
                   onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
                   placeholder="محمد أحمد"
-                  className="w-full px-4 py-2.5 rounded-xl border border-[--border] outline-none text-sm transition-colors focus:border-[#84cc18]/60"
+                  className="w-full px-4 py-2.5 rounded-xl border border-[--border] outline-none text-sm transition-colors focus:border-blue-500/60"
                   style={{ background: "#ffffff", color: "var(--text-primary)" }} />
               </div>
               <div>
@@ -82,7 +82,7 @@ export default function RemovalPage() {
                 <input type="email" required value={form.email}
                   onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
                   placeholder="you@example.com"
-                  className="w-full px-4 py-2.5 rounded-xl border border-[--border] outline-none text-sm transition-colors focus:border-[#84cc18]/60"
+                  className="w-full px-4 py-2.5 rounded-xl border border-[--border] outline-none text-sm transition-colors focus:border-blue-500/60"
                   style={{ background: "#ffffff", color: "var(--text-primary)" }} dir="ltr" />
               </div>
             </div>
@@ -92,7 +92,7 @@ export default function RemovalPage() {
               <input type="url" required value={form.url}
                 onChange={(e) => setForm((f) => ({ ...f, url: e.target.value }))}
                 placeholder="https://advaultmena.com/..."
-                className="w-full px-4 py-2.5 rounded-xl border border-[--border] outline-none text-sm transition-colors focus:border-[#84cc18]/60"
+                className="w-full px-4 py-2.5 rounded-xl border border-[--border] outline-none text-sm transition-colors focus:border-blue-500/60"
                 style={{ background: "#ffffff", color: "var(--text-primary)" }} dir="ltr" />
             </div>
 
@@ -117,7 +117,7 @@ export default function RemovalPage() {
               <textarea required rows={5} value={form.details}
                 onChange={(e) => setForm((f) => ({ ...f, details: e.target.value }))}
                 placeholder="اشرح سبب طلب الإزالة بالتفصيل وأي معلومات إضافية تساعدنا في مراجعة طلبك..."
-                className="w-full px-4 py-2.5 rounded-xl border border-[--border] outline-none text-sm resize-none transition-colors focus:border-[#84cc18]/60"
+                className="w-full px-4 py-2.5 rounded-xl border border-[--border] outline-none text-sm resize-none transition-colors focus:border-blue-500/60"
                 style={{ background: "#ffffff", color: "var(--text-primary)" }} />
             </div>
 
@@ -129,7 +129,7 @@ export default function RemovalPage() {
 
             <button type="submit" disabled={loading}
               className="w-full py-3 rounded-xl font-bold text-sm text-white transition-all hover:opacity-90 disabled:opacity-60"
-              style={{ background: "#84cc18" }}>
+              style={{ background: "#2563eb" }}>
               {loading ? "جارٍ الإرسال..." : "إرسال طلب الإزالة"}
             </button>
           </form>
