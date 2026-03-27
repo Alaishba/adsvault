@@ -45,58 +45,58 @@ export default function RegisterPage() {
 
   if (success) {
     return (
-      <div className="min-h-screen flex items-center justify-center px-4" style={{ background: "#edf1f5" }}>
+      <div className="min-h-screen flex items-center justify-center px-4" style={{ background: "transparent" }}>
         <div className="text-center max-w-sm">
           <div className="text-4xl mb-4">✅</div>
-          <h2 className="text-xl font-extrabold mb-2" style={{ color: "#1c1c1e" }}>تم إنشاء الحساب!</h2>
-          <p className="text-sm mb-4" style={{ color: "#6b7280" }}>تحقق من بريدك الإلكتروني لتفعيل الحساب.</p>
+          <h2 className="text-xl font-extrabold mb-2" style={{ color: "#ffffff" }}>تم إنشاء الحساب!</h2>
+          <p className="text-sm mb-4" style={{ color: "#94a3b8" }}>تحقق من بريدك الإلكتروني لتفعيل الحساب.</p>
           <button onClick={() => { router.push("/login"); router.refresh(); }}
             className="px-6 py-2.5 rounded-xl font-bold text-sm text-white"
-            style={{ background: "#84cc18" }}>تسجيل الدخول</button>
+            style={{ background: "#2563eb" }}>تسجيل الدخول</button>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 py-8" style={{ background: "#edf1f5" }}>
+    <div className="min-h-screen flex items-center justify-center px-4 py-8" style={{ background: "transparent" }}>
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-lg font-black text-white mx-auto mb-3"
-            style={{ background: "#84cc18" }}>AV</div>
-          <h1 className="text-2xl font-extrabold" style={{ color: "#1c1c1e" }}>إنشاء حساب جديد</h1>
-          <p className="text-sm mt-1" style={{ color: "#6b7280" }}>انضم لـ +500 فريق تسويقي في المنطقة</p>
+            style={{ background: "#2563eb" }}>AV</div>
+          <h1 className="text-2xl font-extrabold" style={{ color: "#ffffff" }}>إنشاء حساب جديد</h1>
+          <p className="text-sm mt-1" style={{ color: "#94a3b8" }}>انضم لـ +500 فريق تسويقي في المنطقة</p>
         </div>
 
-        <div className="rounded-2xl border p-6" style={{ background: "#ffffff", borderColor: "#e5e7eb" }}>
+        <div className="rounded-2xl border p-6" style={{ background: "rgba(255,255,255,0.05)", borderColor: "rgba(255,255,255,0.1)" }}>
           <form onSubmit={handleRegister} className="space-y-4">
             <div>
-              <label className="block text-sm font-semibold mb-1.5" style={{ color: "#1c1c1e" }}>الاسم الكامل</label>
+              <label className="block text-sm font-semibold mb-1.5" style={{ color: "#ffffff" }}>الاسم الكامل</label>
               <input type="text" required value={fullName} onChange={(e) => setFullName(e.target.value)}
                 placeholder="أحمد محمد"
                 className="w-full px-4 py-2.5 rounded-xl border outline-none text-sm"
-                style={{ background: "#ffffff", borderColor: "#e5e7eb", color: "#1c1c1e" }} />
+                style={{ background: "rgba(255,255,255,0.05)", borderColor: "rgba(255,255,255,0.1)", color: "#ffffff" }} />
             </div>
             <div>
-              <label className="block text-sm font-semibold mb-1.5" style={{ color: "#1c1c1e" }}>البريد الإلكتروني</label>
+              <label className="block text-sm font-semibold mb-1.5" style={{ color: "#ffffff" }}>البريد الإلكتروني</label>
               <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@example.com"
                 className="w-full px-4 py-2.5 rounded-xl border outline-none text-sm"
-                style={{ background: "#ffffff", borderColor: "#e5e7eb", color: "#1c1c1e" }} dir="ltr" />
+                style={{ background: "rgba(255,255,255,0.05)", borderColor: "rgba(255,255,255,0.1)", color: "#ffffff" }} dir="ltr" />
             </div>
             <div>
-              <label className="block text-sm font-semibold mb-1.5" style={{ color: "#1c1c1e" }}>كلمة المرور</label>
+              <label className="block text-sm font-semibold mb-1.5" style={{ color: "#ffffff" }}>كلمة المرور</label>
               <input type="password" required value={password} onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
                 className="w-full px-4 py-2.5 rounded-xl border outline-none text-sm"
-                style={{ background: "#ffffff", borderColor: "#e5e7eb", color: "#1c1c1e" }} dir="ltr" />
+                style={{ background: "rgba(255,255,255,0.05)", borderColor: "rgba(255,255,255,0.1)", color: "#ffffff" }} dir="ltr" />
             </div>
             <div>
-              <label className="block text-sm font-semibold mb-1.5" style={{ color: "#1c1c1e" }}>تأكيد كلمة المرور</label>
+              <label className="block text-sm font-semibold mb-1.5" style={{ color: "#ffffff" }}>تأكيد كلمة المرور</label>
               <input type="password" required value={confirm} onChange={(e) => setConfirm(e.target.value)}
                 placeholder="••••••••"
                 className="w-full px-4 py-2.5 rounded-xl border outline-none text-sm"
-                style={{ background: "#ffffff", borderColor: "#e5e7eb", color: "#1c1c1e" }} dir="ltr" />
+                style={{ background: "rgba(255,255,255,0.05)", borderColor: "rgba(255,255,255,0.1)", color: "#ffffff" }} dir="ltr" />
             </div>
 
             {error && (
@@ -105,14 +105,14 @@ export default function RegisterPage() {
 
             <button type="submit" disabled={loading}
               className="w-full py-3 rounded-xl font-bold text-sm text-white transition-all hover:opacity-90 disabled:opacity-60"
-              style={{ background: "#84cc18" }}>
+              style={{ background: "#2563eb" }}>
               {loading ? "جارٍ الإنشاء..." : "إنشاء حساب"}
             </button>
           </form>
 
-          <p className="text-center text-sm mt-5" style={{ color: "#6b7280" }}>
+          <p className="text-center text-sm mt-5" style={{ color: "#94a3b8" }}>
             لديك حساب؟{" "}
-            <Link href="/login" className="font-bold hover:underline" style={{ color: "#84cc18" }}>سجّل دخولك</Link>
+            <Link href="/login" className="font-bold hover:underline" style={{ color: "#2563eb" }}>سجّل دخولك</Link>
           </p>
         </div>
       </div>
