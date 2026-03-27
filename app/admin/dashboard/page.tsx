@@ -8,19 +8,19 @@ type User = { id: string; email: string; full_name: string; plan: string; create
 
 
 const planStyle: Record<string, { bg: string; color: string }> = {
-  pro:        { bg: "#f3eeff", color: "#8957f6" },
+  pro:        { bg: "#dbeafe", color: "#3b82f6" },
   enterprise: { bg: "#eff6ff", color: "#2563eb" },
   free:       { bg: "#f3f5f9", color: "#6b7280" },
   admin:      { bg: "#fef2f2", color: "#ef4444" },
 };
 
 const kpiIcons = [
-  <svg key="0" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#84cc18" strokeWidth="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>,
-  <svg key="1" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8957f6" strokeWidth="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>,
-  <svg key="2" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#84cc18" strokeWidth="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>,
-  <svg key="3" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#84cc18" strokeWidth="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>,
-  <svg key="4" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8957f6" strokeWidth="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>,
-  <svg key="5" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#84cc18" strokeWidth="2"><circle cx="12" cy="8" r="4"/><path d="M20 21a8 8 0 1 0-16 0"/></svg>,
+  <svg key="0" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" strokeWidth="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>,
+  <svg key="1" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" strokeWidth="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>,
+  <svg key="2" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" strokeWidth="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>,
+  <svg key="3" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" strokeWidth="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>,
+  <svg key="4" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" strokeWidth="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>,
+  <svg key="5" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" strokeWidth="2"><circle cx="12" cy="8" r="4"/><path d="M20 21a8 8 0 1 0-16 0"/></svg>,
 ];
 
 const kpiLabels = [
@@ -101,16 +101,16 @@ export default function AdminDashboardPage() {
       {/* Row 1: KPIs */}
       <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3 mb-6">
         {kpiLabels.map((k, i) => (
-          <div key={i} className="rounded-2xl border p-4" style={{ background: "#ffffff", borderColor: "#e5e7eb" }}>
+          <div key={i} className="rounded-2xl border p-4" style={{ background: "#eff6ff", borderColor: "#dbeafe" }}>
             <div className="flex items-center justify-between mb-2">
-              <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: "#f7fee7" }}>{kpiIcons[i]}</div>
+              <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: "#dbeafe" }}>{kpiIcons[i]}</div>
               {kpisLoaded && (
                 <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full"
-                  style={{ background: k.up ? "#f7fee7" : "#fef2f2", color: k.up ? "#84cc18" : "#ef4444" }}>{k.change}</span>
+                  style={{ background: k.up ? "#dbeafe" : "#fef2f2", color: k.up ? "#3b82f6" : "#ef4444" }}>{k.change}</span>
               )}
             </div>
             {!kpisLoaded ? (
-              <div className="h-7 w-16 rounded-lg animate-pulse mb-0.5" style={{ background: "#e5e7eb" }} />
+              <div className="h-7 w-16 rounded-lg animate-pulse mb-0.5" style={{ background: "#dbeafe" }} />
             ) : (
               <p className="text-xl font-extrabold text-[#1c1c1e] mb-0.5">{kpiValues[i] ?? "—"}</p>
             )}
@@ -122,13 +122,13 @@ export default function AdminDashboardPage() {
       {/* Row 2: Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
         {/* User growth */}
-        <div className="rounded-2xl border p-5" style={{ background: "#ffffff", borderColor: "#e5e7eb" }}>
+        <div className="rounded-2xl border p-5" style={{ background: "#eff6ff", borderColor: "#dbeafe" }}>
           <h3 className="font-bold text-sm text-[#1c1c1e] mb-4">نمو المستخدمين (آخر 30 يوم)</h3>
           <div className="flex items-end gap-[2px] h-24">
             {growthData.map((v, i) => (
               <div key={i} className="flex-1 rounded-t-sm transition-all" style={{
                 height: `${(v / 1300) * 100}%`,
-                background: i === growthData.length - 1 ? "#84cc18" : "#e5e7eb",
+                background: i === growthData.length - 1 ? "#3b82f6" : "#dbeafe",
               }} />
             ))}
           </div>
@@ -136,16 +136,16 @@ export default function AdminDashboardPage() {
         </div>
 
         {/* Revenue */}
-        <div className="rounded-2xl border p-5" style={{ background: "#ffffff", borderColor: "#e5e7eb" }}>
+        <div className="rounded-2xl border p-5" style={{ background: "#eff6ff", borderColor: "#dbeafe" }}>
           <h3 className="font-bold text-sm text-[#1c1c1e] mb-4">الإيراد الشهري (آخر 6 أشهر)</h3>
           <div className="space-y-2">
             {revenueData.map((d, i) => (
               <div key={i} className="flex items-center gap-3">
                 <span className="text-[10px] w-12 text-left" style={{ color: "#6b7280" }}>{d.month}</span>
-                <div className="flex-1 h-4 rounded-full overflow-hidden" style={{ background: "#e5e7eb" }}>
+                <div className="flex-1 h-4 rounded-full overflow-hidden" style={{ background: "#dbeafe" }}>
                   <div className="h-full rounded-full transition-all" style={{
                     width: `${(d.value / maxRevenue) * 100}%`,
-                    background: i === revenueData.length - 1 ? "#84cc18" : "#8957f6",
+                    background: i === revenueData.length - 1 ? "#3b82f6" : "#3b82f6",
                   }} />
                 </div>
                 <span className="text-[10px] text-[#1c1c1e] font-bold w-14 text-left">{d.value.toLocaleString()}</span>
@@ -155,13 +155,13 @@ export default function AdminDashboardPage() {
         </div>
 
         {/* Platform distribution */}
-        <div className="rounded-2xl border p-5" style={{ background: "#ffffff", borderColor: "#e5e7eb" }}>
+        <div className="rounded-2xl border p-5" style={{ background: "#eff6ff", borderColor: "#dbeafe" }}>
           <h3 className="font-bold text-sm text-[#1c1c1e] mb-4">توزيع المنصات</h3>
           <div className="space-y-3">
             {platformData.map((p) => (
               <div key={p.name} className="flex items-center gap-3">
                 <span className="text-xs w-16" style={{ color: "#6b7280" }}>{p.name}</span>
-                <div className="flex-1 h-3 rounded-full overflow-hidden" style={{ background: "#e5e7eb" }}>
+                <div className="flex-1 h-3 rounded-full overflow-hidden" style={{ background: "#dbeafe" }}>
                   <div className="h-full rounded-full" style={{ width: `${p.pct}%`, background: p.color }} />
                 </div>
                 <span className="text-xs font-bold text-[#1c1c1e] w-8 text-left">{p.pct}%</span>
@@ -175,10 +175,10 @@ export default function AdminDashboardPage() {
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-6">
         {quickActions.map((a) => (
           <Link key={a.href} href={a.href}
-            className="rounded-xl border p-3 text-center transition-all hover:border-[#8957f6]/40 group"
-            style={{ background: "#ffffff", borderColor: "#e5e7eb" }}>
+            className="rounded-xl border p-3 text-center transition-all hover:border-[#3b82f6]/40 group"
+            style={{ background: "#eff6ff", borderColor: "#dbeafe" }}>
             <span className="text-lg">{a.icon}</span>
-            <p className="text-[11px] font-semibold text-[#1c1c1e] mt-1 group-hover:text-[#84cc18] transition-colors">{a.label}</p>
+            <p className="text-[11px] font-semibold text-[#1c1c1e] mt-1 group-hover:text-[#3b82f6] transition-colors">{a.label}</p>
           </Link>
         ))}
       </div>
@@ -186,12 +186,12 @@ export default function AdminDashboardPage() {
       {/* Row 4: Recent Activity */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         {/* Recent Users */}
-        <div className="rounded-2xl border overflow-hidden" style={{ background: "#ffffff", borderColor: "#e5e7eb" }}>
-          <div className="px-5 py-3 border-b flex items-center justify-between" style={{ borderColor: "#e5e7eb" }}>
+        <div className="rounded-2xl border overflow-hidden" style={{ background: "#eff6ff", borderColor: "#dbeafe" }}>
+          <div className="px-5 py-3 border-b flex items-center justify-between" style={{ borderColor: "#dbeafe" }}>
             <h3 className="font-bold text-sm text-[#1c1c1e]">أحدث المستخدمين</h3>
-            <Link href="/admin/users" className="text-[10px] font-bold" style={{ color: "#84cc18" }}>عرض الكل</Link>
+            <Link href="/admin/users" className="text-[10px] font-bold" style={{ color: "#3b82f6" }}>عرض الكل</Link>
           </div>
-          <div className="divide-y" style={{ borderColor: "#e5e7eb" }}>
+          <div className="divide-y" style={{ borderColor: "#dbeafe" }}>
             {users.slice(0, 10).map((u) => {
               const ps = planStyle[u.plan] ?? planStyle.free;
               return (
@@ -208,17 +208,17 @@ export default function AdminDashboardPage() {
         </div>
 
         {/* Recent Ads */}
-        <div className="rounded-2xl border overflow-hidden" style={{ background: "#ffffff", borderColor: "#e5e7eb" }}>
-          <div className="px-5 py-3 border-b flex items-center justify-between" style={{ borderColor: "#e5e7eb" }}>
+        <div className="rounded-2xl border overflow-hidden" style={{ background: "#eff6ff", borderColor: "#dbeafe" }}>
+          <div className="px-5 py-3 border-b flex items-center justify-between" style={{ borderColor: "#dbeafe" }}>
             <h3 className="font-bold text-sm text-[#1c1c1e]">آخر الإعلانات</h3>
-            <Link href="/admin/ads" className="text-[10px] font-bold" style={{ color: "#84cc18" }}>عرض الكل</Link>
+            <Link href="/admin/ads" className="text-[10px] font-bold" style={{ color: "#3b82f6" }}>عرض الكل</Link>
           </div>
-          <div className="divide-y" style={{ borderColor: "#e5e7eb" }}>
+          <div className="divide-y" style={{ borderColor: "#dbeafe" }}>
             {recentAds.map((ad, i) => (
               <div key={i} className="px-5 py-2.5 flex items-center justify-between">
                 <div>
                   <p className="text-xs font-semibold text-[#1c1c1e]">{ad.title}</p>
-                  <p className="text-[10px]" style={{ color: "#8957f6" }}>{ad.brand}</p>
+                  <p className="text-[10px]" style={{ color: "#3b82f6" }}>{ad.brand}</p>
                 </div>
                 <span className="text-[10px]" style={{ color: "#6b7280" }}>{ad.date}</span>
               </div>
@@ -227,11 +227,11 @@ export default function AdminDashboardPage() {
         </div>
 
         {/* Contact Requests */}
-        <div className="rounded-2xl border overflow-hidden" style={{ background: "#ffffff", borderColor: "#e5e7eb" }}>
-          <div className="px-5 py-3 border-b" style={{ borderColor: "#e5e7eb" }}>
+        <div className="rounded-2xl border overflow-hidden" style={{ background: "#eff6ff", borderColor: "#dbeafe" }}>
+          <div className="px-5 py-3 border-b" style={{ borderColor: "#dbeafe" }}>
             <h3 className="font-bold text-sm text-[#1c1c1e]">طلبات التواصل</h3>
           </div>
-          <div className="divide-y" style={{ borderColor: "#e5e7eb" }}>
+          <div className="divide-y" style={{ borderColor: "#dbeafe" }}>
             {contactReqs.map((r, i) => (
               <div key={i} className="px-5 py-2.5">
                 <div className="flex items-center justify-between mb-0.5">
