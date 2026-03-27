@@ -4,28 +4,27 @@
 
 @import url("https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&display=swap");
 
-/* ─── Fixed Hybrid Theme (no dark mode) ─── */
+/* ─── Fixed Dark Theme ─── */
 :root {
-  --bg: #edf1f5;
-  --card: #ffffff;
-  --card-secondary: #f3f5f9;
-  --surface: #f3f5f9;
-  --border: #e5e7eb;
-  --text-primary: #1c1c1e;
-  --text-secondary: #6b7280;
-  --primary: #84cc18;
-  --primary-hover: #6aad0e;
-  --primary-light: #f7fee7;
-  --primary-text: #3f6212;
-  --accent: #8957f6;
-  --accent-hover: #7040e0;
-  --accent-light: #f3eeff;
-  --accent-text: #6d28d9;
+  --bg: transparent;
+  --card: rgba(255,255,255,0.05);
+  --card-secondary: rgba(255,255,255,0.03);
+  --surface: rgba(255,255,255,0.05);
+  --border: rgba(255,255,255,0.1);
+  --text-primary: #ffffff;
+  --text-secondary: #94a3b8;
+  --primary: #2563eb;
+  --primary-hover: #1d4ed8;
+  --primary-light: rgba(37,99,235,0.15);
+  --primary-text: #60a5fa;
+  --accent: #334155;
+  --accent-hover: #475569;
+  --accent-light: rgba(51,65,85,0.3);
+  --accent-text: #cbd5e1;
   --text: var(--text-primary);
   --text-muted: var(--text-secondary);
-  --sidebar: rgba(220,225,235,0.6);
-  --navbar: rgba(137,87,246,0.07);
-  --surface2: #f3f5f9;
+  --navbar: rgba(255,255,255,0.1);
+  --surface2: rgba(255,255,255,0.05);
 }
 
 *, *::before, *::after { box-sizing: border-box; }
@@ -33,7 +32,8 @@
 html { direction: rtl; overflow-x: hidden; }
 
 body {
-  background-color: var(--bg);
+  background: linear-gradient(to bottom right, #0a0a2e, #0d1b4b, #0a2a6e);
+  background-attachment: fixed;
   color: var(--text-primary);
   font-family: "Tajawal", system-ui, sans-serif;
   min-height: 100vh;
@@ -45,7 +45,7 @@ img, video { max-width: 100%; height: auto; }
 /* ─── Scrollbar ─── */
 ::-webkit-scrollbar { width: 5px; height: 5px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #d1d1d6; border-radius: 99px; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 99px; }
 
 /* ─── Animations ─── */
 @keyframes float {
@@ -83,33 +83,35 @@ img, video { max-width: 100%; height: auto; }
   -webkit-backdrop-filter: blur(12px);
 }
 .glass-card {
-  background: rgba(255, 255, 255, 0.7);
+  background: rgba(206, 211, 222, 0.3);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(209, 209, 214, 0.5);
+  border: 1px solid rgba(206, 211, 222, 0.5);
 }
 .glass-purple {
-  background: rgba(137, 87, 246, 0.15);
+  background: rgba(206, 211, 222, 0.25);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(137, 87, 246, 0.25);
+  border: 1px solid rgba(206, 211, 222, 0.4);
 }
 
 /* ─── Utilities ─── */
 @layer utilities {
   .card-base {
-    @apply bg-white rounded-xl border border-[#e5e7eb] transition-all duration-200;
+    @apply rounded-xl transition-all duration-200;
+    background: #ced3de;
+    border: 1px solid #ced3de;
   }
   .card-hover {
-    @apply hover:shadow-md hover:border-[#84cc18]/30 hover:scale-[1.02];
+    @apply hover:shadow-md hover:scale-[1.02];
   }
   .btn-primary {
     @apply px-4 py-2 rounded-xl text-sm font-bold text-white transition-all hover:opacity-90;
-    background: #84cc18;
+    background: #2563eb;
   }
   .btn-accent {
     @apply px-4 py-2 rounded-xl text-sm font-bold text-white transition-all hover:opacity-90;
-    background: #8957f6;
+    background: #334155;
   }
   .btn-secondary {
     @apply px-4 py-2 rounded-xl text-sm font-semibold border transition-all;

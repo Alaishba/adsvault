@@ -30,7 +30,7 @@ function BookmarkButton({ adId }: { adId: string }) {
       onClick={toggle}
       className="absolute top-3 right-3 w-7 h-7 rounded-lg flex items-center justify-center transition-all hover:scale-110"
       style={{
-        background: saved ? "#84cc18" : "rgba(0,0,0,0.35)",
+        background: saved ? "#2563eb" : "rgba(0,0,0,0.35)",
         backdropFilter: "blur(4px)",
       }}
       title={saved ? "إزالة من المحفوظات" : "حفظ"}
@@ -58,14 +58,14 @@ export default function AdCard({ ad, onClick }: { ad: Ad; onClick: (ad: Ad) => v
       {/* Thumbnail */}
       <div
         className="w-full h-36 flex items-center justify-center relative overflow-hidden"
-        style={{ background: `${ad.brandColor ?? "#84cc18"}18` }}
+        style={{ background: `${ad.brandColor ?? "#2563eb"}18` }}
       >
         {(ad.images ?? []).length > 0 ? (
           <img src={getImageUrl("ads-images", (ad.images ?? [])[0])} alt={ad.title}
             className="w-full h-full object-cover" onError={(e) => { e.currentTarget.src = "/fallback.png"; e.currentTarget.style.display = "block"; }} />
         ) : (
           <div className="w-12 h-12 rounded-xl flex items-center justify-center text-lg font-black text-white"
-            style={{ background: ad.brandColor ?? "#84cc18" }}>
+            style={{ background: ad.brandColor ?? "#2563eb" }}>
             {ad.brandInitial ?? (ad.brand ?? "?")[0]}
           </div>
         )}
@@ -77,10 +77,10 @@ export default function AdCard({ ad, onClick }: { ad: Ad; onClick: (ad: Ad) => v
 
       {/* Content */}
       <div className="p-4 overflow-hidden">
-        <p className="text-xs font-extrabold mb-1 truncate" style={{ color: "#8957f6" }}>
+        <p className="text-xs font-extrabold mb-1 truncate text-slate-300">
           {ad.brand}
         </p>
-        <h3 className="text-sm font-bold leading-snug mb-2 line-clamp-2 group-hover:text-[#8957f6] transition-colors"
+        <h3 className="text-sm font-bold leading-snug mb-2 line-clamp-2 group-hover:text-blue-400 transition-colors"
           style={{ color: "var(--text-primary)" }}>
           {ad.title}
         </h3>

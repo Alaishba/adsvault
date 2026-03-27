@@ -20,8 +20,8 @@ export default function Loading() {
         style={{
           width: "48px",
           height: "48px",
-          border: "4px solid #8957f633",
-          borderTopColor: "#8957f6",
+          border: "4px solid rgba(37,99,235,0.2)",
+          borderTopColor: "#2563eb",
           borderRadius: "50%",
           animation: "advault-spin 0.8s linear infinite",
         }}

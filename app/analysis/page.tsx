@@ -3,7 +3,7 @@
 import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 import AppLayout from "../components/AppLayout";
-import FilterBar from "../components/FilterBar";
+import ChipFilter from "../components/ChipFilter";
 import { createClient } from "../lib/supabase/client";
 import { type Strategy } from "../lib/mockData";
 import { fetchStrategies } from "../lib/db";
@@ -17,7 +17,7 @@ const filterConfigs = [
 function ProBlurOverlay() {
   return (
     <div className="absolute inset-0 flex flex-col items-center justify-center rounded-xl z-10"
-      style={{ background: "linear-gradient(to top, rgba(137,87,246,0.95), rgba(137,87,246,0.5))" }}>
+      style={{ background: "linear-gradient(to top, rgba(15,23,42,0.95), rgba(15,23,42,0.7))" }}>
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" className="mb-1">
         <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
         <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
@@ -38,7 +38,7 @@ function StrategyModal({ s, onClose, isPro }: { s: Strategy; onClose: () => void
       style={{ background: "rgba(0,0,0,0.6)", backdropFilter: "blur(4px)" }}
       onClick={(e) => e.target === e.currentTarget && onClose()}>
       <div className="w-full max-w-xl rounded-2xl shadow-2xl overflow-hidden"
-        style={{ background: "var(--card)", animation: "modalIn 0.2s cubic-bezier(0.34,1.56,0.64,1)" }}>
+        style={{ background: "#ced3de", animation: "modalIn 0.2s cubic-bezier(0.34,1.56,0.64,1)" }}>
         <style>{`@keyframes modalIn{from{opacity:0;transform:scale(0.95) translateY(8px)}to{opacity:1;transform:scale(1) translateY(0)}}`}</style>
         <div className="w-full h-40 flex items-center justify-center relative overflow-hidden" style={{ background: "#0f0f0f" }}>
           {s.thumbnail && !s.thumbnail.startsWith("#") ? (
@@ -54,7 +54,7 @@ function StrategyModal({ s, onClose, isPro }: { s: Strategy; onClose: () => void
         <div className="p-6">
           <div className="flex items-start justify-between mb-4">
             <div>
-              <p className="text-xs font-bold mb-1" style={{ color: "#8957f6" }}>{s.brand}</p>
+              <p className="text-xs font-bold mb-1" style={{ color: "#94a3b8" }}>{s.brand}</p>
               <h2 className="text-xl font-extrabold" style={{ color: "var(--text-primary)" }}>{s.title}</h2>
             </div>
             <button onClick={onClose} className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-[--surface2]"
@@ -84,7 +84,7 @@ function StrategyModal({ s, onClose, isPro }: { s: Strategy; onClose: () => void
                 style={{ background: "var(--accent-light)", color: "var(--accent-text)" }}>#{tag}</span>
             ))}
           </div>
-          <button className="w-full py-3 rounded-xl font-bold text-sm text-white" style={{ background: "#84cc18" }}>
+          <button className="w-full py-3 rounded-xl font-bold text-sm text-white" style={{ background: "#2563eb" }}>
             تطبيق هذه الاستراتيجية
           </button>
         </div>
@@ -131,7 +131,7 @@ export default function AnalysisPage() {
 
   return (
     <AppLayout>
-      <FilterBar
+      <ChipFilter
         filters={filterConfigs}
         activeFilters={activeFilters}
         onFilterChange={handleFilterChange}
@@ -148,9 +148,9 @@ export default function AnalysisPage() {
             const isLocked = !isPro && s.is_pro_only;
             return (
               <div key={s.id} onClick={() => setSelected(s)}
-                className="card-base card-hover cursor-pointer group p-0 overflow-hidden relative">
+                className="rounded-xl cursor-pointer group p-0 overflow-hidden relative bg-[#ced3de] border border-[#ced3de] transition-all duration-200 hover:shadow-md hover:scale-[1.02]">
                 {/* Cover image area */}
-                <div className="relative w-full overflow-hidden" style={{ aspectRatio: "16/9", background: "#0f0f0f" }}>
+                <div className="relative w-full h-48 overflow-hidden" style={{ background: "#0f0f0f" }}>
                   {s.thumbnail && !s.thumbnail.startsWith("#") ? (
                     <img src={getImageUrl("strategy-covers", s.thumbnail)} alt={s.title}
                       className="absolute inset-0 w-full h-full object-cover"
@@ -174,12 +174,12 @@ export default function AnalysisPage() {
                   </div>
                   {/* Pro locked overlay */}
                   {isLocked && (
-                    <div className="absolute inset-0 flex items-center justify-center" style={{ background: "rgba(137,87,246,0.6)", backdropFilter: "blur(2px)" }}>
+                    <div className="absolute inset-0 flex items-center justify-center" style={{ background: "rgba(15,23,42,0.7)", backdropFilter: "blur(2px)" }}>
                       <div className="flex items-center gap-1.5">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
                           <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
                         </svg>
-                        <span className="text-xs font-bold text-white px-2 py-0.5 rounded-full" style={{ background: "#8957f6" }}>Pro</span>
+                        <span className="text-xs font-bold text-white px-2 py-0.5 rounded-full" style={{ background: "#94a3b8" }}>Pro</span>
                       </div>
                     </div>
                   )}
@@ -187,12 +187,11 @@ export default function AnalysisPage() {
 
                 {/* Content */}
                 <div className="p-4">
-                  <h3 className="font-extrabold text-sm leading-snug mb-2 line-clamp-2 group-hover:text-[#84cc18] transition-colors"
-                    style={{ color: "var(--text-primary)" }}>{s.title}</h3>
+                  <h3 className="font-extrabold text-sm leading-snug mb-2 line-clamp-2 group-hover:text-blue-400 transition-colors text-slate-900">{s.title}</h3>
                   <div className="space-y-1 mb-3">
                     {(s.insights ?? []).slice(0, 2).map((insight, i) => (
-                      <p key={i} className="text-[11px] truncate flex items-center gap-1.5" style={{ color: "var(--text-secondary)" }}>
-                        <span className="w-1 h-1 rounded-full shrink-0" style={{ background: "#84cc18" }} />
+                      <p key={i} className="text-[11px] truncate flex items-center gap-1.5 text-slate-700">
+                        <span className="w-1 h-1 rounded-full shrink-0" style={{ background: "#2563eb" }} />
                         {insight}
                       </p>
                     ))}

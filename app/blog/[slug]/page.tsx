@@ -22,7 +22,7 @@ export default function BlogArticlePage() {
         setArticle({
           id: data.id as number, slug: (data.slug as string) ?? "", title: (data.title as string) ?? "",
           excerpt: ((data.content as string) ?? "").slice(0, 120), category: (data.category as string) ?? "",
-          coverImage: (data.banner_image as string) ?? "#8957f6", author: (data.author as string) ?? "فريق AdVault",
+          coverImage: (data.banner_image as string) ?? "#2563eb", author: (data.author as string) ?? "فريق AdVault",
           date: ((data.created_at as string) ?? "").slice(0, 10), readTime: "5 دقائق",
           tags: (data.tags as string[]) ?? [],
         });
@@ -34,21 +34,21 @@ export default function BlogArticlePage() {
       if (data) setRelatedArticles(data.filter((d) => (d.slug as string) !== slug).slice(0, 3).map((d) => ({
         id: d.id as number, slug: (d.slug as string) ?? "", title: (d.title as string) ?? "",
         excerpt: ((d.content as string) ?? "").slice(0, 120), category: (d.category as string) ?? "",
-        coverImage: (d.banner_image as string) ?? "#8957f6", author: (d.author as string) ?? "",
+        coverImage: (d.banner_image as string) ?? "#2563eb", author: (d.author as string) ?? "",
         date: ((d.created_at as string) ?? "").slice(0, 10), readTime: "5 دقائق", tags: (d.tags as string[]) ?? [],
       })));
     });
   }, [slug]);
 
   if (loading) {
-    return <AppLayout><div className="flex items-center justify-center min-h-[60vh]"><p style={{ color: "#6b7280" }}>جارٍ التحميل...</p></div></AppLayout>;
+    return <AppLayout><div className="flex items-center justify-center min-h-[60vh]"><p style={{ color: "#94a3b8" }}>جارٍ التحميل...</p></div></AppLayout>;
   }
 
   if (!article) {
     return (
       <AppLayout>
         <div className="flex items-center justify-center min-h-[60vh]">
-          <p className="text-lg font-bold" style={{ color: "#1c1c1e" }}>المقال غير موجود</p>
+          <p className="text-lg font-bold" style={{ color: "#ffffff" }}>المقال غير موجود</p>
         </div>
       </AppLayout>
     );
@@ -78,7 +78,7 @@ export default function BlogArticlePage() {
       {/* Hero banner */}
       <div
         className="w-full relative overflow-hidden"
-        style={{ height: 300, background: article.coverImage.startsWith("#") ? article.coverImage : "#8957f6" }}
+        style={{ height: 300, background: article.coverImage.startsWith("#") ? article.coverImage : "#2563eb" }}
       >
         {!article.coverImage.startsWith("#") && (
           <img src={getImageUrl("Blog-images", article.coverImage)} alt={article.title}
@@ -87,7 +87,7 @@ export default function BlogArticlePage() {
         )}
         <div className="absolute inset-0 bg-black/40" />
         <div className="absolute bottom-6 right-6 left-6 text-white">
-          <span className="inline-block px-3 py-1 rounded-full text-xs font-bold bg-[#84cc18] mb-2">
+          <span className="inline-block px-3 py-1 rounded-full text-xs font-bold bg-blue-600 mb-2">
             {article.category}
           </span>
           <h1 className="text-2xl sm:text-3xl font-extrabold leading-tight">
@@ -137,7 +137,7 @@ export default function BlogArticlePage() {
           <blockquote
             className="pr-4 py-3 my-6 text-lg font-semibold italic"
             style={{
-              borderRight: "4px solid #84cc18",
+              borderRight: "4px solid #2563eb",
               color: "var(--text-primary)",
             }}
           >
@@ -184,7 +184,7 @@ export default function BlogArticlePage() {
             onClick={handleCopy}
             className="px-4 py-2 rounded-lg text-sm font-semibold transition-colors"
             style={{
-              background: copied ? "#84cc18" : "var(--card)",
+              background: copied ? "#2563eb" : "var(--card)",
               color: copied ? "#fff" : "var(--text-primary)",
               border: "1px solid var(--border)",
             }}
@@ -208,7 +208,7 @@ export default function BlogArticlePage() {
         {pdfToast && (
           <div
             className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 px-5 py-3 rounded-xl text-sm font-semibold shadow-lg"
-            style={{ background: "#84cc18", color: "#fff" }}
+            style={{ background: "#2563eb", color: "#fff" }}
           >
             تم تصدير الملف بنجاح
           </div>
@@ -236,7 +236,7 @@ export default function BlogArticlePage() {
                     className="flex items-center justify-center relative overflow-hidden"
                     style={{
                       aspectRatio: "16/9",
-                      background: a.coverImage.startsWith("#") ? a.coverImage : "#8957f6",
+                      background: a.coverImage.startsWith("#") ? a.coverImage : "#2563eb",
                     }}
                   >
                     {!a.coverImage.startsWith("#") && (

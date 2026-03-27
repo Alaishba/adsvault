@@ -16,7 +16,7 @@ const funnelConfig: Record<FunnelStage, { label: string; color: string; bg: stri
 
 function MediaSwiper({ colors, brandColor }: { colors: string[]; brandColor: string }) {
   const [idx, setIdx] = useState(0);
-  const rawItems = colors.length ? colors : [brandColor ?? "#84cc18"];
+  const rawItems = colors.length ? colors : [brandColor ?? "#2563eb"];
   const items = rawItems.map((item) => {
     if (!item || item.startsWith("#")) return item;
     return getImageUrl("ads-images", item);
@@ -64,7 +64,7 @@ function ProBlurOverlay({ children, onUpgrade }: { children: React.ReactNode; on
         {children}
       </div>
       <div className="absolute inset-0 flex flex-col items-center justify-center rounded-xl"
-        style={{ background: "linear-gradient(to top, rgba(137,87,246,0.92) 0%, rgba(137,87,246,0.4) 100%)" }}>
+        style={{ background: "linear-gradient(to top, rgba(15,23,42,0.95) 0%, rgba(15,23,42,0.5) 100%)" }}>
         <p className="text-white font-extrabold text-sm mb-1 text-center px-4">🔓 احصل على التحليل الكامل</p>
         <p className="text-white/80 text-xs mb-4 text-center px-4">ترقية إلى Pro للوصول الكامل</p>
         <button onClick={onUpgrade}
@@ -127,7 +127,7 @@ export default function AdModal({ ad, onClose }: { ad: Ad | null; onClose: () =>
             {(ad.apply_idea ?? []).map((step, i) => (
               <li key={i} className="flex items-start gap-2 text-xs" style={{ color: "var(--text-secondary)" }}>
                 <span className="mt-0.5 w-4 h-4 rounded-full flex items-center justify-center shrink-0 text-[10px] font-bold text-white"
-                  style={{ background: "#84cc18" }}>{i + 1}</span>
+                  style={{ background: "#2563eb" }}>{i + 1}</span>
                 {step}
               </li>
             ))}
@@ -139,7 +139,7 @@ export default function AdModal({ ad, onClose }: { ad: Ad | null; onClose: () =>
           <p className="text-sm font-extrabold mb-2 flex items-center gap-2" style={{ color: "var(--text-primary)" }}>
             <span>🎯</span> الإجراء الموصى به
           </p>
-          <p className="text-sm font-bold" style={{ color: "#8957f6" }}>{ad.recommended_action}</p>
+          <p className="text-sm font-bold" style={{ color: "#94a3b8" }}>{ad.recommended_action}</p>
         </div>
       )}
     </div>
@@ -165,7 +165,7 @@ export default function AdModal({ ad, onClose }: { ad: Ad | null; onClose: () =>
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
                 <div className="flex items-center gap-2 flex-wrap mb-1">
-                  <span className="text-sm font-extrabold truncate" style={{ color: "#8957f6" }}>{ad.brand}</span>
+                  <span className="text-sm font-extrabold truncate" style={{ color: "#94a3b8" }}>{ad.brand}</span>
                   <PlatformBadge platform={ad.platform} />
                   {funnel && (
                     <span className="px-2 py-0.5 rounded-full text-xs font-bold"
@@ -192,7 +192,7 @@ export default function AdModal({ ad, onClose }: { ad: Ad | null; onClose: () =>
 
             {ad.source_url && (
               <a href={ad.source_url} target="_blank" rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg border border-[--border] w-fit hover:border-[#8957f6]/40 transition-all"
+                className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg border border-[--border] w-fit hover:border-[#94a3b8]/40 transition-all"
                 style={{ color: "var(--text-secondary)" }}>
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
@@ -215,11 +215,11 @@ export default function AdModal({ ad, onClose }: { ad: Ad | null; onClose: () =>
 
             <div className="flex gap-4 pt-2 border-t border-[--border]">
               <div>
-                <p className="text-base font-extrabold" style={{ color: "#8957f6" }}>{ad.views}</p>
+                <p className="text-base font-extrabold" style={{ color: "#94a3b8" }}>{ad.views}</p>
                 <p className="text-[10px]" style={{ color: "var(--text-secondary)" }}>مشاهدة</p>
               </div>
               <div>
-                <p className="text-base font-extrabold" style={{ color: "#8957f6" }}>{ad.saved}</p>
+                <p className="text-base font-extrabold" style={{ color: "#94a3b8" }}>{ad.saved}</p>
                 <p className="text-[10px]" style={{ color: "var(--text-secondary)" }}>محفوظ</p>
               </div>
             </div>

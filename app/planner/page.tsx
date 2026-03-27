@@ -72,7 +72,7 @@ const AGE_GROUPS = ["18-24", "25-34", "35-44", "45+"];
 const STAGE_COLORS: Record<string, string> = {
   وعي: "#3b82f6",
   اهتمام: "#eab308",
-  تحويل: "#84cc18",
+  تحويل: "#2563eb",
 };
 
 /* ────────────────────────── helpers ────────────────────────── */
@@ -293,7 +293,7 @@ export default function PlannerPage() {
 
   const labelClass = "block text-sm font-medium mb-2";
   const inputClass =
-    "w-full rounded-xl border px-4 py-3 text-sm outline-none transition focus:ring-2 focus:ring-[#84cc18]";
+    "w-full rounded-xl border px-4 py-3 text-sm outline-none transition focus:ring-2 focus:ring-blue-500";
   const inputStyle = {
     background: "var(--surface2)",
     borderColor: "var(--border)",
@@ -319,7 +319,7 @@ export default function PlannerPage() {
               <div
                 className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold transition-colors duration-300"
                 style={{
-                  background: step >= s ? "#84cc18" : "var(--surface2)",
+                  background: step >= s ? "#2563eb" : "var(--surface2)",
                   color: step >= s ? "#fff" : "var(--text-secondary)",
                 }}
               >
@@ -334,7 +334,7 @@ export default function PlannerPage() {
               {s === 1 && (
                 <div
                   className="w-16 h-1 rounded-full mx-2"
-                  style={{ background: step >= 2 ? "#84cc18" : "var(--border)" }}
+                  style={{ background: step >= 2 ? "#2563eb" : "var(--border)" }}
                 />
               )}
             </div>
@@ -419,9 +419,9 @@ export default function PlannerPage() {
                       onClick={() => toggleGoal(g)}
                       className="px-4 py-2 rounded-full text-sm font-medium border transition-all duration-200"
                       style={{
-                        background: form.goals.includes(g) ? "#84cc18" : "var(--surface2)",
+                        background: form.goals.includes(g) ? "#2563eb" : "var(--surface2)",
                         color: form.goals.includes(g) ? "#fff" : "var(--text-primary)",
-                        borderColor: form.goals.includes(g) ? "#84cc18" : "var(--border)",
+                        borderColor: form.goals.includes(g) ? "#2563eb" : "var(--border)",
                       }}
                     >
                       {g}
@@ -434,7 +434,7 @@ export default function PlannerPage() {
               <div className="mt-6">
                 <label className={labelClass}>
                   الميزانية الشهرية للإعلانات:{" "}
-                  <span className="font-bold" style={{ color: "#84cc18" }}>
+                  <span className="font-bold" style={{ color: "#2563eb" }}>
                     {form.budget.toLocaleString("ar-SA")} ريال
                   </span>
                 </label>
@@ -445,8 +445,8 @@ export default function PlannerPage() {
                   step={500}
                   value={form.budget}
                   onChange={(e) => setForm({ ...form, budget: +e.target.value })}
-                  className="w-full accent-[#84cc18] h-2 rounded-lg cursor-pointer"
-                  style={{ accentColor: "#84cc18" }}
+                  className="w-full accent-blue-500 h-2 rounded-lg cursor-pointer"
+                  style={{ accentColor: "#2563eb" }}
                 />
                 <div
                   className="flex justify-between text-xs mt-1"
@@ -467,9 +467,9 @@ export default function PlannerPage() {
                       onClick={() => togglePlatform(p)}
                       className="px-4 py-2 rounded-full text-sm font-medium border transition-all duration-200"
                       style={{
-                        background: form.platforms.includes(p) ? "#8957f6" : "var(--surface2)",
+                        background: form.platforms.includes(p) ? "#334155" : "var(--surface2)",
                         color: form.platforms.includes(p) ? "#fff" : "var(--text-primary)",
-                        borderColor: form.platforms.includes(p) ? "#8957f6" : "var(--border)",
+                        borderColor: form.platforms.includes(p) ? "#334155" : "var(--border)",
                       }}
                     >
                       {p}
@@ -493,9 +493,9 @@ export default function PlannerPage() {
                           onClick={() => setForm({ ...form, gender: g })}
                           className="px-3 py-1.5 rounded-full text-xs font-medium border transition-all"
                           style={{
-                            background: form.gender === g ? "#84cc18" : "var(--surface2)",
+                            background: form.gender === g ? "#2563eb" : "var(--surface2)",
                             color: form.gender === g ? "#fff" : "var(--text-primary)",
-                            borderColor: form.gender === g ? "#84cc18" : "var(--border)",
+                            borderColor: form.gender === g ? "#2563eb" : "var(--border)",
                           }}
                         >
                           {g}
@@ -514,9 +514,9 @@ export default function PlannerPage() {
                           onClick={() => setForm({ ...form, ageGroup: a })}
                           className="px-3 py-1.5 rounded-full text-xs font-medium border transition-all"
                           style={{
-                            background: form.ageGroup === a ? "#84cc18" : "var(--surface2)",
+                            background: form.ageGroup === a ? "#2563eb" : "var(--surface2)",
                             color: form.ageGroup === a ? "#fff" : "var(--text-primary)",
-                            borderColor: form.ageGroup === a ? "#84cc18" : "var(--border)",
+                            borderColor: form.ageGroup === a ? "#2563eb" : "var(--border)",
                           }}
                         >
                           {a}
@@ -544,7 +544,7 @@ export default function PlannerPage() {
                 <button
                   onClick={() => setStep(2)}
                   className="px-8 py-3 rounded-xl text-white font-bold text-base transition-transform hover:scale-[1.03] active:scale-95"
-                  style={{ background: "#84cc18" }}
+                  style={{ background: "#2563eb" }}
                 >
                   التالي ←
                 </button>
@@ -601,7 +601,7 @@ export default function PlannerPage() {
                         <div className="flex items-center justify-between mt-1">
                           <span
                             className="px-2 py-0.5 rounded-full text-[10px] font-bold text-white"
-                            style={{ background: "#8957f6" }}
+                            style={{ background: "#334155" }}
                           >
                             {item.platform}
                           </span>
@@ -648,8 +648,8 @@ export default function PlannerPage() {
                   [
                     { key: "وعي", color: "#3b82f6", suggestion: "إعلانات الوصول والفيديو", costPct: 0.4, resultLabel: "مشاهدة" },
                     { key: "اهتمام", color: "#eab308", suggestion: "إعلانات تفاعلية وإعادة استهداف", costPct: 0.3, resultLabel: "تفاعل" },
-                    { key: "تحويل", color: "#84cc18", suggestion: "إعلانات مباشرة مع عرض خاص", costPct: 0.2, resultLabel: "عملية شراء" },
-                    { key: "ولاء", color: "#8957f6", suggestion: "محتوى حصري وبرنامج مكافآت", costPct: 0.1, resultLabel: "عميل دائم" },
+                    { key: "تحويل", color: "#2563eb", suggestion: "إعلانات مباشرة مع عرض خاص", costPct: 0.2, resultLabel: "عملية شراء" },
+                    { key: "ولاء", color: "#334155", suggestion: "محتوى حصري وبرنامج مكافآت", costPct: 0.1, resultLabel: "عميل دائم" },
                   ] as const
                 ).map((stage) => {
                   const count = funnel[stage.key];
@@ -729,7 +729,7 @@ export default function PlannerPage() {
                           className="h-full rounded-full transition-all duration-1000 ease-out"
                           style={{
                             width: animateIn ? `${p.pct}%` : "0%",
-                            background: "#8957f6",
+                            background: "#334155",
                             minWidth: animateIn ? "20px" : "0",
                           }}
                         />
@@ -765,12 +765,12 @@ export default function PlannerPage() {
                       <div className="flex flex-wrap items-center gap-3 text-xs">
                         <span
                           className="px-2 py-0.5 rounded-full text-white font-bold"
-                          style={{ background: "#8957f6" }}
+                          style={{ background: "#334155" }}
                         >
                           {s.platform}
                         </span>
                         <span style={{ color: "var(--text-secondary)" }}>التكلفة: {s.cost}</span>
-                        <span style={{ color: "#84cc18" }} className="font-medium">
+                        <span style={{ color: "#2563eb" }} className="font-medium">
                           {s.result}
                         </span>
                       </div>
@@ -805,7 +805,7 @@ export default function PlannerPage() {
                       className="h-full rounded-full transition-all duration-500"
                       style={{
                         width: `${actionProgress}%`,
-                        background: "#84cc18",
+                        background: "#2563eb",
                       }}
                     />
                   </div>
@@ -830,8 +830,8 @@ export default function PlannerPage() {
                             type="checkbox"
                             checked={item.checked}
                             onChange={() => toggleAction(wi, ai)}
-                            className="mt-0.5 rounded accent-[#84cc18]"
-                            style={{ accentColor: "#84cc18" }}
+                            className="mt-0.5 rounded accent-blue-500"
+                            style={{ accentColor: "#2563eb" }}
                           />
                           <span
                             style={{
@@ -862,7 +862,7 @@ export default function PlannerPage() {
               <button
                 onClick={handleExport}
                 className="px-8 py-3 rounded-xl text-white font-bold text-base transition-transform hover:scale-[1.03] active:scale-95"
-                style={{ background: "#8957f6" }}
+                style={{ background: "#334155" }}
               >
                 تصدير الخطة PDF
               </button>
@@ -874,7 +874,7 @@ export default function PlannerPage() {
         {showToast && (
           <div
             className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 px-6 py-3 rounded-xl text-white font-medium text-sm shadow-lg animate-bounce"
-            style={{ background: "#84cc18" }}
+            style={{ background: "#2563eb" }}
           >
             تم تجهيز الخطة للتصدير ✓
           </div>

@@ -16,8 +16,8 @@ const tabs = [
 ];
 
 const planLabels: Record<string, { label: string; color: string; bg: string }> = {
-  free: { label: "مجاني", color: "#6b7280", bg: "#f3f5f9" },
-  pro: { label: "Pro", color: "#84cc18", bg: "#f7fee7" },
+  free: { label: "مجاني", color: "#6b7280", bg: "rgba(255,255,255,0.05)" },
+  pro: { label: "Pro", color: "#60a5fa", bg: "rgba(37,99,235,0.15)" },
   enterprise: { label: "Enterprise", color: "#1d4ed8", bg: "#eff6ff" },
   admin: { label: "Admin", color: "#b91c1c", bg: "#fef2f2" },
 };
@@ -134,29 +134,27 @@ export default function ProfilePage() {
     return <AppLayout><div className="flex items-center justify-center min-h-[60vh]"><p style={{ color: "#6b7280" }}>جارٍ التحميل...</p></div></AppLayout>;
   }
 
-  const inputStyle = { background: "#ffffff", border: "1px solid #e5e7eb", color: "#1c1c1e" };
+  const inputStyle = { background: "#ffffff", border: "1px solid #e5e7eb", color: "#0f172a" };
 
   return (
     <AppLayout>
       <div className="px-6 lg:px-10 py-8 max-w-4xl mx-auto">
         {/* Hero header (glassmorphism) */}
         <div className="rounded-2xl p-6 mb-6 flex flex-col sm:flex-row items-start sm:items-center gap-5" style={{
-          background: "rgba(137,87,246,0.06)",
-          backdropFilter: "blur(20px)",
-          WebkitBackdropFilter: "blur(20px)",
-          border: "1px solid rgba(137,87,246,0.15)",
+          background: "#ced3de",
+          border: "1px solid #ced3de",
         }}>
           <div className="relative shrink-0 group">
             {avatarUrl ? (
-              <img src={getImageUrl("user-avatars", avatarUrl)} alt="avatar" className="w-20 h-20 rounded-2xl object-cover" style={{ border: "3px solid #84cc18" }}
+              <img src={getImageUrl("user-avatars", avatarUrl)} alt="avatar" className="w-20 h-20 rounded-2xl object-cover" style={{ border: "3px solid #2563eb" }}
                 onError={(e) => { e.currentTarget.src = "/fallback.png"; e.currentTarget.style.display = "block"; }} />
             ) : (
               <div className="w-20 h-20 rounded-2xl flex items-center justify-center text-2xl font-black text-white"
-                style={{ background: "#8957f6", border: "3px solid #84cc18" }}>{initials}</div>
+                style={{ background: "#334155", border: "3px solid #2563eb" }}>{initials}</div>
             )}
             <button onClick={() => fileRef.current?.click()} disabled={uploading}
               className="absolute -bottom-1 -left-1 w-7 h-7 rounded-full flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-all"
-              style={{ background: "#84cc18" }}>
+              style={{ background: "#2563eb" }}>
               {uploading ? (
                 <svg className="animate-spin" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10" strokeDasharray="60" strokeDashoffset="20"/></svg>
               ) : (
@@ -166,7 +164,7 @@ export default function ProfilePage() {
             <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleAvatarChange} />
           </div>
           <div className="flex-1 min-w-0">
-            <h1 className="text-xl font-extrabold" style={{ color: "#1c1c1e" }}>{name || "المستخدم"}</h1>
+            <h1 className="text-xl font-extrabold" style={{ color: "#0f172a" }}>{name || "المستخدم"}</h1>
             <p className="text-sm" style={{ color: "#6b7280" }}>{email}</p>
             <span className="inline-flex items-center gap-1 mt-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold"
               style={{ background: planInfo.bg, color: planInfo.color }}>{planInfo.label}</span>
@@ -180,16 +178,14 @@ export default function ProfilePage() {
 
         {/* Tabs (glassmorphism) */}
         <div className="flex gap-1 mb-6 overflow-x-auto rounded-xl p-1" style={{
-          background: "rgba(255,255,255,0.7)",
-          backdropFilter: "blur(10px)",
-          WebkitBackdropFilter: "blur(10px)",
-          border: "1px solid rgba(209,209,214,0.4)",
+          background: "#ced3de",
+          border: "1px solid #ced3de",
         }}>
           {tabs.map((tab) => (
             <button key={tab.id} onClick={() => setActiveTab(tab.id)}
               className="px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap transition-all shrink-0"
               style={{
-                background: activeTab === tab.id ? "#84cc18" : "transparent",
+                background: activeTab === tab.id ? "#2563eb" : "transparent",
                 color: activeTab === tab.id ? "#fff" : "#6b7280",
               }}>
               {tab.label}
@@ -200,11 +196,10 @@ export default function ProfilePage() {
         {/* Tab: معلوماتي */}
         {activeTab === "info" && (
           <div className="rounded-2xl p-6" style={{
-            background: "rgba(255,255,255,0.8)",
-            backdropFilter: "blur(10px)",
-            border: "1px solid rgba(209,209,214,0.4)",
+            background: "#ced3de",
+            border: "1px solid #ced3de",
           }}>
-            <h3 className="font-extrabold mb-5" style={{ color: "#1c1c1e" }}>المعلومات الشخصية</h3>
+            <h3 className="font-extrabold mb-5" style={{ color: "#0f172a" }}>المعلومات الشخصية</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {[
                 { label: "الاسم الكامل", value: name, setter: setName, placeholder: "محمد أحمد", type: "text" },
@@ -213,17 +208,17 @@ export default function ProfilePage() {
                 { label: "رقم الجوال", value: phone, setter: setPhone, placeholder: "+966 5x xxx xxxx", type: "tel" },
               ].map(({ label, value, setter, placeholder, type }) => (
                 <div key={label}>
-                  <label className="block text-sm font-semibold mb-1.5" style={{ color: "#1c1c1e" }}>{label}</label>
+                  <label className="block text-sm font-semibold mb-1.5" style={{ color: "#0f172a" }}>{label}</label>
                   <input type={type} value={value} onChange={(e) => setter(e.target.value)} placeholder={placeholder}
-                    className="w-full px-4 py-2.5 rounded-xl outline-none text-sm focus:ring-2 focus:ring-[#84cc18]/30 transition-all"
+                    className="w-full px-4 py-2.5 rounded-xl outline-none text-sm focus:ring-2 focus:ring-blue-500/30 transition-all"
                     style={inputStyle} />
                 </div>
               ))}
               <div className="sm:col-span-2">
-                <label className="block text-sm font-semibold mb-1.5" style={{ color: "#1c1c1e" }}>البريد الإلكتروني</label>
+                <label className="block text-sm font-semibold mb-1.5" style={{ color: "#0f172a" }}>البريد الإلكتروني</label>
                 <input type="email" value={email} disabled dir="ltr"
                   className="w-full px-4 py-2.5 rounded-xl outline-none text-sm opacity-60 cursor-not-allowed"
-                  style={{ background: "#f3f5f9", border: "1px solid #e5e7eb", color: "#1c1c1e" }} />
+                  style={{ background: "#f3f5f9", border: "1px solid #e5e7eb", color: "#0f172a" }} />
               </div>
             </div>
             {saveError && (
@@ -231,7 +226,7 @@ export default function ProfilePage() {
             )}
             <button onClick={handleSaveInfo}
               className="mt-5 px-6 py-2.5 rounded-xl font-bold text-sm text-white hover:opacity-90 transition-all"
-              style={{ background: saved ? "#84cc18" : "#059669" }}>
+              style={{ background: saved ? "#2563eb" : "#059669" }}>
               {saved ? "حفظ التغييرات" : "✓ جارٍ الحفظ..."}
             </button>
           </div>
@@ -240,18 +235,17 @@ export default function ProfilePage() {
         {/* Tab: اشتراكي */}
         {activeTab === "subscription" && (
           <div className="rounded-2xl p-6" style={{
-            background: isPro ? "rgba(137,87,246,0.08)" : "rgba(255,255,255,0.8)",
-            backdropFilter: "blur(10px)",
-            border: isPro ? "1px solid rgba(137,87,246,0.2)" : "1px solid rgba(209,209,214,0.4)",
+            background: "#ced3de",
+            border: "1px solid #ced3de",
           }}>
             <div className="flex items-center gap-3 mb-6">
               <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: "#f3eeff" }}>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8957f6" strokeWidth="2">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#334155" strokeWidth="2">
                   <rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/>
                 </svg>
               </div>
               <div>
-                <p className="font-extrabold" style={{ color: "#1c1c1e" }}>خطة {planInfo.label}</p>
+                <p className="font-extrabold" style={{ color: "#0f172a" }}>خطة {planInfo.label}</p>
                 <p className="text-sm" style={{ color: "#6b7280" }}>{isPro ? "اشتراك نشط" : "الباقة المجانية"}</p>
               </div>
               <span className="mr-auto px-3 py-1 rounded-full text-xs font-bold"
@@ -267,7 +261,7 @@ export default function ProfilePage() {
                 <div key={f.label} className="flex items-center justify-between py-2 border-b last:border-0" style={{ borderColor: "#e5e7eb" }}>
                   <span className="text-sm" style={{ color: "#6b7280" }}>{f.label}</span>
                   {f.included ? (
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#84cc18" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563eb" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
                   ) : (
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#d1d5db" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                   )}
@@ -276,7 +270,7 @@ export default function ProfilePage() {
             </div>
             <Link href="/pricing"
               className="block w-full py-3 rounded-xl font-bold text-sm text-center text-white hover:opacity-90 transition-all"
-              style={{ background: isPro ? "#8957f6" : "#84cc18" }}>
+              style={{ background: isPro ? "#334155" : "#2563eb" }}>
               {isPro ? "إدارة الاشتراك" : "ترقية إلى Pro →"}
             </Link>
           </div>
@@ -286,11 +280,10 @@ export default function ProfilePage() {
         {/* Tab: التفضيلات */}
         {activeTab === "preferences" && (
           <div className="rounded-2xl p-6" style={{
-            background: "rgba(255,255,255,0.8)",
-            backdropFilter: "blur(10px)",
-            border: "1px solid rgba(209,209,214,0.4)",
+            background: "#ced3de",
+            border: "1px solid #ced3de",
           }}>
-            <h3 className="font-extrabold mb-4" style={{ color: "#1c1c1e" }}>الإشعارات</h3>
+            <h3 className="font-extrabold mb-4" style={{ color: "#0f172a" }}>الإشعارات</h3>
             <div className="space-y-3">
               {[
                 { key: "newAds", label: "إعلانات جديدة", desc: "إشعار عند إضافة إعلانات جديدة" },
@@ -299,13 +292,13 @@ export default function ProfilePage() {
               ].map(({ key, label, desc }) => (
                 <div key={key} className="flex items-center justify-between py-3 border-b last:border-0" style={{ borderColor: "#e5e7eb" }}>
                   <div>
-                    <p className="text-sm font-semibold" style={{ color: "#1c1c1e" }}>{label}</p>
+                    <p className="text-sm font-semibold" style={{ color: "#0f172a" }}>{label}</p>
                     <p className="text-xs" style={{ color: "#9ca3af" }}>{desc}</p>
                   </div>
                   <button
                     onClick={() => setNotifs((n) => ({ ...n, [key]: !n[key as keyof typeof n] }))}
                     className="w-12 h-6 rounded-full transition-all relative"
-                    style={{ background: notifs[key as keyof typeof notifs] ? "#84cc18" : "#e5e7eb" }}>
+                    style={{ background: notifs[key as keyof typeof notifs] ? "#2563eb" : "#e5e7eb" }}>
                     <span className="absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-all"
                       style={{ right: notifs[key as keyof typeof notifs] ? "2px" : "auto", left: notifs[key as keyof typeof notifs] ? "auto" : "2px" }} />
                   </button>

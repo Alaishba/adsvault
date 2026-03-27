@@ -52,7 +52,7 @@ const plans = [
 function FeatureValue({ value }: { value: boolean | string }) {
   if (value === true) return (
     <span className="flex items-center justify-center">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#84cc18" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563eb" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
     </span>
   );
   if (value === false) return (
@@ -123,7 +123,7 @@ function PaymentModal({ onClose, planName }: { onClose: () => void; planName: st
             <p className="text-sm mb-4" style={{ color: "var(--text-secondary)" }}>مرحباً بك في خطة {planName}</p>
             <button onClick={onClose}
               className="px-6 py-2.5 rounded-xl font-bold text-sm text-white"
-              style={{ background: "#84cc18" }}>
+              style={{ background: "#2563eb" }}>
               ابدأ الاستخدام
             </button>
           </div>
@@ -160,7 +160,7 @@ function PaymentModal({ onClose, planName }: { onClose: () => void; planName: st
             )}
             <button type="submit" disabled={loading}
               className="w-full py-3 rounded-xl font-bold text-sm text-white transition-all hover:opacity-90 disabled:opacity-60"
-              style={{ background: "#84cc18" }}>
+              style={{ background: "#2563eb" }}>
               {loading ? "جارٍ المعالجة..." : "إتمام الدفع"}
             </button>
           </form>
@@ -230,7 +230,7 @@ function ContactModal({ onClose }: { onClose: () => void }) {
             </div>
             <button type="submit" disabled={loading}
               className="w-full py-3 rounded-xl font-bold text-sm text-white hover:opacity-90 disabled:opacity-60"
-              style={{ background: "#84cc18" }}>
+              style={{ background: "#2563eb" }}>
               {loading ? "جارٍ الإرسال..." : "إرسال"}
             </button>
           </form>
@@ -258,12 +258,12 @@ export default function PricingPage() {
               className="rounded-2xl border flex flex-col relative overflow-hidden transition-all"
               style={{
                 background: plan.featured ? "#1c1c1e" : "var(--card)",
-                borderColor: plan.featured ? "#8957f6" : "var(--border)",
-                boxShadow: plan.featured ? "0 0 40px #8957f622" : undefined,
+                borderColor: plan.featured ? "#2563eb" : "var(--border)",
+                boxShadow: plan.featured ? "0 0 40px #2563eb22" : undefined,
               }}>
               {plan.featured && (
                 <div className="absolute top-4 left-4 px-3 py-1 rounded-full text-xs font-bold"
-                  style={{ background: "#8957f6", color: "#fff" }}>الأكثر شيوعاً</div>
+                  style={{ background: "#2563eb", color: "#fff" }}>الأكثر شيوعاً</div>
               )}
 
               <div className="p-7 pb-5">
@@ -287,7 +287,7 @@ export default function PricingPage() {
                   onClick={() => plan.isEnterprise ? setContactModal(true) : setPayModal(plan.name)}
                   className="block w-full py-3 rounded-xl font-bold text-sm text-center transition-all hover:opacity-90"
                   style={plan.featured
-                    ? { background: "#84cc18", color: "#fff" }
+                    ? { background: "#2563eb", color: "#fff" }
                     : { background: "var(--surface2)", color: "var(--text-primary)", border: "1px solid var(--border)" }
                   }>
                   {plan.cta}
@@ -309,7 +309,7 @@ export default function PricingPage() {
 
         <div className="text-center text-sm" style={{ color: "var(--text-secondary)" }}>
           هل لديك سؤال؟{" "}
-          <button onClick={() => setContactModal(true)} className="font-semibold hover:underline" style={{ color: "#84cc18" }}>
+          <button onClick={() => setContactModal(true)} className="font-semibold hover:underline" style={{ color: "#2563eb" }}>
             تواصل معنا
           </button>
         </div>

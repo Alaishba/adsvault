@@ -52,7 +52,7 @@ export default function FilterBar({
                 onClick={() => setOpenFilter(openFilter === filter.key ? null : filter.key)}
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border transition-all whitespace-nowrap"
                 style={active
-                  ? { background: "#84cc18", color: "#fff", borderColor: "#84cc18" }
+                  ? { background: "#2563eb", color: "#fff", borderColor: "#2563eb" }
                   : { background: "var(--surface2)", color: "var(--text-secondary)", borderColor: "var(--border)" }
                 }>
                 {active ? active : filter.label}
@@ -77,13 +77,13 @@ export default function FilterBar({
                         onClick={() => { onFilterChange(filter.key, opt); setOpenFilter(null); }}
                         className="w-full text-right px-4 py-2.5 text-xs hover:bg-[--surface2] transition-colors flex items-center justify-between gap-3"
                         style={{
-                          color: active === opt ? "#84cc18" : "var(--text-primary)",
+                          color: active === opt ? "#2563eb" : "var(--text-primary)",
                           background: active === opt ? "var(--accent-light)" : undefined,
                           fontWeight: active === opt ? 600 : 400,
                         }}>
                         {opt}
                         {active === opt && (
-                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#84cc18" strokeWidth="2.5">
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#2563eb" strokeWidth="2.5">
                             <polyline points="20 6 9 17 4 12"/>
                           </svg>
                         )}
@@ -99,7 +99,7 @@ export default function FilterBar({
         {hasActive && (
           <button onClick={clearAll}
             className="px-3 py-1.5 rounded-full text-xs font-semibold transition-all shrink-0 whitespace-nowrap"
-            style={{ color: "#b91c1c", background: "#fef2f2" }}>
+            style={{ color: "#fca5a5", background: "rgba(239,68,68,0.15)" }}>
             مسح الكل
           </button>
         )}

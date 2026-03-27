@@ -112,7 +112,7 @@ export default function BlogPage() {
             id: d.id as number, slug: (d.slug as string) ?? "",
             title: (d.title as string) ?? "", excerpt: ((d.content as string) ?? "").slice(0, 120),
             category: (d.category as string) ?? "تسويق",
-            coverImage: (d.banner_image as string) ?? "#8957f6",
+            coverImage: (d.banner_image as string) ?? "#2563eb",
             author: (d.author as string) ?? "فريق AdVault",
             date: ((d.created_at as string) ?? "").slice(0, 10),
             readTime: "5 دقائق", tags: (d.tags as string[]) ?? [],
@@ -135,7 +135,7 @@ export default function BlogPage() {
         {featured ? (
           <Link href={`/blog/${featured.slug}`}>
             <div className="relative w-full rounded-2xl overflow-hidden mb-8"
-              style={{ minHeight: 360, background: featured.coverImage.startsWith("#") ? featured.coverImage : "#8957f6" }}>
+              style={{ minHeight: 360, background: featured.coverImage.startsWith("#") ? featured.coverImage : "#2563eb" }}>
               {!featured.coverImage.startsWith("#") && (
                 <img src={getImageUrl("Blog-images", featured.coverImage)} alt={featured.title}
                   className="absolute inset-0 w-full h-full object-cover"
@@ -143,7 +143,7 @@ export default function BlogPage() {
               )}
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
               <div className="absolute bottom-0 right-0 left-0 p-6 sm:p-10 text-white">
-                <span className="inline-block px-3 py-1 rounded-full text-xs font-bold bg-[#84cc18] text-white mb-3">{featured.category}</span>
+                <span className="inline-block px-3 py-1 rounded-full text-xs font-bold bg-blue-600 text-white mb-3">{featured.category}</span>
                 <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold mb-2 leading-tight">{featured.title}</h1>
                 <p className="text-sm sm:text-base text-white/80 max-w-2xl mb-3">{featured.excerpt}</p>
                 <span className="text-xs text-white/60">{featured.date}</span>
@@ -151,10 +151,10 @@ export default function BlogPage() {
             </div>
           </Link>
         ) : (
-          <div className="text-center py-16 rounded-2xl mb-8" style={{ background: "#ffffff", border: "1px solid #e5e7eb" }}>
+          <div className="text-center py-16 rounded-2xl mb-8" style={{ background: "#ced3de", border: "1px solid #ced3de" }}>
             <p className="text-3xl mb-2">📝</p>
-            <p className="font-bold" style={{ color: "#1c1c1e" }}>لا يوجد مقالات منشورة بعد</p>
-            <p className="text-sm mt-1" style={{ color: "#6b7280" }}>أضف مقالات من لوحة التحكم</p>
+            <p className="font-bold" style={{ color: "#ffffff" }}>لا يوجد مقالات منشورة بعد</p>
+            <p className="text-sm mt-1" style={{ color: "#94a3b8" }}>أضف مقالات من لوحة التحكم</p>
           </div>
         )}
 
@@ -167,7 +167,7 @@ export default function BlogPage() {
               className="px-4 py-1.5 rounded-full text-sm font-semibold transition-colors"
               style={
                 activeCategory === cat
-                  ? { background: "#84cc18", color: "#fff" }
+                  ? { background: "#2563eb", color: "#fff" }
                   : {
                       background: "var(--card)",
                       color: "var(--text-secondary)",
@@ -187,16 +187,15 @@ export default function BlogPage() {
               <div
                 className="rounded-xl overflow-hidden transition-transform duration-200 hover:scale-[1.02] hover:shadow-lg"
                 style={{
-                  background: "var(--card)",
-                  border: "1px solid var(--border)",
+                  background: "#ced3de",
+                  border: "1px solid #ced3de",
                 }}
               >
                 {/* Cover */}
                 <div
-                  className="flex items-center justify-center relative overflow-hidden"
+                  className="h-48 flex items-center justify-center relative overflow-hidden"
                   style={{
-                    aspectRatio: "16/9",
-                    background: article.coverImage.startsWith("#") ? article.coverImage : "#8957f6",
+                    background: article.coverImage.startsWith("#") ? article.coverImage : "#2563eb",
                   }}
                 >
                   {!article.coverImage.startsWith("#") && (
@@ -207,7 +206,7 @@ export default function BlogPage() {
                   <span className="text-white/30 text-4xl font-extrabold select-none">
                     {getInitials(article.title)}
                   </span>
-                  <span className="absolute top-3 right-3 px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#84cc18] text-white">
+                  <span className="absolute top-3 right-3 px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-600 text-white">
                     {article.category}
                   </span>
                 </div>

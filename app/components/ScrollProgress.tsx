@@ -19,7 +19,7 @@ export default function ScrollProgress() {
 
   return (
     <div className="fixed top-0 left-0 right-0 z-[9999] h-[2px]">
-      <div className="h-full transition-[width] duration-100" style={{ width: `${progress}%`, background: "#84cc18" }} />
+      <div className="h-full transition-[width] duration-100" style={{ width: `${progress}%`, background: "#2563eb" }} />
     </div>
   );
 }

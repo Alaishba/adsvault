@@ -5,7 +5,6 @@ import Link from "next/link";
 import AppLayout from "./components/AppLayout";
 import AdCard from "./components/AdCard";
 import AdModal from "./components/AdModal";
-import PlatformBadge from "./components/PlatformBadge";
 import { type Ad, type Strategy } from "./lib/mockData";
 import { fetchAds, fetchStrategies } from "./lib/db";
 
@@ -42,32 +41,12 @@ function useCountUp(target: number, duration = 1500) {
   return { count, ref };
 }
 
-/* ─── Hero stacked card preview (glassmorphism) ─── */
-function HeroAdPreview({ ad, style }: { ad: Ad; style?: React.CSSProperties }) {
-  return (
-    <div className="glass-purple rounded-2xl p-4 shadow-lg" style={style}>
-      <div className="flex items-center gap-3 mb-3">
-        <div className="w-8 h-8 rounded-lg flex items-center justify-center text-sm font-black text-white shrink-0"
-          style={{ background: ad.brandColor }}>{ad.brandInitial}</div>
-        <div>
-          <p className="text-xs font-bold text-white">{ad.brand}</p>
-          <p className="text-xs text-white/60 truncate max-w-[160px]">{ad.title}</p>
-        </div>
-      </div>
-      <div className="flex gap-1.5 flex-wrap">
-        <PlatformBadge platform={ad.platform} />
-        <span className="px-2 py-0.5 text-xs rounded-md font-medium bg-white/10 text-white/70">{ad.sector}</span>
-      </div>
-    </div>
-  );
-}
-
 /* ─── Stats icons ─── */
 const statIcons = [
-  <svg key="ads" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#84cc18" strokeWidth="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>,
-  <svg key="countries" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#84cc18" strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>,
-  <svg key="sectors" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#84cc18" strokeWidth="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>,
-  <svg key="strats" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#84cc18" strokeWidth="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>,
+  <svg key="ads" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" strokeWidth="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>,
+  <svg key="countries" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>,
+  <svg key="sectors" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" strokeWidth="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>,
+  <svg key="strats" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" strokeWidth="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>,
 ];
 
 function buildStatsData(ads: Ad[], strategies: Strategy[]) {
@@ -87,19 +66,17 @@ function StatCard({ stat }: { stat: StatItem }) {
   const { count, ref } = useCountUp(stat.target);
   const display = `${stat.prefix}${count.toLocaleString()}${stat.suffix}`;
   return (
-    <div ref={ref} className="rounded-xl p-2.5 flex items-center gap-2.5" style={{
-      background: "rgba(255,255,255,0.6)",
+    <div ref={ref} className="rounded-xl p-3 flex flex-col items-center justify-center text-center w-40 h-28" style={{
+      background: "rgba(206,211,222,0.2)",
       backdropFilter: "blur(10px)",
       WebkitBackdropFilter: "blur(10px)",
-      border: "1px solid rgba(209,209,214,0.4)",
+      border: "1px solid rgba(206,211,222,0.4)",
     }}>
-      <div className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0" style={{ background: "var(--primary-light)" }}>
+      <div className="w-8 h-8 rounded-lg flex items-center justify-center mb-1.5" style={{ background: "rgba(37,99,235,0.15)" }}>
         {stat.icon}
       </div>
-      <div className="min-w-0">
-        <p className="text-base font-extrabold leading-tight" style={{ color: "var(--primary)" }}>{display}</p>
-        <p className="text-[10px] font-semibold truncate" style={{ color: "var(--text-primary)" }}>{stat.label}</p>
-      </div>
+      <p className="text-lg font-extrabold leading-tight text-blue-400">{display}</p>
+      <p className="text-[10px] font-semibold text-white mt-0.5">{stat.label}</p>
     </div>
   );
 }
@@ -117,87 +94,58 @@ export default function HomePage() {
   return (
     <AppLayout>
       {/* ── HERO ── */}
-      <section className="px-6 lg:px-10 pt-10 pb-8" style={{ animation: "fadeInUp 0.5s ease both" }}>
-        <div className="flex flex-col lg:flex-row gap-12 items-center">
-          <div className="flex-1 min-w-0 lg:max-w-lg">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold mb-5"
-              style={{ background: "var(--primary-light)", color: "var(--primary-text)", border: "1px solid var(--primary)" }}>
-              <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: "var(--primary)" }} />
-              منصة الذكاء الإعلاني الأولى في MENA ✦
+      <section className="relative min-h-[90vh] flex items-center bg-gradient-to-br from-[#1C4ED8] via-[#0d1b4b] to-black -mt-20 pt-20 overflow-hidden" style={{ animation: "fadeInUp 0.5s ease both" }}>
+        <div className="flex flex-col lg:flex-row gap-12 items-center w-full px-6 lg:px-10">
+          {/* LEFT column (40%) — laptop placeholder, bleeds off left edge */}
+          <div className="w-full lg:w-[40%] order-2 lg:order-2 lg:-ml-[5%]">
+            <div className="rounded-2xl bg-white/5 border border-white/10 w-full h-80 flex items-center justify-center lg:-translate-x-8">
+              <span className="text-4xl">📸 صورة اللابتوب</span>
             </div>
-
-            <h1 className="text-3xl lg:text-5xl font-extrabold leading-tight mb-4" style={{ color: "var(--text-primary)" }}>
-              فكّك الإعلانات الناجحة.{" "}
-              <span style={{ color: "#84cc18" }}>طبّقها باحتراف.</span>
-            </h1>
-
-            <p className="text-base leading-relaxed mb-8 max-w-md" style={{ color: "var(--text-secondary)" }}>
-              استكشف آلاف الإعلانات من كبرى العلامات في المنطقة، افهم ما يجعلها
-              تنجح، وطبّق الاستراتيجيات على حملاتك التسويقية.
-            </p>
-
-            <div className="flex flex-wrap gap-3">
-              <Link href="/library"
-                className="px-7 py-3 rounded-xl font-bold text-base text-white transition-all hover:opacity-90 hover:scale-[1.02]"
-                style={{ background: "#84cc18", boxShadow: "0 4px 20px rgba(132,204,24,0.3)" }}>
-                ابدأ مجاناً
-              </Link>
-              <Link href="/library"
-                className="px-7 py-3 rounded-xl font-bold text-base border transition-all hover:border-[#84cc18]/40"
-                style={{ borderColor: "var(--border)", color: "var(--text-primary)" }}>
-                استعرض المكتبة
-              </Link>
-            </div>
-
-            <p className="mt-6 text-xs" style={{ color: "var(--text-secondary)" }}>
-              يستخدمه أكثر من{" "}
-              <span style={{ color: "#84cc18" }} className="font-bold">500+ فريق تسويقي</span>{" "}
-              في المنطقة
-            </p>
           </div>
 
-          {/* Stacked preview cards (glassmorphism) */}
-          <div className="flex-1 w-full lg:max-w-sm relative pt-4 pl-4">
-            {ads.length >= 3 ? (
-              <>
-                <div className="relative z-10 mx-8 animate-float-2">
-                  <HeroAdPreview ad={ads[2]} style={{ opacity: 0.6, transform: "scale(0.92)", transformOrigin: "top center" }} />
-                </div>
-                <div className="relative z-20 mx-4 -mt-10 animate-float-1">
-                  <HeroAdPreview ad={ads[1]} style={{ opacity: 0.82, transform: "scale(0.96)", transformOrigin: "top center" }} />
-                </div>
-                <div className="relative z-30 -mt-10 animate-float-0">
-                  <HeroAdPreview ad={ads[0]} />
-                </div>
-              </>
-            ) : (
-              <div className="flex items-center justify-center h-64 rounded-2xl" style={{ background: "rgba(137,87,246,0.08)" }}>
-                <p className="text-sm font-semibold" style={{ color: "#8957f6" }}>أضف إعلانات من لوحة التحكم</p>
+          {/* RIGHT column (60%) — glassmorphism card */}
+          <div className="w-full lg:w-[60%] order-1 lg:order-1">
+            <div className="backdrop-blur-lg bg-[#ced3de]/20 border border-[#ced3de]/40 rounded-3xl p-10">
+              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold mb-6 bg-white/10 border border-white/20 text-white">
+                أول منصة ذكاء تسويقي متكامل في السعودية 🇸🇦
               </div>
-            )}
-            <div className="absolute top-0 left-0 px-3 py-1.5 rounded-xl text-xs font-bold shadow-lg z-40"
-              style={{ background: "#84cc18", color: "#fff", animation: "pulse-badge 2s ease infinite" }}>
-              {ads.length > 0 ? `+${ads.length} إعلان` : "AdVault"}
+
+              <h1 className="text-3xl lg:text-5xl font-extrabold leading-tight mb-5 text-white">
+                إستلهم،
+                <br />
+                من أفضل الإعلانات التجارية الناجحة
+              </h1>
+
+              <p className="text-base leading-relaxed mb-8 max-w-lg text-slate-200">
+                تعرّف معنا كيف تنجح أقوى الإعلانات، وطبّق استراتيجياتها على حملاتك التسويقية.
+              </p>
+
+              <Link href="/library"
+                className="inline-block bg-white text-blue-900 font-bold px-8 py-3 rounded-xl hover:bg-blue-50 transition-all">
+                مكتبة الإعلانات
+              </Link>
             </div>
           </div>
         </div>
+        {/* Gradient fade at bottom of hero */}
+        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-b from-transparent to-[#0a0a2e] pointer-events-none" />
       </section>
 
       {/* ── STATS (glassmorphism, smaller) ── */}
-      <section className="px-6 lg:px-10 pb-10">
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+      <section className="px-6 lg:px-10 pb-10 bg-[#0a0a2e]">
+        <div className="flex justify-center gap-6 flex-wrap">
           {buildStatsData(ads, strategies).map((s, i) => <StatCard key={i} stat={s} />)}
         </div>
       </section>
 
       {/* ── LATEST ADS ── */}
-      <section className="px-6 lg:px-10 pb-10">
+      <section className="px-6 lg:px-10 pb-10 bg-[#0a0a2e]">
         <div className="flex items-end justify-between mb-5">
           <div>
             <h2 className="text-xl font-extrabold" style={{ color: "var(--text-primary)" }}>أحدث الإعلانات</h2>
             <p className="text-sm mt-0.5" style={{ color: "var(--text-secondary)" }}>آخر الإعلانات المضافة من كبرى العلامات في MENA</p>
           </div>
-          <Link href="/library" className="text-sm font-semibold transition-colors" style={{ color: "#84cc18" }}>
+          <Link href="/library" className="text-sm font-semibold transition-colors text-blue-400">
             عرض الكل ←
           </Link>
         </div>
@@ -206,38 +154,38 @@ export default function HomePage() {
             {ads.map((ad) => <AdCard key={ad.id} ad={ad} onClick={setSelectedAd} />)}
           </div>
         ) : (
-          <div className="text-center py-12 rounded-2xl" style={{ background: "#ffffff", border: "1px solid #e5e7eb" }}>
+          <div className="text-center py-12 rounded-2xl" style={{ background: "rgba(206,211,222,0.3)", border: "1px solid rgba(206,211,222,0.5)" }}>
             <p className="text-3xl mb-2">📢</p>
-            <p className="font-bold" style={{ color: "#1c1c1e" }}>لا يوجد إعلانات بعد</p>
-            <p className="text-sm mt-1" style={{ color: "#6b7280" }}>أضف إعلانات من لوحة التحكم لتظهر هنا</p>
+            <p className="font-bold text-white">لا يوجد إعلانات بعد</p>
+            <p className="text-sm mt-1 text-slate-400">أضف إعلانات من لوحة التحكم لتظهر هنا</p>
           </div>
         )}
       </section>
 
       {/* ── LATEST STRATEGIES ── */}
-      <section className="px-6 lg:px-10 pb-12">
+      <section className="px-6 lg:px-10 pb-12 bg-[#0a0a2e]">
         <div className="flex items-end justify-between mb-5">
           <div>
             <h2 className="text-xl font-extrabold" style={{ color: "var(--text-primary)" }}>أحدث الاستراتيجيات</h2>
             <p className="text-sm mt-0.5" style={{ color: "var(--text-secondary)" }}>تحليلات عميقة لحملات ناجحة في المنطقة</p>
           </div>
-          <Link href="/analysis" className="text-sm font-semibold transition-colors" style={{ color: "#84cc18" }}>
+          <Link href="/analysis" className="text-sm font-semibold transition-colors text-blue-400">
             عرض الكل ←
           </Link>
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
           {strategies.map((s) => (
             <Link key={s.id} href="/analysis"
-              className="card-base card-hover overflow-hidden group p-0">
-              <div className="w-full h-36 flex items-center justify-center" style={{ background: "#0f0f0f" }}>
+              className="rounded-xl overflow-hidden group p-0 bg-[#ced3de] border border-[#ced3de] transition-all duration-200 hover:shadow-md hover:scale-[1.02]">
+              <div className="w-full h-48 flex items-center justify-center" style={{ background: "#0f0f0f" }}>
                 <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl font-black"
                   style={{ background: s.brandColor === "#000000" ? "#1a1a1a" : `${s.brandColor}22`, color: s.brandColor === "#000000" ? "#fff" : s.brandColor, border: `2px solid ${s.brandColor === "#000000" ? "#333" : s.brandColor + "44"}` }}>
                   {s.brandInitial}
                 </div>
               </div>
               <div className="p-5">
-                <p className="text-xs font-bold mb-1" style={{ color: "#8957f6" }}>{s.brand}</p>
-                <h3 className="text-sm font-extrabold leading-snug mb-2 group-hover:text-[#84cc18] transition-colors" style={{ color: "var(--text-primary)" }}>
+                <p className="text-xs font-bold mb-1 text-slate-300">{s.brand}</p>
+                <h3 className="text-sm font-extrabold leading-snug mb-2 group-hover:text-blue-400 transition-colors" style={{ color: "var(--text-primary)" }}>
                   {s.title}
                 </h3>
                 <p className="text-xs leading-relaxed mb-3 line-clamp-2" style={{ color: "var(--text-secondary)" }}>{s.preview}</p>
