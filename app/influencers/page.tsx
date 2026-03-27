@@ -42,12 +42,12 @@ function InfluencerModal({ inf, onClose }: { inf: Influencer; onClose: () => voi
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-4"
-      style={{ background: "rgba(0,0,0,0.6)", backdropFilter: "blur(4px)" }}
+      style={{ background: "rgba(0,0,0,0.6)", backdropFilter: "blur(6px)" }}
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >
       <div
         className="w-full max-w-xl rounded-2xl shadow-2xl overflow-y-auto"
-        style={{ background: "#ced3de", animation: "modalIn 0.2s cubic-bezier(0.34,1.56,0.64,1)", maxHeight: "90vh" }}
+        style={{ background: "#ced3de", border: "1px solid rgba(206,211,222,0.8)", animation: "modalIn 0.2s cubic-bezier(0.34,1.56,0.64,1)", maxHeight: "90vh", WebkitOverflowScrolling: "touch", touchAction: "pan-y" }}
       >
         <style>{`@keyframes modalIn{from{opacity:0;transform:scale(0.95) translateY(8px)}to{opacity:1;transform:scale(1) translateY(0)}}`}</style>
 
@@ -72,19 +72,19 @@ function InfluencerModal({ inf, onClose }: { inf: Influencer; onClose: () => voi
               </div>
             </div>
           </div>
-          <button onClick={onClose} className="w-8 h-8 rounded-full flex items-center justify-center text-slate-600 hover:bg-white/10 transition-colors">
+          <button onClick={onClose} className="w-8 h-8 rounded-full flex items-center justify-center text-slate-500 hover:text-slate-900 hover:bg-slate-200 transition-colors">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M18 6 6 18M6 6l12 12"/></svg>
           </button>
         </div>
 
         {/* Tabs */}
-        <div className="flex border-b border-white/10 px-6">
+        <div className="flex border-b border-slate-300 px-6">
           {(["info", "contact"] as const).map((t) => (
             <button key={t} onClick={() => setTab(t)}
               className="px-4 py-2 text-sm font-semibold border-b-2 transition-colors -mb-px"
               style={{
                 borderBottomColor: tab === t ? "#2563eb" : "transparent",
-                color: tab === t ? "#15803d" : "var(--text-secondary)",
+                color: tab === t ? "#15803d" : "#64748b",
               }}>
               {t === "info" ? "معلومات المؤثر" : "طلب تعاون"}
             </button>
@@ -95,11 +95,11 @@ function InfluencerModal({ inf, onClose }: { inf: Influencer; onClose: () => voi
           <div className="px-6 pb-6 space-y-5 pt-5">
             {/* Stats */}
             <div className="grid grid-cols-2 gap-3">
-              <div className="p-3 rounded-xl bg-white/5 text-center">
+              <div className="p-3 rounded-xl bg-white text-center">
                 <p className="text-xl font-extrabold" style={{ color: "#2563eb" }}>{inf.followers}</p>
                 <p className="text-xs text-slate-600">متابع</p>
               </div>
-              <div className="p-3 rounded-xl bg-white/5 text-center">
+              <div className="p-3 rounded-xl bg-white text-center">
                 <p className="text-xl font-extrabold" style={{ color: "#2563eb" }}>{inf.engagement}</p>
                 <p className="text-xs text-slate-600">معدل التفاعل</p>
               </div>
@@ -118,7 +118,7 @@ function InfluencerModal({ inf, onClose }: { inf: Influencer; onClose: () => voi
                 {(inf.audienceAge ?? []).map((a) => (
                   <div key={a.label} className="flex items-center gap-3">
                     <span className="text-xs text-slate-600 w-12 text-left">{a.label}</span>
-                    <div className="flex-1 h-2 rounded-full bg-white/5 overflow-hidden">
+                    <div className="flex-1 h-2 rounded-full bg-white overflow-hidden">
                       <div className="h-full rounded-full transition-all" style={{ width: `${a.pct}%`, background: "#2563eb" }} />
                     </div>
                     <span className="text-xs text-slate-600 w-8">{a.pct}%</span>
@@ -135,7 +135,7 @@ function InfluencerModal({ inf, onClose }: { inf: Influencer; onClose: () => voi
                   {inf.audienceCountry.map((a) => (
                     <div key={a.label} className="flex items-center gap-3">
                       <span className="text-xs text-slate-600 w-16">{a.label}</span>
-                      <div className="flex-1 h-2 rounded-full bg-white/5 overflow-hidden">
+                      <div className="flex-1 h-2 rounded-full bg-white overflow-hidden">
                         <div className="h-full rounded-full transition-all" style={{ width: `${a.pct}%`, background: "#3b82f6" }} />
                       </div>
                       <span className="text-xs text-slate-600 w-8">{a.pct}%</span>
@@ -178,38 +178,38 @@ function InfluencerModal({ inf, onClose }: { inf: Influencer; onClose: () => voi
             {submitted ? (
               <div className="text-center py-10">
                 <div className="w-14 h-14 rounded-full flex items-center justify-center text-2xl mx-auto mb-4" style={{ background: "#f0faf0" }}>✅</div>
-                <h3 className="text-lg font-extrabold mb-2" style={{ color: "var(--text-primary)" }}>تم إرسال طلبك!</h3>
-                <p className="text-sm" style={{ color: "var(--text-secondary)" }}>سنتواصل معك خلال 48 ساعة.</p>
+                <h3 className="text-lg font-extrabold mb-2" style={{ color: "#0f172a" }}>تم إرسال طلبك!</h3>
+                <p className="text-sm" style={{ color: "#64748b" }}>سنتواصل معك خلال 48 ساعة.</p>
                 <button onClick={() => { setSubmitted(false); setTab("info"); }}
-                  className="mt-5 px-5 py-2 rounded-xl text-sm font-bold border border-white/10"
-                  style={{ color: "var(--text-secondary)" }}>
+                  className="mt-5 px-5 py-2 rounded-xl text-sm font-bold border border-slate-300"
+                  style={{ color: "#64748b" }}>
                   رجوع
                 </button>
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                  <label className="block text-xs font-bold mb-1" style={{ color: "var(--text-secondary)" }}>اسمك</label>
+                  <label className="block text-xs font-bold mb-1" style={{ color: "#64748b" }}>اسمك</label>
                   <input type="text" required value={contactForm.name}
                     onChange={(e) => setContactForm((f) => ({ ...f, name: e.target.value }))}
                     placeholder="محمد أحمد"
-                    className="w-full px-3 py-2.5 rounded-xl border border-white/10 bg-white/5 outline-none text-sm focus:border-blue-500/60 transition-colors"
-                    style={{ color: "var(--text-primary)" }} />
+                    className="w-full px-3 py-2.5 rounded-xl border border-slate-300 bg-white outline-none text-sm focus:border-blue-500/60 transition-colors"
+                    style={{ color: "#0f172a" }} />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold mb-1" style={{ color: "var(--text-secondary)" }}>بريدك الإلكتروني</label>
+                  <label className="block text-xs font-bold mb-1" style={{ color: "#64748b" }}>بريدك الإلكتروني</label>
                   <input type="email" required value={contactForm.email}
                     onChange={(e) => setContactForm((f) => ({ ...f, email: e.target.value }))}
                     placeholder="you@example.com"
-                    className="w-full px-3 py-2.5 rounded-xl border border-white/10 bg-white/5 outline-none text-sm focus:border-blue-500/60 transition-colors"
-                    style={{ color: "var(--text-primary)" }} dir="ltr" />
+                    className="w-full px-3 py-2.5 rounded-xl border border-slate-300 bg-white outline-none text-sm focus:border-blue-500/60 transition-colors"
+                    style={{ color: "#0f172a" }} dir="ltr" />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold mb-1" style={{ color: "var(--text-secondary)" }}>نوع التعاون</label>
+                  <label className="block text-xs font-bold mb-1" style={{ color: "#64748b" }}>نوع التعاون</label>
                   <select required value={contactForm.type}
                     onChange={(e) => setContactForm((f) => ({ ...f, type: e.target.value }))}
-                    className="w-full px-3 py-2.5 rounded-xl border border-white/10 bg-white/5 outline-none text-sm"
-                    style={{ color: "var(--text-primary)" }}>
+                    className="w-full px-3 py-2.5 rounded-xl border border-slate-300 bg-white outline-none text-sm"
+                    style={{ color: "#0f172a" }}>
                     <option value="">اختر نوع التعاون</option>
                     <option>إعلان ممول</option>
                     <option>مراجعة منتج</option>
@@ -219,12 +219,12 @@ function InfluencerModal({ inf, onClose }: { inf: Influencer; onClose: () => voi
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs font-bold mb-1" style={{ color: "var(--text-secondary)" }}>رسالتك</label>
+                  <label className="block text-xs font-bold mb-1" style={{ color: "#64748b" }}>رسالتك</label>
                   <textarea required rows={4} value={contactForm.message}
                     onChange={(e) => setContactForm((f) => ({ ...f, message: e.target.value }))}
                     placeholder="اكتب تفاصيل طلبك هنا..."
-                    className="w-full px-3 py-2.5 rounded-xl border border-white/10 bg-white/5 outline-none text-sm resize-none focus:border-blue-500/60 transition-colors"
-                    style={{ color: "var(--text-primary)" }} />
+                    className="w-full px-3 py-2.5 rounded-xl border border-slate-300 bg-white outline-none text-sm resize-none focus:border-blue-500/60 transition-colors"
+                    style={{ color: "#0f172a" }} />
                 </div>
                 {submitError && (
                   <div className="px-3 py-2 rounded-lg text-xs" style={{ background: "#fef2f2", color: "#b91c1c" }}>{submitError}</div>
@@ -289,12 +289,12 @@ export default function InfluencersPage() {
               </div>
 
               {/* Stats row */}
-              <div className="flex gap-3 mb-4 pb-4 border-b border-white/10">
+              <div className="flex gap-3 mb-4 pb-4 border-b border-slate-300">
                 <div>
                   <p className="text-base font-extrabold" style={{ color: "#2563eb" }}>{inf.followers}</p>
                   <p className="text-xs text-[#94a3b8]">متابع</p>
                 </div>
-                <div className="w-px bg-white/10" />
+                <div className="w-px bg-slate-300" />
                 <div>
                   <p className="text-base font-extrabold" style={{ color: "#2563eb" }}>{inf.engagement}</p>
                   <p className="text-xs text-[#94a3b8]">تفاعل</p>
