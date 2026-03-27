@@ -184,7 +184,7 @@ export default function AdminTermsPage() {
         <button
           onClick={openAddModal}
           style={{
-            backgroundColor: "#84cc18",
+            backgroundColor: "#3b82f6",
             color: "#ffffff",
             border: "none",
             borderRadius: "8px",
@@ -213,13 +213,16 @@ export default function AdminTermsPage() {
         </p>
       )}
 
-      <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-        {sections.map((section, idx) => (
+      {(() => {
+        const termsSections = sections.filter(s => s.title !== "سياسة الخصوصية");
+        const privacySections = sections.filter(s => s.title === "سياسة الخصوصية");
+
+        const renderSectionCard = (section: TermsSection, idx: number, list: TermsSection[]) => (
           <div
             key={section.id}
             style={{
               backgroundColor: "#ffffff",
-              border: "1px solid #e5e7eb",
+              border: "1px solid #dbeafe",
               borderRadius: "12px",
               padding: "20px",
               display: "flex",
@@ -239,7 +242,7 @@ export default function AdminTermsPage() {
                 justifyContent: "center",
                 fontSize: "16px",
                 fontWeight: 700,
-                color: "#8957f6",
+                color: "#3b82f6",
                 flexShrink: 0,
               }}
             >
@@ -283,7 +286,7 @@ export default function AdminTermsPage() {
                 style={{
                   width: "32px",
                   height: "32px",
-                  border: "1px solid #e5e7eb",
+                  border: "1px solid #dbeafe",
                   borderRadius: "6px",
                   backgroundColor: idx === 0 ? "#f9fafb" : "#ffffff",
                   color: idx === 0 ? "#d1d5db" : "#6b7280",
@@ -298,15 +301,15 @@ export default function AdminTermsPage() {
               </button>
               <button
                 onClick={() => moveSection(section.id, "down")}
-                disabled={idx === sections.length - 1}
+                disabled={idx === list.length - 1}
                 style={{
                   width: "32px",
                   height: "32px",
-                  border: "1px solid #e5e7eb",
+                  border: "1px solid #dbeafe",
                   borderRadius: "6px",
-                  backgroundColor: idx === sections.length - 1 ? "#f9fafb" : "#ffffff",
-                  color: idx === sections.length - 1 ? "#d1d5db" : "#6b7280",
-                  cursor: idx === sections.length - 1 ? "default" : "pointer",
+                  backgroundColor: idx === list.length - 1 ? "#f9fafb" : "#ffffff",
+                  color: idx === list.length - 1 ? "#d1d5db" : "#6b7280",
+                  cursor: idx === list.length - 1 ? "default" : "pointer",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
@@ -323,7 +326,7 @@ export default function AdminTermsPage() {
                 onClick={() => openEditModal(section)}
                 style={{
                   padding: "8px 16px",
-                  border: "1px solid #e5e7eb",
+                  border: "1px solid #dbeafe",
                   borderRadius: "6px",
                   backgroundColor: "#ffffff",
                   color: "#1c1c1e",
@@ -353,7 +356,7 @@ export default function AdminTermsPage() {
                     onClick={() => setDeleteConfirmId(null)}
                     style={{
                       padding: "8px 12px",
-                      border: "1px solid #e5e7eb",
+                      border: "1px solid #dbeafe",
                       borderRadius: "6px",
                       backgroundColor: "#ffffff",
                       color: "#6b7280",
@@ -382,8 +385,38 @@ export default function AdminTermsPage() {
               )}
             </div>
           </div>
-        ))}
-      </div>
+        );
+
+        return (
+          <>
+            {/* Group 1: Terms & Conditions */}
+            <div className="bg-blue-50 border border-blue-100 rounded-xl p-4 mb-6">
+              <h2 className="text-lg font-bold text-gray-900 mb-3">الشروط والأحكام</h2>
+              <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+                {termsSections.map((section, idx) => renderSectionCard(section, idx, termsSections))}
+              </div>
+              {termsSections.length === 0 && (
+                <p style={{ color: "#6b7280", textAlign: "center", padding: "20px 0" }}>
+                  لا توجد أقسام في الشروط والأحكام.
+                </p>
+              )}
+            </div>
+
+            {/* Group 2: Privacy Policy */}
+            <div className="bg-blue-50 border border-blue-100 rounded-xl p-4 mb-6">
+              <h2 className="text-lg font-bold text-gray-900 mb-3">سياسة الخصوصية</h2>
+              <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+                {privacySections.map((section, idx) => renderSectionCard(section, idx, privacySections))}
+              </div>
+              {privacySections.length === 0 && (
+                <p style={{ color: "#6b7280", textAlign: "center", padding: "20px 0" }}>
+                  لا توجد أقسام في سياسة الخصوصية.
+                </p>
+              )}
+            </div>
+          </>
+        );
+      })()}
 
       {/* Modal */}
       {modalOpen && (
@@ -443,7 +476,7 @@ export default function AdminTermsPage() {
                 style={{
                   width: "100%",
                   padding: "10px 14px",
-                  border: "1px solid #e5e7eb",
+                  border: "1px solid #dbeafe",
                   borderRadius: "8px",
                   fontSize: "14px",
                   color: "#1c1c1e",
@@ -475,7 +508,7 @@ export default function AdminTermsPage() {
                 style={{
                   width: "100%",
                   padding: "10px 14px",
-                  border: "1px solid #e5e7eb",
+                  border: "1px solid #dbeafe",
                   borderRadius: "8px",
                   fontSize: "14px",
                   color: "#1c1c1e",
@@ -509,7 +542,7 @@ export default function AdminTermsPage() {
                 style={{
                   width: "100px",
                   padding: "10px 14px",
-                  border: "1px solid #e5e7eb",
+                  border: "1px solid #dbeafe",
                   borderRadius: "8px",
                   fontSize: "14px",
                   color: "#1c1c1e",
@@ -525,7 +558,7 @@ export default function AdminTermsPage() {
               <button
                 onClick={handleSave}
                 style={{
-                  backgroundColor: "#84cc18",
+                  backgroundColor: "#3b82f6",
                   color: "#ffffff",
                   border: "none",
                   borderRadius: "8px",
@@ -542,7 +575,7 @@ export default function AdminTermsPage() {
                 style={{
                   backgroundColor: "#ffffff",
                   color: "#6b7280",
-                  border: "1px solid #e5e7eb",
+                  border: "1px solid #dbeafe",
                   borderRadius: "8px",
                   padding: "10px 24px",
                   fontSize: "14px",
