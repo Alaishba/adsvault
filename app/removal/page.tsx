@@ -91,7 +91,7 @@ export default function RemovalPage() {
               <label className="block text-sm font-semibold mb-1.5" style={{ color: "var(--text-primary)" }}>رابط المحتوى</label>
               <input type="url" required value={form.url}
                 onChange={(e) => setForm((f) => ({ ...f, url: e.target.value }))}
-                placeholder="https://mulhem.com/..."
+                placeholder="https://mulhem.sa/..."
                 className="w-full px-4 py-2.5 rounded-xl border border-[--border] outline-none text-sm transition-colors focus:border-blue-500/60"
                 style={{ background: "#ffffff", color: "var(--text-primary)" }} dir="ltr" />
             </div>
@@ -136,7 +136,7 @@ export default function RemovalPage() {
         </div>
 
         <div className="mt-4 p-4 rounded-xl border border-[--border] text-sm" style={{ color: "var(--text-secondary)" }}>
-          <strong style={{ color: "var(--text-primary)" }}>ملاحظة:</strong> سيتم مراجعة جميع الطلبات خلال 3-5 أيام عمل. في الحالات الطارئة، يمكنك التواصل مباشرة على: legal@mulhem.com
+          <strong style={{ color: "var(--text-primary)" }}>ملاحظة:</strong> سيتم مراجعة جميع الطلبات خلال 3-5 أيام عمل. في الحالات الطارئة، يمكنك التواصل مباشرة على: Support@mulhem.sa
         </div>
       </div>
     </AppLayout>

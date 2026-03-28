@@ -10,10 +10,10 @@ import { type Ad } from "../lib/mockData";
 import { fetchAds } from "../lib/db";
 
 const filterConfigs = [
-  { key: "sector", label: "القطاع", options: ["تجزئة", "اتصالات", "تجارة إلكترونية", "مواد استهلاكية"] },
-  { key: "platform", label: "المنصة", options: ["Meta", "TikTok", "Snap", "YouTube", "Instagram"] },
-  { key: "country", label: "الدولة", options: ["السعودية", "الإمارات", "الكويت", "مصر"] },
-  { key: "funnel_stage", label: "مرحلة القمع", options: ["awareness", "interest", "conversion"] },
+  { key: "sector", label: "القطاع", options: ["التجزئة", "العقارات", "مطاعم ومقاهي", "الصحة والتعليم", "السياحة والترفيه", "مالية/لوجستية"] },
+  { key: "platform", label: "المنصة", options: ["Snapchat", "X", "TikTok", "Instagram", "Google Ads", "YouTube"] },
+  { key: "country", label: "الدولة", options: ["السعودية", "الكويت", "الإمارات العربية", "مصر"] },
+  { key: "funnel_stage", label: "رحلة العميل", options: ["مرحلة الوعي", "مرحلة المقارنة", "مرحلة التحويل", "مرحلة الاحتفاظ"] },
 ];
 
 const sortOptions = [

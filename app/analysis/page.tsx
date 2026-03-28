@@ -10,8 +10,8 @@ import { fetchStrategies } from "../lib/db";
 import { getImageUrl } from "../lib/imageUrl";
 
 const filterConfigs = [
-  { key: "sector", label: "القطاع", options: ["مطاعم", "أزياء رياضية", "خدمات مالية", "تجارة إلكترونية", "اتصالات"] },
-  { key: "tag", label: "التاغ", options: ["رمضان", "موسمي", "عائلي", "مؤثرون", "UGC", "هوية العلامة", "رقمي", "إلحاح"] },
+  { key: "sector", label: "القطاع", options: ["التجزئة", "العقارات", "مطاعم ومقاهي", "الصحة والتعليم", "السياحة والترفيه", "مالية/لوجستية"] },
+  { key: "tag", label: "التصنيف", options: ["UGC", "مؤثرون", "اعلاني", "Branding", "Storytelling"] },
 ];
 
 function ProBlurOverlay() {

@@ -180,7 +180,7 @@ export default function HomePage() {
               <h1 className="text-3xl lg:text-5xl font-extrabold leading-tight mb-5 text-white">
                 إستلهم،
                 <br />
-                من أفضل الإعلانات التجارية الناجحة
+                من أفضل الإعلانات الناجحة
               </h1>
 
               <p className="text-base leading-relaxed mb-8 max-w-lg text-slate-200">
@@ -209,7 +209,7 @@ export default function HomePage() {
       <section className="px-6 lg:px-10 pb-10 bg-[#0a0a2e]">
         <div className="max-w-2xl mx-auto text-center mb-10 bg-[#ced3de]/30 border border-[#ced3de]/50 rounded-2xl p-8">
           <p className="text-xl font-black text-white mb-3">منصة Mulhem — ذكاء تسويقي متكامل</p>
-          <p className="text-sm text-slate-300 leading-relaxed mb-2">نساعدك على استكشاف أفضل الإعلانات التجارية الناجحة في المنطقة العربية، وتحليل استراتيجياتها، وتطبيقها على حملاتك التسويقية.</p>
+          <p className="text-sm text-slate-300 leading-relaxed mb-2">منصة ملهم تجمع أفضل الإعلانات الناجحة في السوق السعودي، وتحللها لك بعمق — لتستلهم منها وتبني حملاتك بثقة.</p>
           <p className="text-sm font-bold text-blue-400">إستلهم. حلّل. طبّق.</p>
         </div>
       </section>
@@ -304,7 +304,7 @@ export default function HomePage() {
           <div className="flex items-end justify-between mb-5">
             <div>
               <h2 className="text-xl font-extrabold text-white">أبرز المؤثرين</h2>
-              <p className="text-sm mt-0.5 text-slate-400">أبرز المؤثرين في المنطقة العربية</p>
+              <p className="text-sm mt-0.5 text-slate-400">أبرز المؤثرين في السعودية 🇸🇦</p>
             </div>
             <Link href="/influencers" className="text-sm font-semibold transition-colors text-blue-400">
               عرض الكل ←

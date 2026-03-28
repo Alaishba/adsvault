@@ -342,7 +342,7 @@ export default function InfluencersPage() {
       <div className="px-6 lg:px-10 py-8">
         <div className="mb-7">
           <h1 className="text-2xl font-extrabold text-[#ffffff]">المؤثرون</h1>
-          <p className="text-sm text-[#94a3b8] mt-1">اكتشف أبرز المؤثرين في المنطقة العربية وحلّل أداءهم</p>
+          <p className="text-sm text-[#94a3b8] mt-1">اكتشف أبرز المؤثرين في السعودية 🇸🇦</p>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
