@@ -3,6 +3,7 @@ import "./globals.css";
 import { ThemeProvider } from "./context/ThemeContext";
 import ScrollProgress from "./components/ScrollProgress";
 import { ToastProvider } from "./components/Toast";
+import { Analytics } from '@vercel/analytics/react';
 
 export const metadata: Metadata = {
   title: "Mulhem",
@@ -19,6 +20,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
             {children}
           </ToastProvider>
         </ThemeProvider>
+        <Analytics />
       </body>
     </html>
   );
