@@ -36,7 +36,7 @@ export default function LoginPage() {
           <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-lg font-black text-white mx-auto mb-3"
             style={{ background: "#2563eb" }}>AV</div>
           <h1 className="text-2xl font-extrabold" style={{ color: "#ffffff" }}>تسجيل الدخول</h1>
-          <p className="text-sm mt-1" style={{ color: "#94a3b8" }}>مرحباً بك مجدداً في AdVault MENA</p>
+          <p className="text-sm mt-1" style={{ color: "#94a3b8" }}>مرحباً بك مجدداً في Mulhem</p>
         </div>
 
         <div className="rounded-2xl border p-6" style={{ background: "rgba(255,255,255,0.05)", borderColor: "rgba(255,255,255,0.1)" }}>

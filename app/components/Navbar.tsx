@@ -100,16 +100,16 @@ export default function Navbar({ onMenuClick }: { onMenuClick?: () => void }) {
 
       {/* Logo mobile */}
       <Link href="/" className="lg:hidden flex items-center gap-2 shrink-0">
-        <img src="/logo.svg" alt="AdVault" className="h-8 w-auto" onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
-        <span className="font-black text-sm" style={{ color: "#1c1c1e" }}>AdVault</span>
+        <img src="/logo.svg" alt="Mulhem" className="h-8 w-auto" onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
+        <span className="font-black text-sm" style={{ color: "#1c1c1e" }}>Mulhem</span>
       </Link>
 
       {/* Logo desktop */}
       <Link href="/" className="hidden lg:flex items-center gap-3 shrink-0 min-w-0">
-        <img src="/logo.svg" alt="AdVault" className="h-8 w-auto" onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
+        <img src="/logo.svg" alt="Mulhem" className="h-8 w-auto" onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
         <div className="min-w-0">
           <p className="font-black text-base leading-tight whitespace-nowrap" style={{ color: "#1c1c1e" }}>
-            AdVault <span style={{ color: "#84cc18" }}>MENA</span>
+            Mulhem <span style={{ color: "#84cc18" }}>MENA</span>
           </p>
           <p className="text-xs whitespace-nowrap" style={{ color: "#6b7280" }}>ذكاء إعلاني استراتيجي</p>
         </div>

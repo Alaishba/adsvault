@@ -31,7 +31,7 @@ function AdminSidebar({ mobileOpen, onClose }: { mobileOpen?: boolean; onClose?:
         <div className="px-5 py-4 flex items-center gap-3" style={{ borderBottom: "1px solid #dbeafe" }}>
           <div className="w-9 h-9 rounded-xl flex items-center justify-center text-sm font-black text-white" style={{ background: "#3b82f6" }}>AV</div>
           <div>
-            <p className="font-black text-sm leading-tight" style={{ color: "#1c1c1e" }}>AdVault</p>
+            <p className="font-black text-sm leading-tight" style={{ color: "#1c1c1e" }}>Mulhem</p>
             <p className="text-xs font-bold" style={{ color: "#ef4444" }}>Admin Panel</p>
           </div>
         </div>

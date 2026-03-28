@@ -22,7 +22,7 @@ export default function BlogArticlePage() {
         setArticle({
           id: data.id as number, slug: (data.slug as string) ?? "", title: (data.title as string) ?? "",
           excerpt: ((data.content as string) ?? "").slice(0, 120), category: (data.category as string) ?? "",
-          coverImage: (data.banner_image as string) ?? "#2563eb", author: (data.author as string) ?? "فريق AdVault",
+          coverImage: (data.banner_image as string) ?? "#2563eb", author: (data.author as string) ?? "فريق Mulhem",
           date: ((data.created_at as string) ?? "").slice(0, 10), readTime: "5 دقائق",
           tags: (data.tags as string[]) ?? [],
         });

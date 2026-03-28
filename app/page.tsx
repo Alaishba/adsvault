@@ -139,7 +139,7 @@ export default function HomePage() {
               title: (d.title as string) ?? "", excerpt: ((d.content as string) ?? "").slice(0, 120),
               category: (d.category as string) ?? "تسويق",
               coverImage: (d.banner_image as string) ?? "#2563eb",
-              author: (d.author as string) ?? "فريق Molhm",
+              author: (d.author as string) ?? "فريق Mulhem",
               date: ((d.created_at as string) ?? "").slice(0, 10),
               readTime: "5 دقائق", tags: (d.tags as string[]) ?? [],
               featured: d.featured as boolean,
@@ -161,7 +161,7 @@ export default function HomePage() {
           <div className="w-full md:w-[40%] max-h-48 md:max-h-full order-2 md:order-2 lg:-ml-[5%]">
             <div className="rounded-2xl bg-white/5 border border-white/10 w-full h-80 flex items-center justify-center lg:-translate-x-8 overflow-hidden">
               {promoBanners["hero_laptop"] ? (
-                <img src={promoBanners["hero_laptop"]} alt="Molhm" className="w-full h-full object-cover" />
+                <img src={promoBanners["hero_laptop"]} alt="Mulhem" className="w-full h-full object-cover" />
               ) : null}
             </div>
           </div>
@@ -169,7 +169,11 @@ export default function HomePage() {
           {/* RIGHT column (60%) — glassmorphism card */}
           <div className="w-full md:w-[60%] order-1 md:order-1">
             <div className="backdrop-blur-lg bg-white/10 border border-white/20 rounded-3xl p-10">
-              <div className="hidden md:inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold mb-6 bg-white/10 border border-white/20 text-white">
+              <div className="hidden md:inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold mb-6 bg-white/10 border border-white/20"
+                style={{
+                  color: '#4ade80',
+                  textShadow: '0 0 12px rgba(74,222,128,0.9), 0 0 30px rgba(74,222,128,0.5), 0 0 60px rgba(74,222,128,0.3)'
+                }}>
                 أول منصة ذكاء تسويقي متكامل في السعودية 🇸🇦
               </div>
 
@@ -204,7 +208,7 @@ export default function HomePage() {
       {/* ── ABOUT MOLHM ── */}
       <section className="px-6 lg:px-10 pb-10 bg-[#0a0a2e]">
         <div className="max-w-2xl mx-auto text-center mb-10 bg-[#ced3de]/30 border border-[#ced3de]/50 rounded-2xl p-8">
-          <p className="text-xl font-black text-white mb-3">منصة ملهم — ذكاء تسويقي متكامل</p>
+          <p className="text-xl font-black text-white mb-3">منصة Mulhem — ذكاء تسويقي متكامل</p>
           <p className="text-sm text-slate-300 leading-relaxed mb-2">نساعدك على استكشاف أفضل الإعلانات التجارية الناجحة في المنطقة العربية، وتحليل استراتيجياتها، وتطبيقها على حملاتك التسويقية.</p>
           <p className="text-sm font-bold text-blue-400">إستلهم. حلّل. طبّق.</p>
         </div>

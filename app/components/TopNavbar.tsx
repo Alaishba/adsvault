@@ -152,12 +152,12 @@ export default function TopNavbar() {
         {/* RIGHT side: Logo */}
         <Link href="/" className="flex items-center gap-2.5 shrink-0">
           {siteLogo ? (
-            <img src={siteLogo} alt="Molhm" className="h-16 w-16 rounded-xl object-contain" />
+            <img src={siteLogo} alt="Mulhem" className="h-16 w-16 rounded-xl object-contain" />
           ) : (
             <div style={{width: 64, height: 64}} />
           )}
           <div className="hidden sm:block">
-            <p className="font-black text-base leading-tight text-white">Molhm</p>
+            <p className="font-black text-base leading-tight text-white">Mulhem</p>
           </div>
         </Link>
 

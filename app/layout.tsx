@@ -5,7 +5,7 @@ import ScrollProgress from "./components/ScrollProgress";
 import { ToastProvider } from "./components/Toast";
 
 export const metadata: Metadata = {
-  title: "AdVault",
+  title: "Mulhem",
   description: "منصة B2B للذكاء الإعلاني في منطقة MENA – فكك الإعلانات الناجحة وطبّقها باحتراف",
 };
 

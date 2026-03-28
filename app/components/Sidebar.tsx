@@ -58,10 +58,10 @@ export default function Sidebar({ mobileOpen, onClose }: { mobileOpen?: boolean;
       >
         {/* Logo */}
         <div className="px-5 py-4 flex items-center gap-3" style={{ borderBottom: "1px solid rgba(209,209,214,0.5)" }}>
-          <img src="/logo.svg" alt="AdVault" className="h-9 w-9 rounded-xl object-contain"
+          <img src="/logo.svg" alt="Mulhem" className="h-9 w-9 rounded-xl object-contain"
             onError={(e) => { (e.target as HTMLImageElement).outerHTML = '<div class="w-9 h-9 rounded-xl flex items-center justify-center text-sm font-black" style="background:#84cc18;color:#fff">AV</div>'; }} />
           <div>
-            <p className="font-black text-sm leading-tight" style={{ color: "#1c1c1e" }}>AdVault</p>
+            <p className="font-black text-sm leading-tight" style={{ color: "#1c1c1e" }}>Mulhem</p>
             <p className="text-xs font-bold" style={{ color: "#84cc18" }}>MENA</p>
           </div>
         </div>

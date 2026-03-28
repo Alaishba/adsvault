@@ -113,7 +113,7 @@ export default function BlogPage() {
             title: (d.title as string) ?? "", excerpt: ((d.content as string) ?? "").slice(0, 120),
             category: (d.category as string) ?? "تسويق",
             coverImage: (d.banner_image as string) ?? "#2563eb",
-            author: (d.author as string) ?? "فريق AdVault",
+            author: (d.author as string) ?? "فريق Mulhem",
             date: ((d.created_at as string) ?? "").slice(0, 10),
             readTime: "5 دقائق", tags: (d.tags as string[]) ?? [],
           })));

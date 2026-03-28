@@ -197,7 +197,7 @@ export default function AdminGuidePage() {
     <div className="px-6 lg:px-10 py-8 max-w-4xl">
       <div className="mb-8">
         <h1 className="text-2xl font-extrabold text-[#1c1c1e]">دليل الإدارة</h1>
-        <p className="text-sm mt-0.5 text-[#6b7280]">كل ما تحتاج معرفته لإدارة منصة AdVault</p>
+        <p className="text-sm mt-0.5 text-[#6b7280]">كل ما تحتاج معرفته لإدارة منصة Mulhem</p>
       </div>
 
       <div className="space-y-6">
@@ -254,7 +254,7 @@ export default function AdminGuidePage() {
       {/* Version note */}
       <div className="mt-8 p-4 rounded-xl border border-[#dbeafe] text-center">
         <p className="text-xs text-[#6b7280]">
-          AdVault Admin Guide · v2.0 · آخر تحديث: مارس 2026
+          Mulhem Admin Guide · v2.0 · آخر تحديث: مارس 2026
         </p>
       </div>
     </div>

@@ -44,9 +44,9 @@ const mockContactRequests: ContactRequest[] = [
 ];
 
 const mockRemovalRequests: RemovalRequest[] = [
-  { id: "r1", name: "ليلى أحمد", email: "layla@brand.com", content_url: "https://advault.io/library/ad-2847", reason: "الإعلان يحتوي على علامتنا التجارية بدون إذن", created_at: "2026-03-19", status: "جديد" },
-  { id: "r2", name: "عمر السعيد", email: "omar@agency.ae", content_url: "https://advault.io/library/ad-1523", reason: "محتوى قديم ولم يعد يمثل حملتنا الحالية", created_at: "2026-03-16", status: "قيد المراجعة" },
-  { id: "r3", name: "هند الكاظمي", email: "hind@corp.bh", content_url: "https://advault.io/library/ad-3901", reason: "بيانات غير دقيقة في التحليل المرفق بالإعلان", created_at: "2026-03-10", status: "مكتمل" },
+  { id: "r1", name: "ليلى أحمد", email: "layla@brand.com", content_url: "https://mulhem.com/library/ad-2847", reason: "الإعلان يحتوي على علامتنا التجارية بدون إذن", created_at: "2026-03-19", status: "جديد" },
+  { id: "r2", name: "عمر السعيد", email: "omar@agency.ae", content_url: "https://mulhem.com/library/ad-1523", reason: "محتوى قديم ولم يعد يمثل حملتنا الحالية", created_at: "2026-03-16", status: "قيد المراجعة" },
+  { id: "r3", name: "هند الكاظمي", email: "hind@corp.bh", content_url: "https://mulhem.com/library/ad-3901", reason: "بيانات غير دقيقة في التحليل المرفق بالإعلان", created_at: "2026-03-10", status: "مكتمل" },
 ];
 
 const mockSupportRequests: SupportRequest[] = [
