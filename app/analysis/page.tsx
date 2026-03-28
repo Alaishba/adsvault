@@ -249,7 +249,7 @@ export default function AnalysisPage() {
                       </p>
                     ))}
                   </div>
-                  <div className="flex flex-wrap gap-1">
+                  <div className="flex justify-start flex-wrap gap-1" dir="ltr">
                     {(s.tags ?? []).slice(0, 3).map((tag) => (
                       <span key={tag} className="px-2 py-0.5 text-[10px] rounded-full font-medium"
                         style={{ background: "var(--accent-light)", color: "var(--accent-text)" }}>{tag}</span>

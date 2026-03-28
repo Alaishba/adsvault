@@ -148,10 +148,18 @@ export default function ProfilePage() {
     <AppLayout>
       <div className="px-6 lg:px-10 py-8 max-w-4xl mx-auto">
         {/* Hero header (glassmorphism) */}
-        <div className="rounded-2xl p-6 mb-6 flex flex-col sm:flex-row items-start sm:items-center gap-5" style={{
+        <div className="rounded-2xl mb-6 flex flex-row-reverse items-center gap-4 p-4" style={{
           background: "#ced3de",
           border: "1px solid #ced3de",
         }}>
+          {/* RIGHT side — text info */}
+          <div className="flex-1 text-right">
+            <p className="text-lg font-black text-slate-900">{name || "المستخدم"}</p>
+            <p className="text-sm text-slate-600">{email}</p>
+            <span className="inline-block mt-1 px-3 py-0.5 rounded-full text-xs font-bold"
+              style={{ background: planInfo.bg, color: planInfo.color }}>{planInfo.label}</span>
+          </div>
+          {/* LEFT side — avatar */}
           <div className="relative shrink-0 group">
             {avatarUrl ? (
               <img src={getImageUrl("user-avatars", avatarUrl)} alt="avatar" className="w-20 h-20 rounded-2xl object-cover" style={{ border: "3px solid #2563eb" }}
@@ -171,21 +179,10 @@ export default function ProfilePage() {
             </button>
             <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleAvatarChange} />
           </div>
-          <div className="flex-1 min-w-0">
-            <h1 className="text-xl font-extrabold" style={{ color: "#0f172a" }}>{name || "المستخدم"}</h1>
-            <p className="text-sm" style={{ color: "#6b7280" }}>{email}</p>
-            <span className="inline-flex items-center gap-1 mt-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold"
-              style={{ background: planInfo.bg, color: planInfo.color }}>{planInfo.label}</span>
-          </div>
-          <button onClick={handleLogout}
-            className="px-4 py-2 rounded-xl text-sm font-semibold transition-all"
-            style={{ color: "#ef4444", border: "1px solid #e5e7eb" }}>
-            تسجيل الخروج
-          </button>
         </div>
 
         {/* Tabs (glassmorphism) */}
-        <div className="flex gap-1 mb-6 overflow-x-auto rounded-xl p-1" style={{
+        <div className="flex justify-center gap-1 mb-6 overflow-x-auto rounded-xl p-1" style={{
           background: "#ced3de",
           border: "1px solid #ced3de",
         }}>

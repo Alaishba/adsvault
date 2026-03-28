@@ -79,7 +79,7 @@ function StatCard({ stat }: { stat: StatItem }) {
   const { count, ref } = useCountUp(stat.target);
   const display = `${stat.prefix}${count.toLocaleString()}${stat.suffix}`;
   return (
-    <div ref={ref} className="rounded-xl p-3 flex flex-col items-center justify-center text-center w-48 h-28" style={{
+    <div ref={ref} className="rounded-xl p-3 flex flex-col items-center justify-center text-center w-full md:w-48 h-28" style={{
       background: "rgba(206,211,222,0.2)",
       backdropFilter: "blur(10px)",
       WebkitBackdropFilter: "blur(10px)",
@@ -156,9 +156,9 @@ export default function HomePage() {
     <AppLayout>
       {/* ── HERO ── */}
       <section className="relative min-h-[80vh] flex items-center bg-gradient-to-br from-[#1C4ED8] via-[#0d1b4b] to-black -mt-20 pt-8 overflow-hidden" style={{ animation: "fadeInUp 0.5s ease both" }}>
-        <div className="flex flex-col lg:flex-row gap-12 items-center w-full px-6 lg:px-10">
+        <div className="flex flex-col md:flex-row gap-12 items-center w-full px-6 lg:px-10">
           {/* LEFT column (40%) — laptop placeholder, bleeds off left edge */}
-          <div className="w-full lg:w-[40%] order-2 lg:order-2 lg:-ml-[5%]">
+          <div className="w-full md:w-[40%] max-h-48 md:max-h-full order-2 md:order-2 lg:-ml-[5%]">
             <div className="rounded-2xl bg-white/5 border border-white/10 w-full h-80 flex items-center justify-center lg:-translate-x-8 overflow-hidden">
               {promoBanners["hero_laptop"] ? (
                 <img src={promoBanners["hero_laptop"]} alt="Molhm" className="w-full h-full object-cover" />
@@ -167,9 +167,9 @@ export default function HomePage() {
           </div>
 
           {/* RIGHT column (60%) — glassmorphism card */}
-          <div className="w-full lg:w-[60%] order-1 lg:order-1">
+          <div className="w-full md:w-[60%] order-1 md:order-1">
             <div className="backdrop-blur-lg bg-white/10 border border-white/20 rounded-3xl p-10">
-              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold mb-6 bg-white/10 border border-white/20 text-white">
+              <div className="hidden md:inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold mb-6 bg-white/10 border border-white/20 text-white">
                 أول منصة ذكاء تسويقي متكامل في السعودية 🇸🇦
               </div>
 
@@ -196,7 +196,7 @@ export default function HomePage() {
 
       {/* ── STATS (glassmorphism, smaller) ── */}
       <section className="px-6 lg:px-10 pt-2 pb-10 bg-[#0a0a2e]">
-        <div className="flex justify-center gap-6 flex-wrap">
+        <div className="grid grid-cols-2 md:flex md:flex-row gap-4 md:gap-6 justify-center">
           {buildStatsData(ads, strategies).map((s, i) => <StatCard key={i} stat={s} />)}
         </div>
       </section>
@@ -229,7 +229,7 @@ export default function HomePage() {
               </div>
             ))}
             {/* Promo banner */}
-            <div className="rounded-2xl overflow-hidden" style={{ height: 360 }}>
+            <div className="rounded-2xl overflow-hidden h-[252px] md:h-[360px]">
               {promoBanners["ads"] ? (
                 <img src={promoBanners["ads"]} alt="" className="w-full h-full object-cover" />
               ) : <div className="w-full h-full bg-[#ced3de]/20" />}
@@ -277,7 +277,7 @@ export default function HomePage() {
                   {s.title}
                 </h3>
                 <p className="text-xs leading-relaxed mb-2 line-clamp-1 text-slate-700">{s.preview}</p>
-                <div className="flex flex-wrap gap-1">
+                <div className="flex justify-start flex-wrap gap-1" dir="ltr">
                   {(s.tags ?? []).slice(0, 2).map((tag) => (
                     <span key={tag} className="px-2 py-0.5 text-xs rounded-full font-medium bg-blue-100 text-blue-700">{tag}</span>
                   ))}
@@ -286,7 +286,7 @@ export default function HomePage() {
             </Link>
           ))}
           {/* Promo banner */}
-          <div className="rounded-2xl bg-[#ced3de]/20 overflow-hidden" style={{ height: 280 }}>
+          <div className="rounded-2xl bg-[#ced3de]/20 overflow-hidden h-[196px] md:h-[280px]">
             {promoBanners["strategies"] ? (
               <img src={promoBanners["strategies"]} alt="" className="w-full h-full object-cover" />
             ) : <div className="w-full h-full bg-[#ced3de]/20" />}
@@ -330,13 +330,13 @@ export default function HomePage() {
                   <span className="text-slate-900 font-bold">{inf.engagement} <span className="text-slate-500 font-normal">تفاعل</span></span>
                 </div>
                 {inf.country && (
-                  <p className="text-[10px] text-slate-500 mt-1">{getCountryFlag(inf.country)} {inf.country}</p>
+                  <p className="flex justify-start text-[10px] text-slate-500 mt-1" dir="ltr">{getCountryFlag(inf.country)} {inf.country}</p>
                 )}
                 {(inf as any).niche && (
-                  <p className="text-[10px] text-slate-400 mt-0.5">{(inf as any).niche}</p>
+                  <p className="text-[10px] text-slate-400 mt-0.5 text-left" dir="ltr">{(inf as any).niche}</p>
                 )}
                 {((inf as any).interests as string[] ?? []).length > 0 && (
-                  <div className="flex flex-wrap gap-0.5 mt-1">
+                  <div className="flex justify-start flex-wrap gap-0.5 mt-1" dir="ltr">
                     {((inf as any).interests as string[] ?? []).slice(0, 3).map((i: string) => (
                       <span key={i} className="text-[9px] px-1.5 py-0.5 rounded-full bg-blue-100/60 text-blue-800">#{i}</span>
                     ))}
@@ -345,7 +345,7 @@ export default function HomePage() {
               </Link>
             ))}
             {/* Promo banner */}
-            <div className="rounded-2xl bg-[#ced3de]/20 overflow-hidden" style={{ height: 160 }}>
+            <div className="rounded-2xl bg-[#ced3de]/20 overflow-hidden h-[112px] md:h-[160px]">
               {promoBanners["influencers"] ? (
                 <img src={promoBanners["influencers"]} alt="" className="w-full h-full object-cover" />
               ) : <div className="w-full h-full bg-[#ced3de]/20" />}
@@ -366,7 +366,26 @@ export default function HomePage() {
               عرض الكل ←
             </Link>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {/* Mobile-only blog titles */}
+          <div className="flex md:hidden justify-center px-4 mb-4">
+            <div className="inline-flex items-center gap-0 rounded-full px-4 py-2"
+              style={{
+                background: 'rgba(206,211,222,0.15)',
+                border: '1px solid rgba(255,255,255,0.2)',
+                backdropFilter: 'blur(8px)',
+              }}>
+              {blogPosts.slice(0,3).map((post, i) => (
+                <span key={post.id} className="flex items-center gap-0">
+                  <Link href={`/blog/${post.slug}`}
+                    className="text-xs text-white whitespace-nowrap px-2 hover:text-blue-300 transition-colors">
+                    {post.title}
+                  </Link>
+                  {i < 2 && <span className="text-white/40 text-xs">|</span>}
+                </span>
+              ))}
+            </div>
+          </div>
+          <div className="hidden md:grid grid-cols-1 md:grid-cols-3 gap-4">
             {blogPosts.slice(0, 2).map((post) => (
               <Link key={post.id} href={`/blog/${post.slug}`}
                 className="rounded-xl overflow-hidden bg-[#ced3de] border border-[#ced3de] transition-all duration-200 hover:shadow-md hover:scale-[1.02]"
@@ -378,7 +397,7 @@ export default function HomePage() {
                       className="absolute inset-0 w-full h-full object-cover"
                       onError={(e) => { e.currentTarget.style.display = "none"; }} />
                   )}
-                  <span className="absolute top-3 right-3 px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-600 text-white">
+                  <span className="absolute top-3 left-3 px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-600 text-white">
                     {post.category}
                   </span>
                 </div>
@@ -390,7 +409,7 @@ export default function HomePage() {
               </Link>
             ))}
             {/* Promo banner */}
-            <div className="rounded-2xl bg-[#ced3de]/20 overflow-hidden" style={{ height: 280 }}>
+            <div className="rounded-2xl bg-[#ced3de]/20 overflow-hidden h-[196px] md:h-[280px]">
               {promoBanners["blog"] ? (
                 <img src={promoBanners["blog"]} alt="" className="w-full h-full object-cover" />
               ) : <div className="w-full h-full bg-[#ced3de]/20" />}

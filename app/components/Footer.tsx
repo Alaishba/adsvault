@@ -17,9 +17,9 @@ export default function Footer() {
   return (
     <footer className="bg-[#ced3de]/20 border-t border-[#ced3de]/40">
       <div className="max-w-7xl mx-auto px-6 lg:px-10 py-8">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+        <div className="flex flex-col md:grid md:grid-cols-4 gap-8">
           {/* RIGHT column — Logo + copyright */}
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-3 order-1 md:order-none">
             <Link href="/" className="flex items-center gap-2.5">
               {siteLogo ? (
                 <img src={siteLogo} alt="Molhm" className="h-24 w-24 rounded-lg object-contain" />
@@ -32,21 +32,21 @@ export default function Footer() {
           </div>
 
           {/* CENTER-RIGHT column — Quick links */}
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-2 order-4 md:order-none">
             <p className="text-sm font-bold text-black mb-1">روابط سريعة</p>
             <Link href="/terms" className="text-sm text-black hover:text-slate-900 transition-colors">سياسة الخصوصية</Link>
             <Link href="/terms" className="text-sm text-black hover:text-slate-900 transition-colors">الشروط والأحكام</Link>
           </div>
 
           {/* CENTER-LEFT column — Important links */}
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-2 order-3 md:order-none">
             <p className="text-sm font-bold text-black mb-1">روابط مهمة</p>
             <Link href="/removal" className="text-sm text-black hover:text-slate-900 transition-colors">طلبات إزالة المحتوى</Link>
             <Link href="/terms" className="text-sm text-black hover:text-slate-900 transition-colors">دعم فني/تقني</Link>
           </div>
 
           {/* LEFT column — Social + Contact */}
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-4 order-2 md:order-none">
             {/* Social icons */}
             <div className="flex gap-2">
               {/* Twitter/X */}

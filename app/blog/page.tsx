@@ -206,7 +206,7 @@ export default function BlogPage() {
                   <span className="text-white/30 text-4xl font-extrabold select-none">
                     {getInitials(article.title)}
                   </span>
-                  <span className="absolute top-3 right-3 px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-600 text-white">
+                  <span className="absolute top-3 left-3 px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-600 text-white">
                     {article.category}
                   </span>
                 </div>

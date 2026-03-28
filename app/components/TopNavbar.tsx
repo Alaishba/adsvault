@@ -117,11 +117,14 @@ export default function TopNavbar() {
   }, [search, doSearch]);
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
-    setUserInfo(null);
-    setDropdownOpen(false);
-    router.push("/");
-    router.refresh();
+    try {
+      const supabase = createClient();
+      await supabase.auth.signOut();
+    } catch (e) {
+      console.error(e);
+    } finally {
+      window.location.href = '/';
+    }
   };
 
   const initials = userInfo?.name
@@ -130,7 +133,15 @@ export default function TopNavbar() {
 
   return (
     <header className={`fixed top-0 left-0 right-0 z-50 bg-transparent transition-opacity duration-300 ${scrolled ? "opacity-25" : "opacity-100"}`}>
-      <div className="flex items-center gap-3 px-4 lg:px-8 py-5">
+      <div className="relative flex items-center gap-3 px-4 lg:px-8 py-5">
+        <div
+          className="absolute top-0 left-0 right-0 pointer-events-none"
+          style={{
+            height: '50px',
+            background: 'linear-gradient(to bottom, rgba(255,255,255,0.15) 0%, transparent 100%)',
+            zIndex: -1
+          }}
+        />
         {/* Mobile hamburger */}
         <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="lg:hidden p-2 rounded-lg text-white/70 hover:text-white transition-colors">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -169,8 +180,8 @@ export default function TopNavbar() {
           </div>
         </nav>
 
-        {/* Search (compact, mobile only) */}
-        <div className="relative lg:hidden flex-1 mx-2">
+        {/* Search (compact, hidden on desktop nav) */}
+        <div className="relative flex lg:hidden flex-1 mx-2">
           <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-white/10 border border-white/15">
             <svg className="shrink-0" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ color: "#94a3b8" }}>
               <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
@@ -233,7 +244,18 @@ export default function TopNavbar() {
                   {userInfo.avatar ? (
                     <img src={getImageUrl("user-avatars", userInfo.avatar)} alt="" className="w-full h-full object-cover"
                       onError={(e) => { e.currentTarget.src = "/fallback.png"; e.currentTarget.style.display = "block"; }} />
-                  ) : initials}
+                  ) : (
+                    <div className="w-8 h-8 rounded-full overflow-hidden flex items-center justify-center bg-slate-800">
+                      <img
+                        src="/logo.png"
+                        alt="avatar"
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          e.currentTarget.style.display = 'none';
+                        }}
+                      />
+                    </div>
+                  )}
                 </div>
               </button>
               {dropdownOpen && (

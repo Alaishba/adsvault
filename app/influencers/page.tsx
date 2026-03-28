@@ -390,15 +390,15 @@ export default function InfluencersPage() {
               </div>
 
               {inf.country && (
-                <p className="text-xs text-slate-600 mt-2">
+                <p className="flex justify-start text-xs text-slate-600 mt-2" dir="ltr">
                   {getCountryFlag(inf.country)} {inf.country}
                 </p>
               )}
               {!!inf.niche && (
-                <p className="text-xs text-slate-500 mt-1">{inf.niche}</p>
+                <p className="text-xs text-slate-500 mt-1 text-left" dir="ltr">{inf.niche}</p>
               )}
               {(inf.interests ?? []).length > 0 && (
-                <div className="flex flex-wrap gap-1 mt-2">
+                <div className="flex justify-start flex-wrap gap-1 mt-2" dir="ltr">
                   {(inf.interests ?? []).slice(0, 3).map((i: string) => (
                     <span key={i} className="text-xs px-2 py-0.5 rounded-full bg-blue-100/60 text-blue-800">#{i}</span>
                   ))}
