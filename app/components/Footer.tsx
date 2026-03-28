@@ -1,6 +1,19 @@
+"use client";
+
+import { useState, useEffect } from "react";
 import Link from "next/link";
+import { createClient } from "../lib/supabase/client";
 
 export default function Footer() {
+  const [siteLogo, setSiteLogo] = useState<string | null>(null);
+
+  useEffect(() => {
+    const supabase = createClient();
+    supabase.from("site_settings").select("value").eq("key", "site_logo").single()
+      .then(({ data }: { data: { value: string } | null }) => { setSiteLogo(data?.value || "/logo.svg"); })
+      .catch(() => { setSiteLogo("/logo.svg"); });
+  }, []);
+
   return (
     <footer className="bg-[#ced3de]/20 border-t border-[#ced3de]/40">
       <div className="max-w-7xl mx-auto px-6 lg:px-10 py-8">
@@ -8,9 +21,12 @@ export default function Footer() {
           {/* RIGHT column — Logo + copyright */}
           <div className="flex flex-col gap-3">
             <Link href="/" className="flex items-center gap-2.5">
-              <img src="/logo.svg" alt="AdVault" className="h-8 w-8 rounded-lg object-contain"
-                onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
-              <span className="font-black text-sm text-white">AdVault <span className="text-blue-400">MENA</span></span>
+              {siteLogo ? (
+                <img src={siteLogo} alt="Molhm" className="h-24 w-24 rounded-lg object-contain" />
+              ) : (
+                <div style={{width: 96, height: 96}} />
+              )}
+              <span className="font-black text-base text-white">Molhm</span>
             </Link>
             <p className="text-sm text-black">© 2026 بندر. جميع الحقوق محفوظة</p>
           </div>

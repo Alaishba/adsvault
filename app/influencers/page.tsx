@@ -8,13 +8,27 @@ import { fetchInfluencers } from "../lib/db";
 import { supabase, isSupabaseConfigured } from "../lib/supabase";
 import { getImageUrl } from "../lib/imageUrl";
 
+function getCountryFlag(country: string): string {
+  const flags: Record<string, string> = {
+    "السعودية": "🇸🇦", "الإمارات": "🇦🇪", "الكويت": "🇰🇼",
+    "مصر": "🇪🇬", "قطر": "🇶🇦", "البحرين": "🇧🇭", "عمان": "🇴🇲",
+  };
+  return flags[country] ?? "🌍";
+}
+
 function InfluencerModal({ inf, onClose }: { inf: Influencer; onClose: () => void }) {
   const [tab, setTab] = useState<"info" | "contact">("info");
   const [contactForm, setContactForm] = useState({ name: "", email: "", type: "", message: "" });
   const [submitted, setSubmitted] = useState(false);
+  const [barsAnimated, setBarsAnimated] = useState(false);
 
   const [submitLoading, setSubmitLoading] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const t = setTimeout(() => setBarsAnimated(true), 100);
+    return () => clearTimeout(t);
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -56,17 +70,17 @@ function InfluencerModal({ inf, onClose }: { inf: Influencer; onClose: () => voi
           <div className="flex items-center gap-4">
             {(inf as unknown as Record<string, string>).profile_image ? (
               <img src={getImageUrl("influencer-photos", (inf as unknown as Record<string, string>).profile_image)}
-                alt={inf.name} className="w-20 h-20 rounded-full object-cover shrink-0"
+                alt={inf.name} className="w-24 h-24 rounded-full object-cover shrink-0"
                 onError={(e) => { e.currentTarget.src = "/fallback.png"; e.currentTarget.style.display = "block"; }} />
             ) : (
-              <div className="w-20 h-20 rounded-full flex items-center justify-center text-2xl font-black text-white shrink-0"
+              <div className="w-24 h-24 rounded-full flex items-center justify-center text-2xl font-black text-white shrink-0"
                 style={{ background: inf.color }}>
                 {inf.initial}
               </div>
             )}
             <div>
-              <h2 className="text-lg font-extrabold text-slate-900">{inf.name}</h2>
-              <p className="text-sm text-slate-600">{inf.category} · {inf.country}</p>
+              <h2 className="text-xl font-black text-slate-900">{inf.name}</h2>
+              <p className="text-sm text-slate-700">{inf.category} · {inf.country}</p>
               <div className="flex gap-1 mt-1">
                 {(inf.platforms ?? []).map((p) => <PlatformBadge key={p} platform={p as Platform} />)}
               </div>
@@ -109,6 +123,14 @@ function InfluencerModal({ inf, onClose }: { inf: Influencer; onClose: () => voi
             <div>
               <p className="text-xs font-bold text-slate-900 mb-1">نبذة</p>
               <p className="text-sm text-slate-600 leading-relaxed">{inf.bio}</p>
+            </div>
+
+            {/* Contact Method — blurred */}
+            <div className="bg-blue-50/60 border border-blue-200 rounded-xl p-3">
+              <p className="text-xs font-bold text-slate-900 mb-1">طريقة التواصل</p>
+              <p className="text-sm text-slate-700 select-none" style={{ filter: "blur(4px)" }}>
+                {(inf as any).contactEmail || "contact@gmail.com"}
+              </p>
             </div>
 
             {/* Niche */}
@@ -169,21 +191,29 @@ function InfluencerModal({ inf, onClose }: { inf: Influencer; onClose: () => voi
               </div>
             )}
 
-            {/* Audience age */}
-            <div>
-              <p className="text-xs font-bold text-slate-900 mb-2">توزيع الجمهور حسب العمر</p>
-              <div className="space-y-2">
-                {(inf.audienceAge ?? []).map((a) => (
-                  <div key={a.label} className="flex items-center gap-3">
-                    <span className="text-xs text-slate-600 w-12 text-left">{a.label}</span>
-                    <div className="flex-1 h-2 rounded-full bg-white overflow-hidden">
-                      <div className="h-full rounded-full transition-all" style={{ width: `${a.pct}%`, background: "#2563eb" }} />
+            {/* Audience age — animated bars */}
+            {(inf.audienceAge ?? []).length > 0 && (
+              <div>
+                <p className="text-xs font-bold text-slate-900 mb-2">توزيع الجمهور حسب العمر</p>
+                <div className="space-y-2">
+                  {(inf.audienceAge ?? []).map((a) => (
+                    <div key={a.label} className="flex items-center gap-3">
+                      <span className="text-xs text-slate-600 w-12 text-left">{a.label}</span>
+                      <div className="flex-1 h-2 rounded-full bg-white overflow-hidden">
+                        <div
+                          className="h-full rounded-full bg-blue-500"
+                          style={{
+                            width: barsAnimated ? `${a.pct}%` : "0%",
+                            transition: "width 0.8s cubic-bezier(0.4,0,0.2,1)",
+                          }}
+                        />
+                      </div>
+                      <span className="text-xs text-slate-600 w-8">{a.pct}%</span>
                     </div>
-                    <span className="text-xs text-slate-600 w-8">{a.pct}%</span>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
 
             {/* Audience country */}
             {inf.audienceCountry && inf.audienceCountry.length > 0 && (
@@ -327,17 +357,17 @@ export default function InfluencersPage() {
               <div className="flex items-center gap-3 mb-4">
                 {(inf as unknown as Record<string, string>).profile_image ? (
                   <img src={getImageUrl("influencer-photos", (inf as unknown as Record<string, string>).profile_image)}
-                    alt={inf.name} className="w-12 h-12 rounded-2xl object-cover shrink-0"
+                    alt={inf.name} className="w-20 h-20 rounded-2xl object-cover shrink-0"
                     onError={(e) => { e.currentTarget.src = "/fallback.png"; e.currentTarget.style.display = "block"; }} />
                 ) : (
-                  <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-lg font-black text-white shrink-0"
+                  <div className="w-20 h-20 rounded-2xl flex items-center justify-center text-lg font-black text-white shrink-0"
                     style={{ background: inf.color }}>
                     {inf.initial}
                   </div>
                 )}
                 <div>
-                  <p className="font-bold text-sm transition-colors group-hover:text-blue-400" style={{ color: "#ffffff" }}>{inf.name}</p>
-                  <p className="text-xs text-[#94a3b8]">{inf.category} · {inf.country}</p>
+                  <p className="font-black text-base transition-colors group-hover:text-blue-400 text-slate-900">{inf.name}</p>
+                  <p className="text-sm text-slate-700">{inf.category} · {inf.country}</p>
                 </div>
               </div>
 
@@ -359,15 +389,21 @@ export default function InfluencersPage() {
                 </div>
               </div>
 
-              {/* Strength tags */}
-              <div className="flex flex-wrap gap-1">
-                {(inf.strengths ?? []).slice(0, 2).map((s) => (
-                  <span key={s} className="px-2 py-0.5 text-xs rounded-full font-medium" style={{ background: "#f0faf0", color: "#15803d" }}>{s}</span>
-                ))}
-                {(inf.weaknesses ?? []).slice(0, 1).map((w) => (
-                  <span key={w} className="px-2 py-0.5 text-xs rounded-full font-medium" style={{ background: "#fef2f2", color: "#b91c1c" }}>{w}</span>
-                ))}
-              </div>
+              {inf.country && (
+                <p className="text-xs text-slate-600 mt-2">
+                  {getCountryFlag(inf.country)} {inf.country}
+                </p>
+              )}
+              {!!inf.niche && (
+                <p className="text-xs text-slate-500 mt-1">{inf.niche}</p>
+              )}
+              {(inf.interests ?? []).length > 0 && (
+                <div className="flex flex-wrap gap-1 mt-2">
+                  {(inf.interests ?? []).slice(0, 3).map((i: string) => (
+                    <span key={i} className="text-xs px-2 py-0.5 rounded-full bg-blue-100/60 text-blue-800">#{i}</span>
+                  ))}
+                </div>
+              )}
             </div>
           ))}
         </div>

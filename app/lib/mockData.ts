@@ -23,6 +23,9 @@ export interface Ad {
   ad_goal?: string;
   funnel_stage?: FunnelStage;
   season?: string;
+  pro_analysis?: Record<string, unknown> | null;
+  is_pro_only?: boolean;
+  video_url?: string;
 }
 
 export interface Influencer {
@@ -40,6 +43,12 @@ export interface Influencer {
   weaknesses: string[];
   audienceAge: { label: string; pct: number }[];
   audienceCountry?: { label: string; pct: number }[];
+  niche?: string;
+  target_audience?: string;
+  interests?: string[];
+  historical_performance?: Record<string, string> | null;
+  demographics?: Record<string, string> | null;
+  featured?: boolean;
 }
 
 export interface Strategy {

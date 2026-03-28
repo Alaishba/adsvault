@@ -27,6 +27,9 @@ function mapDbAd(row: any): Ad {
     ad_goal: row.ad_goal ?? "",
     funnel_stage: row.funnel_stage ?? undefined,
     season: row.season ?? "",
+    pro_analysis: row.pro_analysis ?? null,
+    is_pro_only: row.is_pro_only ?? false,
+    video_url: row.video_url ?? "",
   };
 }
 
@@ -52,6 +55,12 @@ function mapDbInfluencer(row: any): Influencer & { profile_image?: string } {
     audienceAge: row.audience_age ?? [],
     audienceCountry: row.audience_country ?? [],
     profile_image: row.profile_image ?? null,
+    niche: row.niche ?? null,
+    target_audience: row.target_audience ?? null,
+    interests: row.interests ?? [],
+    historical_performance: row.historical_performance ?? null,
+    demographics: row.demographics ?? null,
+    featured: row.featured ?? false,
   };
 }
 

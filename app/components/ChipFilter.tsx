@@ -33,7 +33,7 @@ export default function ChipFilter({
   const hasActive = Object.values(activeFilters).some(Boolean);
 
   return (
-    <div className="px-4 lg:px-10 py-4" style={{ position: "relative", zIndex: 20 }}>
+    <div className="px-4 lg:px-10 py-4 mx-auto max-w-4xl" style={{ position: "relative", zIndex: 20 }}>
       <div className="flex flex-wrap gap-3 items-center">
         {/* Filter dropdowns */}
         {filters.map((filter) => (
@@ -41,7 +41,7 @@ export default function ChipFilter({
             key={filter.key}
             value={activeFilters[filter.key] ?? ""}
             onChange={(e) => onFilterChange(filter.key, e.target.value || null)}
-            className="bg-[#ced3de] border border-slate-300 rounded-xl px-3 py-2 text-sm text-slate-900 cursor-pointer outline-none font-medium"
+            className="bg-[#ced3de] border border-slate-300 rounded-xl px-3 py-1.5 text-xs text-slate-900 cursor-pointer outline-none font-medium"
           >
             <option value="">{filter.label}</option>
             {filter.options.map((opt) => (
@@ -55,7 +55,7 @@ export default function ChipFilter({
           <select
             value={sortValue}
             onChange={(e) => onSortChange(e.target.value)}
-            className="bg-[#ced3de] border border-slate-300 rounded-xl px-3 py-2 text-sm text-slate-900 cursor-pointer outline-none font-medium"
+            className="bg-[#ced3de] border border-slate-300 rounded-xl px-3 py-1.5 text-xs text-slate-900 cursor-pointer outline-none font-medium"
           >
             {sortOptions.map((o) => (
               <option key={o.value} value={o.value}>ترتيب: {o.label}</option>

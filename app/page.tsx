@@ -13,6 +13,14 @@ import { getImageUrl } from "./lib/imageUrl";
 import PlatformBadge from "./components/PlatformBadge";
 import type { Platform } from "./lib/mockData";
 
+function getCountryFlag(country: string): string {
+  const flags: Record<string, string> = {
+    "السعودية": "🇸🇦", "الإمارات": "🇦🇪", "الكويت": "🇰🇼",
+    "مصر": "🇪🇬", "قطر": "🇶🇦", "البحرين": "🇧🇭", "عمان": "🇴🇲",
+  };
+  return flags[country] ?? "🌍";
+}
+
 /* ─── Animated counter hook ─── */
 function useCountUp(target: number, duration = 1500) {
   const [count, setCount] = useState(0);
@@ -59,7 +67,7 @@ function buildStatsData(ads: Ad[], strategies: Strategy[]) {
   const uniqueSectors = new Set(ads.map((a) => a.sector).filter(Boolean));
   return [
     { target: ads.length, prefix: "+", suffix: "", label: "إعلان", sub: "من كبرى العلامات التجارية", icon: statIcons[0] },
-    { target: uniqueCountries.size || 0, prefix: "", suffix: "", label: "دولة", sub: "تغطية شاملة لمنطقة MENA", icon: statIcons[1] },
+    { target: uniqueCountries.size || 0, prefix: "", suffix: "", label: "دولة", sub: "تغطية شاملة للمنطقة العربية", icon: statIcons[1] },
     { target: uniqueSectors.size || 0, prefix: "", suffix: "", label: "قطاع تجاري", sub: "من التقنية إلى العقارات", icon: statIcons[2] },
     { target: strategies.length, prefix: "", suffix: "", label: "استراتيجية", sub: "تحليلات عميقة للحملات", icon: statIcons[3] },
   ];
@@ -131,7 +139,7 @@ export default function HomePage() {
               title: (d.title as string) ?? "", excerpt: ((d.content as string) ?? "").slice(0, 120),
               category: (d.category as string) ?? "تسويق",
               coverImage: (d.banner_image as string) ?? "#2563eb",
-              author: (d.author as string) ?? "فريق AdVault",
+              author: (d.author as string) ?? "فريق Molhm",
               date: ((d.created_at as string) ?? "").slice(0, 10),
               readTime: "5 دقائق", tags: (d.tags as string[]) ?? [],
               featured: d.featured as boolean,
@@ -153,10 +161,8 @@ export default function HomePage() {
           <div className="w-full lg:w-[40%] order-2 lg:order-2 lg:-ml-[5%]">
             <div className="rounded-2xl bg-white/5 border border-white/10 w-full h-80 flex items-center justify-center lg:-translate-x-8 overflow-hidden">
               {promoBanners["hero_laptop"] ? (
-                <img src={promoBanners["hero_laptop"]} alt="AdVault" className="w-full h-full object-cover" />
-              ) : (
-                <span className="text-4xl">📸 صورة اللابتوب</span>
-              )}
+                <img src={promoBanners["hero_laptop"]} alt="Molhm" className="w-full h-full object-cover" />
+              ) : null}
             </div>
           </div>
 
@@ -195,12 +201,21 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* ── ABOUT MOLHM ── */}
+      <section className="px-6 lg:px-10 pb-10 bg-[#0a0a2e]">
+        <div className="max-w-2xl mx-auto text-center mb-10 bg-[#ced3de]/30 border border-[#ced3de]/50 rounded-2xl p-8">
+          <p className="text-xl font-black text-white mb-3">منصة ملهم — ذكاء تسويقي متكامل</p>
+          <p className="text-sm text-slate-300 leading-relaxed mb-2">نساعدك على استكشاف أفضل الإعلانات التجارية الناجحة في المنطقة العربية، وتحليل استراتيجياتها، وتطبيقها على حملاتك التسويقية.</p>
+          <p className="text-sm font-bold text-blue-400">إستلهم. حلّل. طبّق.</p>
+        </div>
+      </section>
+
       {/* ── LATEST ADS ── */}
       <section className="px-6 lg:px-10 pb-10 bg-[#0a0a2e]">
         <div className="flex items-end justify-between mb-5">
           <div>
             <h2 className="text-xl font-extrabold" style={{ color: "var(--text-primary)" }}>أحدث الإعلانات</h2>
-            <p className="text-sm mt-0.5" style={{ color: "var(--text-secondary)" }}>آخر الإعلانات المضافة من كبرى العلامات في MENA</p>
+            <p className="text-sm mt-0.5" style={{ color: "var(--text-secondary)" }}>آخر الإعلانات المضافة من كبرى العلامات التجارية</p>
           </div>
           <Link href="/library" className="text-sm font-semibold transition-colors text-blue-400">
             عرض الكل ←
@@ -295,14 +310,14 @@ export default function HomePage() {
             {influencers.slice(0, 3).map((inf) => (
               <Link key={inf.id} href="/influencers"
                 className="rounded-xl p-3 bg-[#ced3de] border border-[#ced3de] transition-all duration-200 hover:shadow-md hover:scale-[1.02] overflow-hidden"
-                style={{ height: 220 }}>
+                style={{ height: 160 }}>
                 <div className="flex items-center gap-3 mb-2">
                   {inf.profile_image ? (
                     <img src={getImageUrl("influencer-photos", inf.profile_image)} alt={inf.name}
-                      className="w-10 h-10 rounded-xl object-cover shrink-0"
+                      className="w-14 h-14 rounded-full object-cover shrink-0"
                       onError={(e) => { e.currentTarget.style.display = "none"; }} />
                   ) : (
-                    <div className="w-10 h-10 rounded-xl flex items-center justify-center text-sm font-black text-white shrink-0"
+                    <div className="w-14 h-14 rounded-full flex items-center justify-center text-sm font-black text-white shrink-0"
                       style={{ background: inf.color }}>{inf.initial}</div>
                   )}
                   <div>
@@ -314,10 +329,23 @@ export default function HomePage() {
                   <span className="text-slate-900 font-bold">{inf.followers} <span className="text-slate-500 font-normal">متابع</span></span>
                   <span className="text-slate-900 font-bold">{inf.engagement} <span className="text-slate-500 font-normal">تفاعل</span></span>
                 </div>
+                {inf.country && (
+                  <p className="text-[10px] text-slate-500 mt-1">{getCountryFlag(inf.country)} {inf.country}</p>
+                )}
+                {(inf as any).niche && (
+                  <p className="text-[10px] text-slate-400 mt-0.5">{(inf as any).niche}</p>
+                )}
+                {((inf as any).interests as string[] ?? []).length > 0 && (
+                  <div className="flex flex-wrap gap-0.5 mt-1">
+                    {((inf as any).interests as string[] ?? []).slice(0, 3).map((i: string) => (
+                      <span key={i} className="text-[9px] px-1.5 py-0.5 rounded-full bg-blue-100/60 text-blue-800">#{i}</span>
+                    ))}
+                  </div>
+                )}
               </Link>
             ))}
             {/* Promo banner */}
-            <div className="rounded-2xl bg-[#ced3de]/20 overflow-hidden" style={{ height: 220 }}>
+            <div className="rounded-2xl bg-[#ced3de]/20 overflow-hidden" style={{ height: 160 }}>
               {promoBanners["influencers"] ? (
                 <img src={promoBanners["influencers"]} alt="" className="w-full h-full object-cover" />
               ) : <div className="w-full h-full bg-[#ced3de]/20" />}

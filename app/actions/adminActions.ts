@@ -246,6 +246,51 @@ export async function deleteAdminBlogPost(id: string | number): Promise<Result> 
   return { success: true };
 }
 
+// ─── Site Settings ───
+
+export async function saveSiteSetting(key: string, value: string): Promise<Result> {
+  try {
+    const supabase = createAdminClient();
+    const { data: existing } = await supabase
+      .from("site_settings")
+      .select("id")
+      .eq("key", key)
+      .single();
+
+    if (existing?.id) {
+      const { error } = await supabase
+        .from("site_settings")
+        .update({ value })
+        .eq("id", existing.id);
+      if (error) return { error: error.message };
+    } else {
+      const { error } = await supabase
+        .from("site_settings")
+        .insert({ key, value });
+      if (error) return { error: error.message };
+    }
+
+    revalidatePath("/");
+    return { success: true };
+  } catch (err) {
+    return { error: err instanceof Error ? err.message : "Failed to save setting" };
+  }
+}
+
+export async function fetchSiteSetting(key: string): Promise<string | null> {
+  try {
+    const supabase = createAdminClient();
+    const { data } = await supabase
+      .from("site_settings")
+      .select("value")
+      .eq("key", key)
+      .single();
+    return data?.value ?? null;
+  } catch {
+    return null;
+  }
+}
+
 // ─── Fetch helpers (server-side, bypasses RLS) ───
 // Map DB snake_case → TS camelCase for admin pages
 
@@ -275,6 +320,7 @@ function mapAdRow(row: any) {
     funnel_stage: row.funnel_stage ?? "awareness",
     season: row.season ?? "",
     is_pro_only: row.is_pro_only ?? false,
+    pro_analysis: row.pro_analysis ?? null,
   };
 }
 
@@ -299,6 +345,12 @@ function mapInfluencerRow(row: any) {
     profile_image: row.profile_image ?? null,
     profileImage: row.profile_image ?? null,
     contactEmail: row.contact_email ?? "",
+    niche: row.niche ?? null,
+    target_audience: row.target_audience ?? null,
+    interests: row.interests ?? [],
+    historical_performance: row.historical_performance ?? null,
+    demographics: row.demographics ?? null,
+    featured: row.featured ?? false,
   };
 }
 
@@ -376,6 +428,17 @@ export async function fetchAdminContactRequests() {
   const supabase = createAdminClient();
   const { data } = await supabase.from("contact_requests").select("name,email,message,created_at").order("created_at", { ascending: false }).limit(5);
   return (data ?? []).map((d: Record<string, string>) => ({ name: d.name ?? "", email: d.email ?? "", message: d.message ?? "", date: (d.created_at ?? "").slice(0, 10) }));
+}
+
+// ─── Confirm User Email (admin/testing bypass) ───
+
+export async function confirmUserEmail(userId: string): Promise<Result> {
+  const supabase = createAdminClient();
+  const { error } = await supabase.auth.admin.updateUserById(userId, {
+    email_confirm: true,
+  });
+  if (error) return { error: error.message };
+  return { success: true };
 }
 
 export async function fetchAdminUsers() {

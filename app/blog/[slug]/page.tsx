@@ -77,7 +77,13 @@ export default function BlogArticlePage() {
     <AppLayout>
       {/* Back button */}
       <div className="px-4 sm:px-6 lg:px-10 py-3">
-        <Link href="/blog" className="flex items-center gap-2 text-slate-700 hover:text-slate-900 text-sm font-semibold transition-colors">
+        <Link href="/blog" className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold transition-all hover:opacity-80"
+          style={{
+            background: 'rgba(206,211,222,0.2)',
+            border: '1px solid rgba(206,211,222,0.4)',
+            backdropFilter: 'blur(8px)',
+            color: '#2563eb'
+          }}>
           → العودة للمدونة
         </Link>
       </div>

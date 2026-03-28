@@ -30,6 +30,7 @@ export default function TopNavbar() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [siteLogo, setSiteLogo] = useState<string | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Navbar fade on scroll
@@ -37,6 +38,14 @@ export default function TopNavbar() {
     const handleScroll = () => setScrolled(window.scrollY > 50);
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  // Fetch site logo — null = loading, then resolve to URL or fallback
+  useEffect(() => {
+    supabase.from("site_settings").select("value").eq("key", "site_logo").single()
+      .then(({ data }: { data: { value: string } | null }) => { setSiteLogo(data?.value || "/logo.svg"); })
+      .catch(() => { setSiteLogo("/logo.svg"); });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Load user on mount with mounted guard to prevent lock errors
@@ -121,7 +130,7 @@ export default function TopNavbar() {
 
   return (
     <header className={`fixed top-0 left-0 right-0 z-50 bg-transparent transition-opacity duration-300 ${scrolled ? "opacity-25" : "opacity-100"}`}>
-      <div className="flex items-center gap-3 px-4 lg:px-8 py-4">
+      <div className="flex items-center gap-3 px-4 lg:px-8 py-5">
         {/* Mobile hamburger */}
         <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="lg:hidden p-2 rounded-lg text-white/70 hover:text-white transition-colors">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -131,21 +140,24 @@ export default function TopNavbar() {
 
         {/* RIGHT side: Logo */}
         <Link href="/" className="flex items-center gap-2.5 shrink-0">
-          <img src="/logo.svg" alt="AdVault" className="h-9 w-9 rounded-xl object-contain"
-            onError={(e) => { (e.target as HTMLImageElement).outerHTML = '<div class="w-9 h-9 rounded-xl flex items-center justify-center text-sm font-black" style="background:#2563eb;color:#fff">AV</div>'; }} />
+          {siteLogo ? (
+            <img src={siteLogo} alt="Molhm" className="h-16 w-16 rounded-xl object-contain" />
+          ) : (
+            <div style={{width: 64, height: 64}} />
+          )}
           <div className="hidden sm:block">
-            <p className="font-black text-sm leading-tight text-white">AdVault <span className="text-blue-400">MENA</span></p>
+            <p className="font-black text-base leading-tight text-white">Molhm</p>
           </div>
         </Link>
 
         {/* CENTER: Single pill nav container (desktop) */}
         <nav className="hidden lg:flex flex-1 justify-center">
-          <div className="flex items-center gap-1 rounded-full backdrop-blur-md bg-white/10 border border-white/20 px-2 py-1.5">
+          <div className="flex items-center gap-1 rounded-full backdrop-blur-md bg-white/10 border border-white/20 px-4 py-2">
             {navLinks.map((link) => {
               const active = pathname === link.href;
               return (
                 <Link key={link.href} href={link.href}
-                  className={`px-4 py-1.5 rounded-full text-sm font-semibold transition-all ${
+                  className={`px-4 py-2 rounded-full text-base font-semibold transition-all ${
                     active
                       ? "bg-white/30 text-white"
                       : "text-slate-800 hover:bg-white/15 hover:text-white"
@@ -202,11 +214,11 @@ export default function TopNavbar() {
           {!authLoading && !userInfo && (
             <div className="flex items-center gap-2">
               <Link href="/login"
-                className="px-5 py-2 rounded-full backdrop-blur-sm bg-white/10 border border-white/20 text-sm font-semibold text-white hover:bg-white/20 transition-all">
+                className="px-5 py-2.5 rounded-full backdrop-blur-sm bg-white/10 border border-white/20 text-base font-semibold text-white hover:bg-white/20 transition-all">
                 دخول
               </Link>
               <Link href="/register"
-                className="px-5 py-2 rounded-full text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 transition-all">
+                className="px-5 py-2.5 rounded-full text-base font-bold text-white bg-blue-600 hover:bg-blue-700 transition-all">
                 تسجيل
               </Link>
             </div>
@@ -216,8 +228,8 @@ export default function TopNavbar() {
             <div className="relative" ref={dropdownRef}>
               <button onClick={() => setDropdownOpen(!dropdownOpen)}
                 className="flex items-center gap-2 cursor-pointer hover:opacity-90 transition-all">
-                <span className="hidden sm:inline text-sm text-slate-200 font-medium">مرحباً {userInfo.name}</span>
-                <div className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold text-white shrink-0 overflow-hidden bg-blue-600">
+                <span className="hidden sm:inline text-base text-slate-200 font-medium">مرحباً {userInfo.name}</span>
+                <div className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold text-white shrink-0 overflow-hidden bg-blue-600">
                   {userInfo.avatar ? (
                     <img src={getImageUrl("user-avatars", userInfo.avatar)} alt="" className="w-full h-full object-cover"
                       onError={(e) => { e.currentTarget.src = "/fallback.png"; e.currentTarget.style.display = "block"; }} />

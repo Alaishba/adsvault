@@ -138,6 +138,9 @@ export default function AdminInfluencersPage() {
       historical_performance: parsedHistoricalPerformance,
       demographics: parsedDemographics,
       featured: form.featured ?? false,
+      category: form.category || null,
+      country: form.country || null,
+      initial: form.initial || form.name?.[0] || "?",
     };
 
     console.log("[AdminInfluencers] Saving influencer:", { ...infData, profile_image: infData.profile_image ? "(set)" : "(null)" });

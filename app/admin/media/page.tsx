@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { uploadAdminFile, savePromoBanner, fetchPromoBanners } from "../../actions/adminActions";
+import { uploadAdminFile, savePromoBanner, fetchPromoBanners, saveSiteSetting, fetchSiteSetting } from "../../actions/adminActions";
 
 const sections = [
   { key: "ads", label: "بانر الإعلانات" },
@@ -14,10 +14,13 @@ export default function AdminMediaPage() {
   const [banners, setBanners] = useState<Record<string, string>>({});
   const [uploading, setUploading] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
+  const [logoUrl, setLogoUrl] = useState<string | null>(null);
   const fileRefs = useRef<Record<string, HTMLInputElement | null>>({});
+  const logoRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     fetchPromoBanners().then(setBanners);
+    fetchSiteSetting("site_logo").then(setLogoUrl);
   }, []);
 
   const handleUpload = async (sectionKey: string, file: File) => {
@@ -38,6 +41,32 @@ export default function AdminMediaPage() {
         } else {
           setBanners((prev) => ({ ...prev, [sectionKey]: result.url! }));
           setMessage("تم الرفع بنجاح");
+        }
+      }
+    } catch {
+      setMessage("حدث خطأ غير متوقع");
+    }
+    setUploading(null);
+  };
+
+  const handleLogoUpload = async (file: File) => {
+    setUploading("logo");
+    setMessage(null);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("bucket", "ads-images");
+      formData.append("path", "logo/main-logo");
+      const result = await uploadAdminFile(formData);
+      if (result.error || !result.url) {
+        setMessage(`خطأ: ${result.error ?? "فشل الرفع"}`);
+      } else {
+        const saveResult = await saveSiteSetting("site_logo", result.url);
+        if ("error" in saveResult) {
+          setMessage(`خطأ في الحفظ: ${saveResult.error}`);
+        } else {
+          setLogoUrl(result.url);
+          setMessage("تم رفع الشعار بنجاح");
         }
       }
     } catch {
@@ -82,6 +111,28 @@ export default function AdminMediaPage() {
               </button>
             </div>
           ))}
+        </div>
+      </div>
+
+      {/* Logo upload section */}
+      <div className="space-y-4 mb-8">
+        <h2 className="text-lg font-bold text-gray-900">شعار الموقع</h2>
+        <div className="bg-blue-50 border border-blue-100 rounded-xl p-4 max-w-sm">
+          <p className="text-sm font-bold text-gray-900 mb-3">الشعار الرئيسي</p>
+          {logoUrl ? (
+            <img src={logoUrl} alt="شعار الموقع" className="w-24 h-24 object-contain rounded-lg mb-3" />
+          ) : (
+            <div className="w-24 h-24 bg-blue-100/50 rounded-lg flex items-center justify-center mb-3">
+              <span className="text-xs text-gray-500">لا يوجد شعار</span>
+            </div>
+          )}
+          <input type="file" accept="image/*" ref={logoRef} className="hidden"
+            onChange={(e) => { const f = e.target.files?.[0]; if (f) handleLogoUpload(f); }} />
+          <button onClick={() => logoRef.current?.click()}
+            disabled={uploading === "logo"}
+            className="w-full py-2 rounded-xl text-sm font-bold text-white bg-blue-500 hover:bg-blue-600 disabled:opacity-60 transition-all">
+            {uploading === "logo" ? "جارٍ الرفع..." : "رفع شعار"}
+          </button>
         </div>
       </div>
 

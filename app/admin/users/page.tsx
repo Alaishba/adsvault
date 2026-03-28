@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { fetchAdminUsers } from "../../actions/adminActions";
+import { fetchAdminUsers, confirmUserEmail } from "../../actions/adminActions";
 
 type User = { id: string; email: string; full_name: string; plan: string; created_at: string; status: string };
 
@@ -17,6 +17,8 @@ const plans = ["free", "pro", "enterprise", "admin"];
 export default function AdminUsersPage() {
   const [users, setUsers] = useState<User[]>([]);
   const [search, setSearch] = useState("");
+  const [confirmingId, setConfirmingId] = useState<string | null>(null);
+  const [confirmMsg, setConfirmMsg] = useState<{ id: string; text: string } | null>(null);
 
   useEffect(() => {
     fetchAdminUsers().then((data) => {
@@ -42,6 +44,19 @@ export default function AdminUsersPage() {
     setUsers((prev) =>
       prev.map((u) => (u.id === id ? { ...u, status: u.status === "active" ? "suspended" : "active" } : u))
     );
+
+  const handleConfirmEmail = async (id: string) => {
+    setConfirmingId(id);
+    setConfirmMsg(null);
+    const result = await confirmUserEmail(id);
+    if ("success" in result) {
+      setConfirmMsg({ id, text: "تم التفعيل" });
+    } else {
+      setConfirmMsg({ id, text: result.error });
+    }
+    setConfirmingId(null);
+    setTimeout(() => setConfirmMsg((prev) => (prev?.id === id ? null : prev)), 2500);
+  };
 
   return (
     <div className="px-6 lg:px-10 py-8">
@@ -98,11 +113,21 @@ export default function AdminUsersPage() {
                       </span>
                     </td>
                     <td className="px-5 py-3">
-                      <button onClick={() => toggleStatus(u.id)}
-                        className="text-xs px-2.5 py-1 rounded-lg font-medium border border-[#dbeafe] hover:border-[#3b82f6]/40 transition-all"
-                        style={{ color: "#6b7280" }}>
-                        {u.status === "active" ? "تعليق" : "تفعيل"}
-                      </button>
+                      <div className="flex items-center gap-2">
+                        <button onClick={() => toggleStatus(u.id)}
+                          className="text-xs px-2.5 py-1 rounded-lg font-medium border border-[#dbeafe] hover:border-[#3b82f6]/40 transition-all"
+                          style={{ color: "#6b7280" }}>
+                          {u.status === "active" ? "تعليق" : "تفعيل"}
+                        </button>
+                        <button onClick={() => handleConfirmEmail(u.id)}
+                          disabled={confirmingId === u.id}
+                          className="text-xs px-2.5 py-1 rounded-lg font-medium border border-blue-200 text-blue-600 hover:border-blue-400 transition-all disabled:opacity-50">
+                          {confirmingId === u.id ? "..." : "تفعيل"}
+                        </button>
+                        {confirmMsg?.id === u.id && (
+                          <span className="text-xs text-green-600">{confirmMsg.text}</span>
+                        )}
+                      </div>
                     </td>
                   </tr>
                 );
@@ -111,6 +136,7 @@ export default function AdminUsersPage() {
           </table>
         </div>
       </div>
+      <p className="text-xs text-gray-400 mt-2">تفعيل الحساب يتجاوز التحقق من البريد — للحسابات التجريبية فقط</p>
     </div>
   );
 }

@@ -1,4 +1,5 @@
 import type { Platform } from "../lib/mockData";
+import { PlatformIcon } from "./PlatformIcon";
 
 const config: Record<
   Platform,
@@ -46,7 +47,7 @@ export default function PlatformBadge({
       className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-semibold"
       style={{ background: style.bg, color: style.text }}
     >
-      {c.label}
+      <PlatformIcon platform={platform} size={12} />
     </span>
   );
 }
