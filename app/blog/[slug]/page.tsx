@@ -10,6 +10,7 @@ import { getImageUrl } from "../../lib/imageUrl";
 
 export default function BlogArticlePage() {
   const { slug } = useParams<{ slug: string }>();
+  const decodedSlug = decodeURIComponent(slug);
   const [copied, setCopied] = useState(false);
   const [pdfToast, setPdfToast] = useState(false);
   const [article, setArticle] = useState<BlogArticle | null>(null);
@@ -17,7 +18,7 @@ export default function BlogArticlePage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    supabase.from("blog_posts").select("*").eq("slug", slug).single().then(({ data }: { data: Record<string, unknown> | null }) => {
+    supabase.from("blog_posts").select("*").eq("slug", decodedSlug).single().then(({ data }: { data: Record<string, unknown> | null }) => {
       if (data) {
         setArticle({
           id: data.id as number, slug: (data.slug as string) ?? "", title: (data.title as string) ?? "",
@@ -31,14 +32,14 @@ export default function BlogArticlePage() {
     });
     // Fetch related
     supabase.from("blog_posts").select("*").eq("status", "published").limit(4).then(({ data }: { data: Record<string, unknown>[] | null }) => {
-      if (data) setRelatedArticles(data.filter((d) => (d.slug as string) !== slug).slice(0, 3).map((d) => ({
+      if (data) setRelatedArticles(data.filter((d) => (d.slug as string) !== decodedSlug).slice(0, 3).map((d) => ({
         id: d.id as number, slug: (d.slug as string) ?? "", title: (d.title as string) ?? "",
         excerpt: ((d.content as string) ?? "").slice(0, 120), category: (d.category as string) ?? "",
         coverImage: (d.banner_image as string) ?? "#2563eb", author: (d.author as string) ?? "",
         date: ((d.created_at as string) ?? "").slice(0, 10), readTime: "5 دقائق", tags: (d.tags as string[]) ?? [],
       })));
     });
-  }, [slug]);
+  }, [decodedSlug]);
 
   if (loading) {
     return <AppLayout><div className="flex items-center justify-center min-h-[60vh]"><p style={{ color: "#94a3b8" }}>جارٍ التحميل...</p></div></AppLayout>;
