@@ -33,6 +33,27 @@ function ProBlurOverlay() {
 
 function StrategyModal({ s, onClose, isPro }: { s: Strategy; onClose: () => void; isPro: boolean }) {
   const isLocked = !isPro && s.is_pro_only;
+  const [showContact, setShowContact] = useState(false);
+  const [contactForm, setContactForm] = useState({ name: "", email: "", message: `أود تطبيق استراتيجية: ${s.title}` });
+  const [contactLoading, setContactLoading] = useState(false);
+  const [contactSuccess, setContactSuccess] = useState(false);
+
+  const handleContactSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setContactLoading(true);
+    try {
+      const supabase = createClient();
+      await supabase.from("contact_requests").insert({
+        name: contactForm.name,
+        email: contactForm.email,
+        message: contactForm.message,
+        created_at: new Date().toISOString(),
+      });
+      setContactSuccess(true);
+    } catch { /* ignore */ }
+    setContactLoading(false);
+  };
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4"
       style={{ background: "rgba(0,0,0,0.6)", backdropFilter: "blur(6px)" }}
@@ -81,9 +102,36 @@ function StrategyModal({ s, onClose, isPro }: { s: Strategy; onClose: () => void
               <span key={tag} className="px-2.5 py-1 text-xs rounded-full font-medium bg-blue-100 text-blue-700">#{tag}</span>
             ))}
           </div>
-          <button className="w-full py-3 rounded-xl font-bold text-sm text-white" style={{ background: "#2563eb" }}>
+          <button onClick={() => setShowContact(true)} className="w-full py-3 rounded-xl font-bold text-sm text-white" style={{ background: "#2563eb" }}>
             تطبيق هذه الاستراتيجية
           </button>
+          {showContact && (
+            <div className="mt-4 bg-[#ced3de] rounded-xl p-4 border border-slate-300">
+              {contactSuccess ? (
+                <div className="text-center py-4">
+                  <p className="text-2xl mb-2">✅</p>
+                  <p className="font-bold text-slate-900">تم إرسال طلبك!</p>
+                  <p className="text-xs text-slate-600 mt-1">سنتواصل معك قريباً</p>
+                </div>
+              ) : (
+                <form onSubmit={handleContactSubmit} className="space-y-3">
+                  <input type="text" required placeholder="اسمك" value={contactForm.name}
+                    onChange={(e) => setContactForm({...contactForm, name: e.target.value})}
+                    className="w-full px-3 py-2 rounded-xl border border-slate-300 bg-white text-sm text-slate-900 outline-none" />
+                  <input type="email" required placeholder="بريدك الإلكتروني" value={contactForm.email}
+                    onChange={(e) => setContactForm({...contactForm, email: e.target.value})}
+                    className="w-full px-3 py-2 rounded-xl border border-slate-300 bg-white text-sm text-slate-900 outline-none" dir="ltr" />
+                  <textarea rows={3} required value={contactForm.message}
+                    onChange={(e) => setContactForm({...contactForm, message: e.target.value})}
+                    className="w-full px-3 py-2 rounded-xl border border-slate-300 bg-white text-sm text-slate-900 outline-none resize-none" />
+                  <button type="submit" disabled={contactLoading}
+                    className="w-full py-2.5 rounded-xl font-bold text-sm text-white disabled:opacity-60" style={{ background: "#2563eb" }}>
+                    {contactLoading ? "جارٍ الإرسال..." : "إرسال الطلب"}
+                  </button>
+                </form>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </div>
