@@ -155,7 +155,7 @@ export default function HomePage() {
   return (
     <AppLayout>
       {/* ── HERO ── */}
-      <section className="relative min-h-[80vh] flex items-center bg-gradient-to-br from-[#1C4ED8] via-[#0d1b4b] to-black -mt-20 pt-8 overflow-hidden" style={{ animation: "fadeInUp 0.5s ease both" }}>
+      <section className="relative min-h-[80vh] flex items-center bg-gradient-to-br from-[#1C4ED8] via-[#0d1b4b] to-black -mt-20 pt-24 md:pt-8 overflow-hidden" style={{ animation: "fadeInUp 0.5s ease both" }}>
         <div className="flex flex-col md:flex-row gap-12 items-center w-full px-6 lg:px-10">
           {/* LEFT column (40%) — laptop placeholder, bleeds off left edge */}
           <div className="w-full md:w-[40%] max-h-48 md:max-h-full order-2 md:order-2 lg:-ml-[5%]">
