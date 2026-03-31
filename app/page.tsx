@@ -264,16 +264,12 @@ export default function HomePage() {
             <Link key={s.id} href="/analysis"
               className="rounded-xl overflow-hidden group p-0 bg-[#ced3de] border border-[#ced3de] transition-all duration-200 hover:shadow-md hover:scale-[1.02]"
               style={{ height: 280 }}>
-              <div className="w-full h-40 flex items-center justify-center relative overflow-hidden" style={{ background: "#0f0f0f" }}>
+              <div className="w-full h-40 relative overflow-hidden" style={{ background: "rgba(206,211,222,0.2)" }}>
                 {s.thumbnail && !s.thumbnail.startsWith("#") ? (
                   <img src={getImageUrl("strategy-covers", s.thumbnail)} alt={s.title}
                     className="absolute inset-0 w-full h-full object-cover"
                     onError={(e) => { e.currentTarget.style.display = "none"; }} />
                 ) : null}
-                <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-xl font-black relative"
-                  style={{ background: s.brandColor === "#000000" ? "#1a1a1a" : `${s.brandColor}22`, color: s.brandColor === "#000000" ? "#fff" : s.brandColor, border: `2px solid ${s.brandColor === "#000000" ? "#333" : s.brandColor + "44"}` }}>
-                  {s.brandInitial}
-                </div>
               </div>
               <div className="p-3">
                 <p className="text-xs font-bold mb-1 text-slate-700">{s.brand}</p>

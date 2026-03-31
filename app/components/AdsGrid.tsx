@@ -17,74 +17,7 @@ const platformColors: Record<string, string> = {
   "LinkedIn text": "#4a9cf5",
 };
 
-const ads = [
-  {
-    brand: "جرير",
-    logo: "J",
-    logoColor: "#22c55e",
-    title: "حملة العودة للمدرسة 2024",
-    description: "إعلان عاطفي يستهدف الأسر في موسم بدء العام الدراسي",
-    platforms: ["Instagram", "TikTok", "Snapchat"],
-    sector: "تجزئة",
-    views: "2.3M",
-    saved: 847,
-  },
-  {
-    brand: "STC",
-    logo: "S",
-    logoColor: "#7c3aed",
-    title: "رامي للإنترنت الفائق",
-    description: "حملة كوميدية ترويجية لخدمة الإنترنت المنزلي بالسعودية",
-    platforms: ["YouTube", "Facebook"],
-    sector: "اتصالات",
-    views: "5.1M",
-    saved: 1203,
-  },
-  {
-    brand: "أمازون السعودية",
-    logo: "A",
-    logoColor: "#f59e0b",
-    title: "فرصة اليوم الواحد – ماجيك ديل",
-    description: "إعلان مباشر بعروض لحظية يعتمد على الإلحاح وعد التنازلي",
-    platforms: ["Instagram", "Snapchat"],
-    sector: "تجارة إلكترونية",
-    views: "8.7M",
-    saved: 2104,
-  },
-  {
-    brand: "نون",
-    logo: "N",
-    logoColor: "#facc15",
-    title: "رمضان مع نون",
-    description: "حملة رمضانية بأسلوب درامي يربط المنتج بقيم العائلة",
-    platforms: ["TikTok", "YouTube", "Facebook"],
-    sector: "تجارة إلكترونية",
-    views: "3.8M",
-    saved: 932,
-  },
-  {
-    brand: "اتصالات الإمارات",
-    logo: "E",
-    logoColor: "#06b6d4",
-    title: "خطط 5G الجديدة",
-    description: "إعلان تقني يبرز سرعة الشبكة مع مؤثرين إماراتيين",
-    platforms: ["Instagram", "Twitter", "YouTube"],
-    sector: "اتصالات",
-    views: "1.9M",
-    saved: 541,
-  },
-  {
-    brand: "أكواتيل",
-    logo: "Q",
-    logoColor: "#10b981",
-    title: "الصيف مع أكواتيل",
-    description: "حملة موسمية للمياه المعبأة تعتمد على الرياضة والطبيعة",
-    platforms: ["Snapchat", "Instagram"],
-    sector: "مواد استهلاكية",
-    views: "1.1M",
-    saved: 318,
-  },
-];
+const ads: { brand: string; logo: string; logoColor: string; title: string; description: string; platforms: string[]; sector: string; views: string; saved: number }[] = [];
 
 function PlatformTag({ name }: { name: string }) {
   return (

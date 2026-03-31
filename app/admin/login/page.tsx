@@ -79,8 +79,14 @@ export default function AdminLoginPage() {
       <div className="w-full max-w-sm">
         {/* Header */}
         <div className="text-center mb-8">
-          <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-lg font-black text-white mx-auto mb-4"
-            style={{ background: "#3b82f6" }}>AV</div>
+          <div className="flex justify-center mb-6">
+            <img
+              src="/logo.png"
+              alt="Mulhem"
+              className="h-20 w-auto object-contain"
+              onError={(e) => { e.currentTarget.style.display='none' }}
+            />
+          </div>
           <h1 className="text-2xl font-extrabold" style={{ color: "#1c1c1e" }}>لوحة الإدارة</h1>
           <p className="text-sm mt-1" style={{ color: "#6b7280" }}>
             {step === 1 ? "أدخل رقم الهاتف المسجّل" : "أدخل رمز التحقق"}

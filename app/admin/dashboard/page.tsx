@@ -24,33 +24,20 @@ const kpiIcons = [
 ];
 
 const kpiLabels = [
-  { label: "إجمالي المستخدمين", change: "+12%", up: true },
-  { label: "المشتركون Pro", change: "+8%", up: true },
-  { label: "الإيراد الشهري (MRR)", change: "+8.3%", up: true },
-  { label: "إعلانات مضافة", change: "+5", up: true },
-  { label: "استراتيجيات", change: "+3", up: true },
-  { label: "مؤثرون", change: "+12", up: true },
+  { label: "إجمالي المستخدمين" },
+  { label: "المشتركون Pro" },
+  { label: "الإيراد الشهري (MRR)" },
+  { label: "إعلانات مضافة" },
+  { label: "استراتيجيات" },
+  { label: "مؤثرون" },
 ];
 
-/* Simple bar chart */
-const revenueData = [
-  { month: "أكتوبر", value: 8200 }, { month: "نوفمبر", value: 9100 },
-  { month: "ديسمبر", value: 10800 }, { month: "يناير", value: 9500 },
-  { month: "فبراير", value: 11200 }, { month: "مارس", value: 12450 },
-];
-const maxRevenue = Math.max(...revenueData.map((d) => d.value));
+const revenueData: { month: string; value: number }[] = [];
+const maxRevenue = 1;
 
-/* User growth mock */
-const growthData = [320, 340, 380, 420, 390, 450, 480, 520, 490, 560, 580, 620, 610, 650, 680, 720, 700, 750, 780, 810, 790, 840, 870, 900, 920, 960, 980, 1020, 1100, 1247];
+const growthData: number[] = [];
 
-/* Platform distribution */
-const platformData = [
-  { name: "Meta", pct: 35, color: "#3b82f6" },
-  { name: "TikTok", pct: 28, color: "#ef4444" },
-  { name: "Snap", pct: 18, color: "#eab308" },
-  { name: "YouTube", pct: 12, color: "#ef4444" },
-  { name: "Instagram", pct: 7, color: "#a855f7" },
-];
+const platformData: { name: string; pct: number; color: string }[] = [];
 
 const quickActions = [
   { href: "/admin/ads", label: "إضافة إعلان", icon: "📢" },
@@ -103,10 +90,6 @@ export default function AdminDashboardPage() {
           <div key={i} className="rounded-2xl border p-4" style={{ background: "#eff6ff", borderColor: "#dbeafe" }}>
             <div className="flex items-center justify-between mb-2">
               <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: "#dbeafe" }}>{kpiIcons[i]}</div>
-              {kpisLoaded && (
-                <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full"
-                  style={{ background: k.up ? "#dbeafe" : "#fef2f2", color: k.up ? "#3b82f6" : "#ef4444" }}>{k.change}</span>
-              )}
             </div>
             {!kpisLoaded ? (
               <div className="h-7 w-16 rounded-lg animate-pulse mb-0.5" style={{ background: "#dbeafe" }} />
@@ -131,7 +114,9 @@ export default function AdminDashboardPage() {
               }} />
             ))}
           </div>
-          <p className="text-xs mt-2" style={{ color: "#6b7280" }}>اليوم: <span className="text-[#1c1c1e] font-bold">1,247</span></p>
+          {growthData.length > 0 && (
+            <p className="text-xs mt-2" style={{ color: "#6b7280" }}>اليوم: <span className="text-[#1c1c1e] font-bold">{growthData[growthData.length - 1]?.toLocaleString()}</span></p>
+          )}
         </div>
 
         {/* Revenue */}

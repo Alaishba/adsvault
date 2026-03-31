@@ -33,8 +33,14 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center px-4" style={{ background: "transparent" }}>
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-lg font-black text-white mx-auto mb-3"
-            style={{ background: "#2563eb" }}>AV</div>
+          <div className="flex justify-center mb-6">
+            <img
+              src="/logo.png"
+              alt="Mulhem"
+              className="h-24 w-auto object-contain"
+              onError={(e) => { e.currentTarget.style.display='none' }}
+            />
+          </div>
           <h1 className="text-2xl font-extrabold" style={{ color: "#ffffff" }}>تسجيل الدخول</h1>
           <p className="text-sm mt-1" style={{ color: "#94a3b8" }}>مرحباً بك مجدداً في Mulhem</p>
         </div>

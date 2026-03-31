@@ -80,7 +80,7 @@ function InfluencerModal({ inf, onClose }: { inf: Influencer; onClose: () => voi
             )}
             <div>
               <h2 className="text-xl font-black text-slate-900">{inf.name}</h2>
-              <p className="text-sm text-slate-700">{inf.category} · {inf.country}</p>
+              <p className="text-sm text-slate-700">{inf.category} {getCountryFlag(inf.country ?? "")}</p>
               <div className="flex gap-1 mt-1">
                 {(inf.platforms ?? []).map((p) => <PlatformBadge key={p} platform={p as Platform} />)}
               </div>
@@ -366,8 +366,8 @@ export default function InfluencersPage() {
                   </div>
                 )}
                 <div>
-                  <p className="font-black text-base transition-colors group-hover:text-blue-400 text-slate-900">{inf.name}</p>
-                  <p className="text-sm text-slate-700">{inf.category} · {inf.country}</p>
+                  <p className="font-black text-base transition-colors group-hover:text-blue-400 text-slate-900">{inf.name} {getCountryFlag(inf.country ?? "")}</p>
+                  <p className="text-sm text-slate-700">{inf.category}</p>
                 </div>
               </div>
 
@@ -389,11 +389,6 @@ export default function InfluencersPage() {
                 </div>
               </div>
 
-              {inf.country && (
-                <p className="flex justify-start text-xs text-slate-600 mt-2" dir="ltr">
-                  {getCountryFlag(inf.country)} {inf.country}
-                </p>
-              )}
               {!!inf.niche && (
                 <p className="text-xs text-slate-500 mt-1 text-left" dir="ltr">{inf.niche}</p>
               )}

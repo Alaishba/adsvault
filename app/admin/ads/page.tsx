@@ -5,11 +5,10 @@ import { type Ad } from "../../lib/mockData";
 import { saveAdminAd, deleteAdminAd, fetchAdminAds } from "../../actions/adminActions";
 import { uploadViaSignedUrl } from "../../lib/uploadViaSignedUrl";
 
-const platforms = ["Meta", "TikTok", "Snap", "YouTube", "Instagram"];
-const sectors = ["تجزئة", "اتصالات", "تجارة إلكترونية", "مواد استهلاكية", "خدمات مالية", "مطاعم", "عقارات", "تعليم"];
-const countries = ["السعودية", "الإمارات", "الكويت", "مصر", "قطر", "البحرين", "الأردن", "المغرب"];
-const seasons = ["عام", "رمضان", "صيف", "شتاء", "عيد", "العودة للمدرسة", "بلاك فرايدي"];
-const adGoals = ["تعزيز الوعي", "زيادة المبيعات", "تحويل مباشر", "بناء العلامة", "استقطاب عملاء"];
+const platforms = ["X", "TikTok", "Snapchat", "Instagram", "YouTube", "Google Ads"];
+const sectors = ["المطاعم والكافيهات", "الجمال والعناية", "الأزياء والموضة", "العقارات والاستثمار", "الصحة والتعليم", "السفر والترفيه", "المركبات والعناية", "التعليم والتدريب", "الإلكترونيات والتقنية"];
+const seasons = ["الأعياد", "رمضان", "الصيف", "الشتاء", "العودة للمدارس", "نهاية السنة", "عام/الكل"];
+const adGoals = ["الوعي", "زيارات وتفاعل", "جمع البيانات", "التحويل والمبيعات", "تحميل التطبيق", "اتخاذ إجراء"];
 const funnelOptions = [
   { value: "awareness", label: "وعي" },
   { value: "interest", label: "اهتمام" },
@@ -116,7 +115,18 @@ export default function AdminAdsPage() {
   );
 
   const openAdd = () => { setForm(emptyForm); setEditId(null); setImageFiles([]); setImagePreviews([]); setShowForm(true); };
-  const openEdit = (ad: Ad) => { setForm({ ...ad, is_pro_only: false, pro_analysis: { ...emptyProAnalysis }, featured: (ad as unknown as Record<string, boolean>).featured ?? false }); setEditId(ad.id); setImageFiles([]); setImagePreviews(ad.images ?? []); setShowForm(true); };
+  const openEdit = (ad: Ad) => {
+    const raw = ad as unknown as Record<string, unknown>;
+    setForm({
+      ...ad,
+      is_pro_only: !!raw.is_pro_only,
+      pro_analysis: raw.pro_analysis
+        ? { ...emptyProAnalysis, ...(raw.pro_analysis as ProAnalysis) }
+        : { ...emptyProAnalysis },
+      featured: (raw.featured as boolean) ?? false,
+    });
+    setEditId(ad.id); setImageFiles([]); setImagePreviews(ad.images ?? []); setShowForm(true);
+  };
   const handleDelete = async (id: string) => {
     const result = await deleteAdminAd(id);
     if ("error" in result) { window.alert("خطأ في الحذف: " + result.error); return; }
@@ -196,7 +206,7 @@ export default function AdminAdsPage() {
         brand_initial: form.brandInitial || form.brand?.[0] || "?",
         brand_color: form.brandColor || "#3b82f6",
         description: form.description || "", platform: form.platform || "Meta",
-        sector: form.sector || "", country: form.country || "",
+        sector: form.sector || "", country: "",
         season: form.season || "", ad_goal: form.ad_goal || "",
         funnel_stage: form.funnel_stage || "awareness",
         tags: form.tags ?? [], images,
@@ -256,7 +266,7 @@ export default function AdminAdsPage() {
           <table className="w-full text-sm">
             <thead>
               <tr style={{ background: "#eff6ff" }}>
-                {["العلامة", "العنوان", "القطاع", "المنصة", "البلد", "Pro فقط", "الإجراءات"].map((h) => (
+                {["العلامة", "العنوان", "القطاع", "المنصة", "Pro فقط", "الإجراءات"].map((h) => (
                   <th key={h} className="text-right px-5 py-3 text-xs font-bold uppercase tracking-wider" style={{ color: "#6b7280" }}>{h}</th>
                 ))}
               </tr>
@@ -268,7 +278,6 @@ export default function AdminAdsPage() {
                   <td className="px-5 py-3 max-w-[200px] truncate text-[#1c1c1e]">{ad.title}</td>
                   <td className="px-5 py-3" style={{ color: "#6b7280" }}>{ad.sector}</td>
                   <td className="px-5 py-3" style={{ color: "#6b7280" }}>{ad.platform}</td>
-                  <td className="px-5 py-3" style={{ color: "#6b7280" }}>{ad.country}</td>
                   <td className="px-5 py-3">
                     <span className="text-xs px-2 py-0.5 rounded-full font-bold" style={{ background: "#f3eeff", color: "#3b82f6" }}>Pro</span>
                   </td>
@@ -320,7 +329,6 @@ export default function AdminAdsPage() {
                 {[
                   { key: "platform", label: "المنصة", options: platforms },
                   { key: "sector", label: "القطاع", options: sectors },
-                  { key: "country", label: "البلد", options: countries },
                   { key: "season", label: "الموسم", options: seasons },
                   { key: "ad_goal", label: "هدف الإعلان", options: adGoals },
                 ].map(({ key, label, options }) => (
@@ -338,7 +346,7 @@ export default function AdminAdsPage() {
 
               {/* Funnel */}
               <div>
-                <label className={labelCls}>مرحلة القمع</label>
+                <label className={labelCls}>رحلة العميل</label>
                 <div className="flex gap-3">
                   {funnelOptions.map((f) => (
                     <label key={f.value} className="flex items-center gap-2 cursor-pointer">

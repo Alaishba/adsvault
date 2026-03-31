@@ -1,29 +1,4 @@
-const stats = [
-  {
-    value: "+12,000",
-    label: "إعلان محلل",
-    sublabel: "من كبرى العلامات التجارية",
-    icon: "◈",
-  },
-  {
-    value: "22",
-    label: "دولة عربية",
-    sublabel: "تغطية شاملة لمنطقة MENA",
-    icon: "◎",
-  },
-  {
-    value: "+85",
-    label: "قطاع تجاري",
-    sublabel: "من التقنية إلى العقارات",
-    icon: "◐",
-  },
-  {
-    value: "4.9★",
-    label: "تقييم المستخدمين",
-    sublabel: "رضا عملائنا أولويتنا",
-    icon: "◉",
-  },
-];
+const stats: { value: string; label: string; sublabel: string; icon: string }[] = [];
 
 export default function StatsRow() {
   return (

@@ -10,7 +10,7 @@ import { fetchStrategies } from "../lib/db";
 import { getImageUrl } from "../lib/imageUrl";
 
 const filterConfigs = [
-  { key: "sector", label: "القطاع", options: ["التجزئة", "العقارات", "مطاعم ومقاهي", "الصحة والتعليم", "السياحة والترفيه", "مالية/لوجستية"] },
+  { key: "sector", label: "القطاع", options: ["المطاعم والكافيهات", "الجمال والعناية", "الأزياء والموضة", "العقارات والاستثمار", "الصحة والتعليم", "السفر والترفيه", "المركبات والعناية", "التعليم والتدريب", "الإلكترونيات والتقنية"] },
   { key: "tag", label: "التصنيف", options: ["UGC", "مؤثرون", "اعلاني", "Branding", "Storytelling"] },
 ];
 
@@ -61,16 +61,12 @@ function StrategyModal({ s, onClose, isPro }: { s: Strategy; onClose: () => void
       <div className="w-full max-w-xl rounded-2xl shadow-2xl overflow-hidden overflow-y-auto"
         style={{ background: "#ced3de", animation: "modalIn 0.2s cubic-bezier(0.34,1.56,0.64,1)", maxHeight: "85vh", WebkitOverflowScrolling: "touch", touchAction: "pan-y", border: "1px solid rgba(206,211,222,0.8)" }}>
         <style>{`@keyframes modalIn{from{opacity:0;transform:scale(0.95) translateY(8px)}to{opacity:1;transform:scale(1) translateY(0)}}`}</style>
-        <div className="w-full h-40 flex items-center justify-center relative overflow-hidden" style={{ background: "#0f0f0f" }}>
+        <div className="w-full h-40 flex items-center justify-center relative overflow-hidden" style={{ background: "rgba(206,211,222,0.2)" }}>
           {s.thumbnail && !s.thumbnail.startsWith("#") ? (
             <img src={getImageUrl("strategy-covers", s.thumbnail)} alt={s.title}
               className="absolute inset-0 w-full h-full object-cover"
               onError={(e) => { e.currentTarget.style.display = "none"; }} />
           ) : null}
-          <div className="w-16 h-16 rounded-2xl flex items-center justify-center text-2xl font-black relative"
-            style={{ background: s.brandColor === "#000000" ? "#1a1a1a" : `${s.brandColor}22`, color: s.brandColor === "#000000" ? "#fff" : s.brandColor }}>
-            {s.brandInitial}
-          </div>
         </div>
         <div className="p-6">
           <div className="flex items-start justify-between mb-4">
@@ -203,22 +199,14 @@ export default function AnalysisPage() {
               <div key={s.id} onClick={() => setSelected(s)}
                 className="rounded-xl cursor-pointer group p-0 overflow-hidden relative bg-[#ced3de] border border-[#ced3de] transition-all duration-200 hover:shadow-md hover:scale-[1.02]">
                 {/* Cover image area */}
-                <div className="relative w-full h-48 overflow-hidden" style={{ background: "#0f0f0f" }}>
+                <div className="relative w-full h-48 overflow-hidden" style={{ background: "rgba(206,211,222,0.2)" }}>
                   {s.thumbnail && !s.thumbnail.startsWith("#") ? (
                     <img src={getImageUrl("strategy-covers", s.thumbnail)} alt={s.title}
                       className="absolute inset-0 w-full h-full object-cover"
                       onError={(e) => { e.currentTarget.style.display = "none"; }} />
                   ) : null}
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl font-black"
-                      style={{ background: s.brandColor === "#000000" ? "#1a1a1a" : `${s.brandColor}22`, color: s.brandColor === "#000000" ? "#fff" : s.brandColor }}>
-                      {s.brandInitial}
-                    </div>
-                  </div>
                   {/* Brand overlay */}
-                  <div className="absolute top-3 right-3 flex items-center gap-2">
-                    <div className="w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-black text-white"
-                      style={{ background: s.brandColor }}>{s.brandInitial}</div>
+                  <div className="absolute top-3 right-3">
                     <span className="text-xs font-bold text-white drop-shadow">{s.brand}</span>
                   </div>
                   {/* Date badge */}

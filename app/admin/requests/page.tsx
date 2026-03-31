@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { supabase, isSupabaseConfigured } from "../../lib/supabase";
 
 type RequestStatus = "جديد" | "قيد المراجعة" | "مكتمل";
@@ -35,26 +35,9 @@ interface SupportRequest {
   status: RequestStatus;
 }
 
-const mockContactRequests: ContactRequest[] = [
-  { id: "c1", name: "أحمد الراشد", email: "ahmed@company.sa", company: "شركة النور للتسويق", message: "نرغب في الاشتراك بخطة المؤسسات لفريق مكون من 15 شخص. نرجو التواصل لمناقشة التفاصيل.", created_at: "2026-03-18", status: "جديد" },
-  { id: "c2", name: "فاطمة العلي", email: "fatima@mediahouse.ae", company: "ميديا هاوس", message: "هل يمكنكم توفير عرض خاص للوكالات الإعلانية؟ لدينا أكثر من 20 عميل محتمل.", created_at: "2026-03-17", status: "قيد المراجعة" },
-  { id: "c3", name: "خالد المنصور", email: "khaled@brands.kw", company: "براندز الكويت", message: "نبحث عن شراكة استراتيجية لتوفير تحليلات الإعلانات لعملائنا في الخليج.", created_at: "2026-03-15", status: "جديد" },
-  { id: "c4", name: "نورة الحسن", email: "noura@digitalegy.com", company: "ديجيتال إيجي", message: "أريد معرفة المزيد عن إمكانيات التحليل المتقدم وكيف يمكن دمجها مع أدواتنا الحالية.", created_at: "2026-03-14", status: "مكتمل" },
-  { id: "c5", name: "سعود القحطاني", email: "saud@adagency.sa", company: "وكالة سعود الإعلانية", message: "هل تقدمون خصومات للاشتراكات السنوية؟ نحتاج اشتراك لـ 8 مستخدمين.", created_at: "2026-03-12", status: "جديد" },
-];
-
-const mockRemovalRequests: RemovalRequest[] = [
-  { id: "r1", name: "ليلى أحمد", email: "layla@brand.com", content_url: "https://mulhem.com/library/ad-2847", reason: "الإعلان يحتوي على علامتنا التجارية بدون إذن", created_at: "2026-03-19", status: "جديد" },
-  { id: "r2", name: "عمر السعيد", email: "omar@agency.ae", content_url: "https://mulhem.com/library/ad-1523", reason: "محتوى قديم ولم يعد يمثل حملتنا الحالية", created_at: "2026-03-16", status: "قيد المراجعة" },
-  { id: "r3", name: "هند الكاظمي", email: "hind@corp.bh", content_url: "https://mulhem.com/library/ad-3901", reason: "بيانات غير دقيقة في التحليل المرفق بالإعلان", created_at: "2026-03-10", status: "مكتمل" },
-];
-
-const mockSupportRequests: SupportRequest[] = [
-  { id: "s1", name: "محمد العتيبي", email: "mohammed@user.sa", request_type: "مشكلة تقنية", message: "لا أستطيع تحميل الصور في لوحة التحكم. تظهر رسالة خطأ عند رفع ملفات أكبر من 2MB.", created_at: "2026-03-19", status: "جديد" },
-  { id: "s2", name: "سارة الشمري", email: "sara@user.kw", request_type: "استفسار عام", message: "كيف يمكنني تصدير تقارير التحليل بصيغة PDF؟ لم أجد الخيار في لوحة التحكم.", created_at: "2026-03-18", status: "جديد" },
-  { id: "s3", name: "يوسف الدوسري", email: "yousef@user.ae", request_type: "مشكلة في الدفع", message: "تم خصم المبلغ من بطاقتي لكن لم يتم ترقية حسابي إلى Pro بعد مرور 24 ساعة.", created_at: "2026-03-17", status: "قيد المراجعة" },
-  { id: "s4", name: "ريم الفهد", email: "reem@user.qa", request_type: "اقتراح تحسين", message: "أقترح إضافة فلتر حسب اللغة في مكتبة الإعلانات لتسهيل البحث عن الإعلانات العربية.", created_at: "2026-03-15", status: "مكتمل" },
-];
+const emptyContactRequests: ContactRequest[] = [];
+const emptyRemovalRequests: RemovalRequest[] = [];
+const emptySupportRequests: SupportRequest[] = [];
 
 type TabKey = "contact" | "removal" | "support";
 
@@ -66,11 +49,21 @@ const statusColors: Record<RequestStatus, { bg: string; text: string }> = {
 
 export default function AdminRequestsPage() {
   const [activeTab, setActiveTab] = useState<TabKey>("contact");
-  const [contactRequests, setContactRequests] = useState<ContactRequest[]>(mockContactRequests);
-  const [removalRequests, setRemovalRequests] = useState<RemovalRequest[]>(mockRemovalRequests);
-  const [supportRequests, setSupportRequests] = useState<SupportRequest[]>(mockSupportRequests);
+  const [contactRequests, setContactRequests] = useState<ContactRequest[]>(emptyContactRequests);
+  const [removalRequests, setRemovalRequests] = useState<RemovalRequest[]>(emptyRemovalRequests);
+  const [supportRequests, setSupportRequests] = useState<SupportRequest[]>(emptySupportRequests);
   const [replyModalId, setReplyModalId] = useState<string | null>(null);
   const [replyText, setReplyText] = useState("");
+
+  useEffect(() => {
+    if (!isSupabaseConfigured()) return;
+    supabase.from("contact_requests").select("*").order("created_at", { ascending: false })
+      .then(({ data }: { data: Record<string, unknown>[] | null }) => { if (data) setContactRequests(data as unknown as ContactRequest[]); });
+    supabase.from("removal_requests").select("*").order("created_at", { ascending: false })
+      .then(({ data }: { data: Record<string, unknown>[] | null }) => { if (data) setRemovalRequests(data as unknown as RemovalRequest[]); });
+    supabase.from("support_requests").select("*").order("created_at", { ascending: false })
+      .then(({ data }: { data: Record<string, unknown>[] | null }) => { if (data) setSupportRequests(data as unknown as SupportRequest[]); });
+  }, []);
 
   const newContactCount = contactRequests.filter((r) => r.status === "جديد").length;
   const newRemovalCount = removalRequests.filter((r) => r.status === "جديد").length;
@@ -132,7 +125,7 @@ export default function AdminRequestsPage() {
   }
 
   function StatusBadge({ status }: { status: RequestStatus }) {
-    const colors = statusColors[status];
+    const colors = statusColors[status] ?? { bg: "#f3f5f9", text: "#6b7280" };
     return (
       <span
         style={{
